@@ -22,7 +22,7 @@ interface QuickAction {
   action: () => void;
 }
 
-export default function QuickActions_DISABLED() {
+export default function QuickActions() {
   const [showPostEditor, setShowPostEditor] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
 

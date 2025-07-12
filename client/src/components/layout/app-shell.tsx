@@ -3,7 +3,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./sidebar";
 import MobileNav from "./mobile-nav";
 import TopNavigation from "./top-navigation";
-// import QuickActions from "@/components/mobile/quick-actions"; // Temporarily disabled for debugging
+import QuickActions from "@/components/mobile/quick-actions";
 import MobileStatsBar from "@/components/mobile/mobile-stats-bar";
 import { cn } from "@/lib/utils";
 
@@ -132,8 +132,8 @@ export default function AppShell({ children }: AppShellProps) {
       {/* Mobile Bottom Navigation */}
       {isMobile && <MobileNav />}
       
-      {/* Quick Actions - Temporarily disabled for debugging */}
-      {/* <QuickActions /> */}
+      {/* Quick Actions */}
+      <QuickActions />
     </div>
   );
 }
