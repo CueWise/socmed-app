@@ -508,7 +508,23 @@ export default function PostEditorModal({
     setShowEmojiPicker(false);
   };
 
-  const commonEmojis = ['😀', '😂', '😍', '🤔', '👍', '👎', '❤️', '🎉', '💯', '🔥', '✅', '❌'];
+  const commonEmojis = [
+    // Smileys & Emotion
+    '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', 
+    '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏',
+    // Gestures & Hands
+    '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👋', '🤚',
+    '🖐️', '✋', '🖖', '👏', '🙌', '🤲', '🤝', '🙏', '✍️', '💪', '🦾', '🦿', '🦵', '🦶', '👂', '🦻',
+    // Hearts & Symbols
+    '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖',
+    '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈',
+    // Activities & Objects
+    '⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍',
+    '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛷', '⛸️', '🥌', '🎿',
+    // Food & Drink
+    '🍎', '🍌', '🍓', '🍇', '🍊', '🍋', '🍒', '🥭', '🍑', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦',
+    '🥒', '🌶️', '🌽', '🥕', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓'
+  ];
 
   const handleAddReply = (threadId: number) => {
     if (!replyText.trim()) return;
@@ -1117,16 +1133,18 @@ export default function PostEditorModal({
                     <Smile className="h-4 w-4" />
                   </Button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-1 z-20">
-                      {commonEmojis.map((emoji, index) => (
-                        <button
-                          key={index}
-                          onClick={() => addEmoji(emoji)}
-                          className="hover:bg-gray-100 rounded p-1 text-lg"
-                        >
-                          {emoji}
-                        </button>
-                      ))}
+                    <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-3 z-20 w-64 max-h-48 overflow-y-auto">
+                      <div className="grid grid-cols-8 gap-2">
+                        {commonEmojis.map((emoji, index) => (
+                          <button
+                            key={index}
+                            onClick={() => addEmoji(emoji)}
+                            className="hover:bg-gray-100 rounded p-2 text-lg flex items-center justify-center min-h-[2rem] min-w-[2rem]"
+                          >
+                            {emoji}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
