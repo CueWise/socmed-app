@@ -36,16 +36,18 @@ import {
 
 interface RichTextEditorProps {
   content?: string
-  onChange?: (html: string, markdown?: string) => void
+  onChange?: (content: string, isHtml?: boolean) => void
   placeholder?: string
   className?: string
+  onSend?: () => void
 }
 
 export default function RichTextEditor({
   content = '',
   onChange,
   placeholder = 'Start typing...',
-  className = ''
+  className = '',
+  onSend
 }: RichTextEditorProps) {
   const [showSource, setShowSource] = useState(false)
   const [sourceContent, setSourceContent] = useState('')
@@ -115,12 +117,28 @@ export default function RichTextEditor({
     ],
     content,
     onUpdate: ({ editor }) => {
-      const html = editor.getHTML()
-      onChange?.(html)
+      if (showToolbar) {
+        // Rich text mode - send HTML
+        const html = editor.getHTML()
+        onChange?.(html, true)
+      } else {
+        // Plain text mode - send text only
+        const text = editor.getText()
+        onChange?.(text, false)
+      }
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[80px] p-3 text-sm'
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[80px] p-3 text-sm',
+        'data-placeholder': placeholder
+      },
+      handleKeyDown: (view, event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault()
+          handleSend()
+          return true
+        }
+        return false
       }
     }
   })
@@ -152,6 +170,11 @@ export default function RichTextEditor({
     setShowLinkInput(false)
   }, [editor, linkUrl])
 
+  const clearEditor = useCallback(() => {
+    if (!editor) return
+    editor.commands.clearContent()
+  }, [editor])
+
   const addImage = useCallback(() => {
     if (!editor || !imageUrl) return
     
@@ -164,6 +187,15 @@ export default function RichTextEditor({
     if (!editor) return
     editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
   }, [editor])
+
+  // Handle clearing editor after sending
+  const handleSend = useCallback(() => {
+    if (onSend) {
+      onSend()
+      // Clear editor after sending
+      setTimeout(() => clearEditor(), 100)
+    }
+  }, [onSend, clearEditor])
 
   if (!editor) {
     return null
