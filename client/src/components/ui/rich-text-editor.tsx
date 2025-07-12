@@ -129,7 +129,7 @@ export default function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[80px] p-3 text-sm',
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[50px] max-h-[100px] p-2 text-sm',
         'data-placeholder': placeholder
       },
       handleKeyDown: (view, event) => {
@@ -190,13 +190,16 @@ export default function RichTextEditor({
 
   // Handle clearing editor after sending
   const handleSend = useCallback(() => {
-    if (onSend) {
+    if (onSend && editor) {
+      // Clear editor first, then call onSend
+      editor.commands.clearContent()
       onSend()
-      // Clear editor after sending - use editor commands directly
-      if (editor) {
-        editor.commands.clearContent()
-        editor.commands.focus()
-      }
+      // Refocus after a brief delay
+      setTimeout(() => {
+        if (editor) {
+          editor.commands.focus()
+        }
+      }, 50)
     }
   }, [onSend, editor])
 
@@ -423,7 +426,7 @@ export default function RichTextEditor({
           <textarea
             value={sourceContent}
             onChange={(e) => setSourceContent(e.target.value)}
-            className="w-full min-h-[80px] p-3 font-mono text-sm border-none resize-none focus:outline-none"
+            className="w-full min-h-[50px] max-h-[100px] p-2 font-mono text-sm border-none resize-none focus:outline-none"
             placeholder="HTML source..."
           />
         ) : (
