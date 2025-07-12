@@ -243,7 +243,10 @@ export default function PostEditorModal({
         ? prev.filter(p => p !== platformId)
         : [...prev, platformId]
     );
+    setHasUnsavedChanges(true);
   };
+
+
 
   const handleGenerateCaption = () => {
     if (!content.trim()) {
@@ -387,41 +390,55 @@ export default function PostEditorModal({
                 : "Create New Post"
               }
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="absolute right-4 top-4"
-              onClick={handleClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </DialogHeader>
 
         <div className="space-y-6">
           {/* Platform Selection */}
           <div>
             <Label className="text-sm font-medium mb-3 block">Select Platforms</Label>
-            <div className="flex flex-wrap gap-3">
-              {platforms.map((platform) => {
-                const IconComponent = platform.icon;
-                return (
-                  <div key={platform.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={platform.id}
-                      checked={selectedPlatforms.includes(platform.id)}
-                      onCheckedChange={() => handlePlatformToggle(platform.id)}
-                    />
-                    <Label 
-                      htmlFor={platform.id}
-                      className="flex items-center space-x-2 cursor-pointer"
+            <Select>
+              <SelectTrigger className="w-full">
+                <SelectValue>
+                  {selectedPlatforms.length > 0 ? (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {selectedPlatforms.map((platformId) => {
+                        const platform = platforms.find(p => p.id === platformId);
+                        if (!platform) return null;
+                        const IconComponent = platform.icon;
+                        return (
+                          <div key={platformId} className="flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-md">
+                            <IconComponent className={`w-4 h-4 ${platform.color}`} />
+                            <span className="text-sm">{platform.name}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <span className="text-gray-500">Choose platforms</span>
+                  )}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {platforms.map((platform) => {
+                  const IconComponent = platform.icon;
+                  const isSelected = selectedPlatforms.includes(platform.id);
+                  return (
+                    <div 
+                      key={platform.id}
+                      className="flex items-center gap-2 w-full p-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handlePlatformToggle(platform.id)}
                     >
-                      <IconComponent className={`w-5 h-5 ${platform.color}`} />
-                      <span className="text-sm">{platform.name}</span>
-                    </Label>
-                  </div>
-                );
-              })}
-            </div>
+                      <Checkbox
+                        checked={isSelected}
+                        readOnly
+                      />
+                      <IconComponent className={`w-4 h-4 ${platform.color}`} />
+                      <span>{platform.name}</span>
+                    </div>
+                  );
+                })}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Status Selection */}
