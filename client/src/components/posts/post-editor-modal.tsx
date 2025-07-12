@@ -761,127 +761,110 @@ export default function PostEditorModal({
           <DialogTitle>Notes & Comments</DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto space-y-4">
-          {/* Note Threads */}
+        <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 rounded-lg">
+          {/* Note Messages - Slack Style */}
           {noteThreads.map((thread) => (
-            <div key={thread.id} className="border rounded-lg p-4 space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <span className="font-medium">{thread.author}</span>
-                    <span>•</span>
-                    <span>{new Date(thread.timestamp).toLocaleString()}</span>
+            <div key={thread.id} className="group hover:bg-gray-100 rounded p-2 transition-colors">
+              <div className="flex items-start gap-3">
+                {/* User Avatar */}
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium mt-1">
+                  {thread.author.charAt(0)}
+                </div>
+                
+                <div className="flex-1 min-w-0">
+                  {/* Message Header */}
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <span className="font-medium text-gray-900 text-sm">{thread.author}</span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(thread.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
-                  <p className="text-sm mb-3">{thread.text}</p>
+                  
+                  {/* Message Content */}
+                  <div className="text-sm text-gray-800 leading-relaxed">
+                    {thread.text.split('\n').map((line, index) => (
+                      <div key={index}>
+                        {line.startsWith('**') && line.endsWith('**') ? (
+                          <strong>{line.slice(2, -2)}</strong>
+                        ) : line.startsWith('*') && line.endsWith('*') ? (
+                          <em>{line.slice(1, -1)}</em>
+                        ) : line.startsWith('• ') ? (
+                          <div className="ml-4">• {line.slice(2)}</div>
+                        ) : line.match(/^\d+\. /) ? (
+                          <div className="ml-4">{line}</div>
+                        ) : (
+                          line
+                        )}
+                      </div>
+                    ))}
+                  </div>
                   
                   {/* Attachments */}
                   {thread.attachments.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-3">
+                    <div className="flex flex-wrap gap-2 mt-2">
                       {thread.attachments.map((attachment: any) => {
                         const FileIcon = getFileIcon(attachment.type);
                         return (
-                          <div key={attachment.id} className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1 text-xs">
-                            <FileIcon className="h-3 w-3" />
-                            <span>{attachment.name}</span>
-                            <span className="text-gray-500">({Math.round(attachment.size / 1024)}KB)</span>
+                          <div key={attachment.id} className="flex items-center gap-2 bg-white border rounded px-3 py-2 text-xs shadow-sm">
+                            <FileIcon className="h-4 w-4 text-gray-500" />
+                            <span className="font-medium">{attachment.name}</span>
+                            <span className="text-gray-400">({Math.round(attachment.size / 1024)}KB)</span>
                           </div>
                         );
                       })}
                     </div>
                   )}
-                  
-                  {/* File Upload */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="file"
-                      multiple
-                      onChange={(e) => e.target.files && handleFileUpload(thread.id, e.target.files)}
-                      className="hidden"
-                      id={`file-upload-${thread.id}`}
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi"
-                    />
-                    <label htmlFor={`file-upload-${thread.id}`} className="cursor-pointer">
-                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
-                        <Paperclip className="h-3 w-3 mr-1" />
-                        Attach
-                      </Button>
-                    </label>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setReplyingTo(thread.id)}
-                      className="text-gray-500 hover:text-gray-700"
-                    >
-                      <Reply className="h-3 w-3 mr-1" />
-                      Reply
-                    </Button>
-                  </div>
                 </div>
               </div>
               
               {/* Replies */}
               {thread.replies.length > 0 && (
-                <div className="ml-6 space-y-2 border-l-2 border-gray-200 pl-4">
+                <div className="ml-11 mt-3 space-y-2">
                   {thread.replies.map((reply: any) => (
-                    <div key={reply.id} className="text-sm">
-                      <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
-                        <span className="font-medium">{reply.author}</span>
-                        <span>•</span>
-                        <span>{new Date(reply.timestamp).toLocaleString()}</span>
+                    <div key={reply.id} className="flex items-start gap-2">
+                      <div className="w-6 h-6 bg-gray-400 rounded-full flex items-center justify-center text-white text-xs font-medium">
+                        {reply.author.charAt(0)}
                       </div>
-                      <p>{reply.text}</p>
+                      <div className="flex-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-medium text-gray-900 text-xs">{reply.author}</span>
+                          <span className="text-xs text-gray-500">
+                            {new Date(reply.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-700 mt-1">{reply.text}</div>
+                      </div>
                     </div>
                   ))}
-                </div>
-              )}
-              
-              {/* Reply Input */}
-              {replyingTo === thread.id && (
-                <div className="ml-6 flex gap-2">
-                  <Textarea
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder="Write a reply..."
-                    className="flex-1 min-h-[60px]"
-                  />
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      size="sm"
-                      onClick={() => handleAddReply(thread.id)}
-                      disabled={!replyText.trim()}
-                    >
-                      <Send className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setReplyingTo(null)}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
                 </div>
               )}
             </div>
           ))}
           
           {noteThreads.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <StickyNote className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-              <p>No notes yet. Add a note to start the conversation.</p>
+            <div className="text-center py-12 text-gray-500">
+              <StickyNote className="h-16 w-16 mx-auto mb-4 text-gray-300" />
+              <p className="text-lg font-medium mb-2">No messages yet</p>
+              <p className="text-sm">Start the conversation with your team</p>
             </div>
           )}
         </div>
         
-        {/* Add New Note */}
-        <div className="border-t pt-4 space-y-3">
+        {/* Add New Message */}
+        <div className="border-t pt-4 bg-white">
           <div className="space-y-2">
             <Textarea
               id="new-note-textarea"
               value={newNoteText}
               onChange={(e) => setNewNoteText(e.target.value)}
-              placeholder="Add a note or comment..."
-              className="min-h-[80px]"
+              placeholder="Type a message..."
+              className="min-h-[60px] border-2 focus:border-primary resize-none"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  if (newNoteText.trim()) handleAddNote();
+                }
+              }}
             />
             
             {/* New Note Attachments */}
@@ -973,10 +956,9 @@ export default function PostEditorModal({
                 <Button
                   onClick={handleAddNote}
                   disabled={!newNoteText.trim()}
-                  className="bg-primary hover:bg-primary/90"
+                  className="bg-primary hover:bg-primary/90 px-3"
                 >
-                  <Send className="h-4 w-4 mr-2" />
-                  Add Note
+                  <Send className="h-4 w-4" />
                 </Button>
               </div>
             </div>
