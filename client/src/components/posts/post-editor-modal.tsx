@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -651,6 +652,12 @@ export default function PostEditorModal({
                 : "Create New Post"
               }
             </DialogTitle>
+            <DialogDescription>
+              {initialData 
+                ? "Edit your social media post content, platforms, and scheduling settings."
+                : "Create and schedule your social media post across multiple platforms."
+              }
+            </DialogDescription>
           </DialogHeader>
 
         <div className="space-y-6">
@@ -906,14 +913,14 @@ export default function PostEditorModal({
       <>
         {/* Backdrop */}
         <div 
-          className="fixed inset-0 bg-black/50 z-40"
+          className="fixed inset-0 bg-black/30 z-[60]"
           onClick={() => setShowNotesModal(false)}
         />
         
         {/* Slide-in Panel */}
-        <div className={`fixed top-0 right-0 h-full w-full max-w-2xl bg-white z-50 transform transition-transform duration-300 ease-in-out ${
+        <div className={`fixed top-4 right-4 bottom-4 w-96 bg-white z-[70] transform transition-transform duration-300 ease-in-out ${
           showNotesModal ? 'translate-x-0' : 'translate-x-full'
-        } flex flex-col`}>
+        } flex flex-col rounded-lg shadow-2xl border`}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b bg-white">
             <h2 className="text-lg font-semibold">Notes & Comments</h2>
