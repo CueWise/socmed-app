@@ -901,15 +901,35 @@ export default function PostEditorModal({
       </DialogContent>
     </Dialog>
 
-    {/* Notes Thread Modal */}
-    <Dialog open={showNotesModal} onOpenChange={setShowNotesModal}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Notes & Comments</DialogTitle>
-        </DialogHeader>
+    {/* Notes Slide-in Panel */}
+    {showNotesModal && (
+      <>
+        {/* Backdrop */}
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => setShowNotesModal(false)}
+        />
         
-        <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 rounded-lg">
-          {/* Note Messages - Slack Style */}
+        {/* Slide-in Panel */}
+        <div className={`fixed top-0 right-0 h-full w-full max-w-2xl bg-white z-50 transform transition-transform duration-300 ease-in-out ${
+          showNotesModal ? 'translate-x-0' : 'translate-x-full'
+        } flex flex-col`}>
+          {/* Header */}
+          <div className="flex items-center justify-between p-4 border-b bg-white">
+            <h2 className="text-lg font-semibold">Notes & Comments</h2>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowNotesModal(false)}
+              className="h-8 w-8 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4">
+            {/* Note Messages - Slack Style */}
           {noteThreads.map((thread) => (
             <div key={thread.id} className="group hover:bg-gray-100 rounded p-2 transition-colors">
               <div className="flex items-start gap-3">
@@ -1320,12 +1340,11 @@ export default function PostEditorModal({
                 >
                   <Send className="h-4 w-4" />
                 </Button>
-              </div>
             </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </>
+    )}
 
     {/* Platform Selection Modal */}
     <Dialog open={showPlatformModal} onOpenChange={setShowPlatformModal}>
