@@ -1070,7 +1070,11 @@ export default function PostEditorModal({
           <div className="space-y-2">
             <RichTextEditor
               content={newNoteText}
-              onChange={(html) => setNewNoteText(html)}
+              onChange={(content, isHtml) => {
+                // Always just store the content as is
+                setNewNoteText(content)
+              }}
+              onSend={handleAddNote}
               placeholder="Type a message..."
               className="min-h-[80px]"
             />
