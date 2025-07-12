@@ -102,7 +102,7 @@ export default function QuickActions() {
   return (
     <>
       {/* Floating Action Button with expandable menu */}
-      <div className="fixed bottom-20 right-4 z-50 md:hidden">
+      <div className="fixed bottom-20 right-4 z-50 md:hidden" style={{ isolation: 'isolate' }}>
         {/* Overlay for expanded state */}
         {isExpanded && (
           <div 
@@ -148,34 +148,29 @@ export default function QuickActions() {
         </div>
 
         {/* Main FAB */}
-        <div className="relative">
-          <Button
-            size="icon"
-            className={cn(
-              "w-14 h-14 rounded-full shadow-lg transition-all duration-300 text-white z-50 relative",
-              mainAction.color
-            )}
-            onClick={() => {
+        <Button
+          size="icon"
+          className={cn(
+            "w-14 h-14 rounded-full shadow-lg transition-all duration-300 text-white z-50 relative",
+            mainAction.color,
+            isExpanded && "rotate-45"
+          )}
+          onClick={() => {
+            if (isExpanded) {
+              setIsExpanded(false);
+            } else {
               // Primary action: create post
               mainAction.action();
-            }}
-          >
-            <Plus className="h-6 w-6" />
-          </Button>
-          
-          {/* Small expand button */}
-          <Button
-            size="icon"
-            className={cn(
-              "w-8 h-8 rounded-full shadow-md transition-all duration-300 text-white absolute -top-2 -left-2 z-50",
-              "bg-gray-600 hover:bg-gray-700",
-              isExpanded && "rotate-45"
-            )}
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            <Plus className="h-4 w-4" />
-          </Button>
-        </div>
+            }
+          }}
+          onDoubleClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsExpanded(!isExpanded);
+          }}
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
       </div>
 
       {/* Quick Action Bar for larger screens */}

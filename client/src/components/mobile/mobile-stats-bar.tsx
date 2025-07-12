@@ -12,7 +12,9 @@ interface StatItem {
 
 export default function MobileStatsBar() {
   const { selectedBrand } = useBrand();
-  const { data: analyticsSummary } = useAnalyticsSummary(selectedBrand?.id);
+  // Temporarily disabled to stop infinite loop
+  // const { data: analyticsSummary } = useAnalyticsSummary(selectedBrand?.id);
+  const analyticsSummary = null;
 
   const stats: StatItem[] = [
     {
