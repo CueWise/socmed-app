@@ -106,14 +106,14 @@ export default function QuickActions() {
         {/* Overlay for expanded state */}
         {isExpanded && (
           <div 
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
             onClick={() => setIsExpanded(false)}
           />
         )}
         
         {/* Secondary Actions */}
         <div className={cn(
-          "absolute bottom-16 right-0 space-y-3 transition-all duration-300",
+          "absolute bottom-16 right-0 space-y-3 transition-all duration-300 z-50",
           isExpanded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"
         )}>
           {secondaryActions.map((action, index) => {
@@ -148,23 +148,34 @@ export default function QuickActions() {
         </div>
 
         {/* Main FAB */}
-        <Button
-          size="icon"
-          className={cn(
-            "w-14 h-14 rounded-full shadow-lg transition-all duration-300 text-white",
-            mainAction.color,
-            isExpanded && "rotate-45"
-          )}
-          onClick={() => {
-            if (isExpanded) {
-              setIsExpanded(false);
-            } else {
-              setIsExpanded(true);
-            }
-          }}
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
+        <div className="relative">
+          <Button
+            size="icon"
+            className={cn(
+              "w-14 h-14 rounded-full shadow-lg transition-all duration-300 text-white z-50 relative",
+              mainAction.color
+            )}
+            onClick={() => {
+              // Primary action: create post
+              mainAction.action();
+            }}
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
+          
+          {/* Small expand button */}
+          <Button
+            size="icon"
+            className={cn(
+              "w-8 h-8 rounded-full shadow-md transition-all duration-300 text-white absolute -top-2 -left-2 z-50",
+              "bg-gray-600 hover:bg-gray-700",
+              isExpanded && "rotate-45"
+            )}
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Quick Action Bar for larger screens */}
