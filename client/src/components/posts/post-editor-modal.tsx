@@ -53,6 +53,7 @@ export default function PostEditorModal({
       : "14:00"
   );
   const [hashtags, setHashtags] = useState<string[]>(initialData?.hashtags || []);
+  const [mediaUrls, setMediaUrls] = useState<string[]>(initialData?.mediaUrls || []);
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [isGeneratingHashtags, setIsGeneratingHashtags] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
@@ -66,6 +67,7 @@ export default function PostEditorModal({
       setContent(initialData.content || "");
       setSelectedPlatforms(initialData.platforms || ["instagram"]);
       setHashtags(initialData.hashtags || []);
+      setMediaUrls(initialData.mediaUrls || []);
       
       if (initialData.scheduledAt) {
         const scheduleDate = new Date(initialData.scheduledAt);
@@ -77,6 +79,7 @@ export default function PostEditorModal({
       setContent("");
       setSelectedPlatforms(["instagram"]);
       setHashtags([]);
+      setMediaUrls([]);
       setScheduledDate(defaultDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0]);
       setScheduledTime("14:00");
     }
@@ -247,6 +250,7 @@ export default function PostEditorModal({
     setScheduledDate(new Date().toISOString().split('T')[0]);
     setScheduledTime("14:00");
     setHashtags([]);
+    setMediaUrls([]);
   };
 
   const handleSubmit = (action: 'draft' | 'review' | 'schedule') => {
@@ -273,6 +277,7 @@ export default function PostEditorModal({
       platforms: selectedPlatforms,
       scheduledAt: new Date(`${scheduledDate}T${scheduledTime}`),
       hashtags,
+      mediaUrls,
     };
 
     createPostMutation.mutate(postData);
@@ -282,7 +287,12 @@ export default function PostEditorModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Post</DialogTitle>
+          <DialogTitle>
+            {initialData 
+              ? `Edit: ${initialData.content?.split('.')[0] || initialData.content?.split('!')[0] || initialData.content?.slice(0, 50)}...`
+              : "Create New Post"
+            }
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -374,6 +384,39 @@ export default function PostEditorModal({
           {/* Media Upload */}
           <div>
             <Label className="text-sm font-medium mb-2 block">Media</Label>
+            
+            {/* Show existing media if editing */}
+            {mediaUrls.length > 0 && (
+              <div className="mb-4">
+                <p className="text-sm text-gray-600 mb-2">Current media:</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {mediaUrls.map((url, index) => (
+                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                      {url.includes('.mp4') || url.includes('video') ? (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                          <span className="text-xs text-gray-500">Video</span>
+                        </div>
+                      ) : (
+                        <img 
+                          src={url} 
+                          alt={`Media ${index + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = `data:image/svg+xml;base64,${btoa(`
+                              <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="100" height="100" fill="#f3f4f6"/>
+                                <text x="50" y="50" font-family="Arial" font-size="12" fill="#9ca3af" text-anchor="middle" dy="4">Image</text>
+                              </svg>
+                            `)}`;
+                          }}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
             <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
               <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <p className="text-sm text-gray-600 dark:text-gray-400">
