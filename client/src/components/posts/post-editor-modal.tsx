@@ -41,7 +41,7 @@ interface PostData {
   scheduledAt?: Date;
   mediaUrls?: string[];
   hashtags?: string[];
-  status?: string;
+  status: string;
   notes?: string;
 }
 
@@ -130,11 +130,11 @@ export default function PostEditorModal({
   ];
 
   const statusOptions = [
-    { value: "draft", label: "Draft" },
-    { value: "review", label: "Send for review" },
-    { value: "pending_approval", label: "Submit for approval" },
-    { value: "scheduled", label: "Schedule" },
-    { value: "published", label: "Publish now" },
+    { value: "draft", label: "Save as Draft" },
+    { value: "review", label: "Send for Review" },
+    { value: "pending_approval", label: "Submit for Approval" },
+    { value: "scheduled", label: "Schedule Post" },
+    { value: "published", label: "Publish Now" },
   ];
 
   const createPostMutation = useMutation({
@@ -326,7 +326,7 @@ export default function PostEditorModal({
   };
 
   const handleSaveAndClose = () => {
-    handleSubmit('draft');
+    handleSubmit();
     setShowUnsavedDialog(false);
   };
 
@@ -334,6 +334,15 @@ export default function PostEditorModal({
     setHasUnsavedChanges(false);
     setShowUnsavedDialog(false);
     onOpenChange(false);
+  };
+
+  const handleStatusChange = (newStatus: string) => {
+    setStatus(newStatus);
+    
+    // Automatically trigger the action based on status selection
+    setTimeout(() => {
+      handleSubmit();
+    }, 100); // Small delay to ensure state is updated
   };
 
   const handleSubmit = (action?: 'draft' | 'review' | 'schedule') => {
@@ -361,6 +370,7 @@ export default function PostEditorModal({
       hashtags,
       mediaUrls,
       notes: notes.trim(),
+      status: status,
     };
 
     createPostMutation.mutate(postData);
@@ -417,9 +427,9 @@ export default function PostEditorModal({
           {/* Status Selection */}
           <div>
             <Label className="text-sm font-medium mb-3 block">Status</Label>
-            <Select value={status} onValueChange={setStatus}>
+            <Select value={status} onValueChange={handleStatusChange}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select status" />
+                <SelectValue placeholder="Select action" />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((option) => (
@@ -606,26 +616,18 @@ export default function PostEditorModal({
         {/* Modal Actions */}
         <div className="flex justify-end space-x-3 pt-6 border-t">
           <Button
-            variant="ghost"
-            onClick={() => handleSubmit('draft')}
-            disabled={createPostMutation.isPending}
-          >
-            Save Draft
-          </Button>
-          <Button
             variant="outline"
-            onClick={() => handleSubmit('review')}
+            onClick={handleClose}
             disabled={createPostMutation.isPending}
-            className="bg-orange-50 border-orange-200 text-orange-700 hover:bg-orange-100"
           >
-            Submit for Review
+            Cancel
           </Button>
           <Button
-            onClick={() => handleSubmit('schedule')}
-            disabled={createPostMutation.isPending}
+            onClick={() => handleSubmit()}
+            disabled={createPostMutation.isPending || !content.trim() || selectedPlatforms.length === 0}
             className="bg-primary hover:bg-primary/90"
           >
-            {createPostMutation.isPending ? "Creating..." : "Schedule Post"}
+            {createPostMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </DialogContent>
