@@ -1102,83 +1102,30 @@ export default function PostEditorModal({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 {/* Attachment Button */}
+
                 <input
                   type="file"
-                  multiple
-                  onChange={(e) => e.target.files && handleNewNoteFileUpload(e.target.files)}
+                  id="mobile-file-upload"
                   className="hidden"
-                  id="new-note-file-upload"
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi"
+                  accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                  multiple
+                  capture="environment"
+                  onChange={(e) => {
+                    if (e.target.files) {
+                      handleNewNoteFileUpload(e.target.files);
+                    }
+                  }}
                 />
-                <div className="relative">
+                <label htmlFor="mobile-file-upload" className="cursor-pointer">
                   <Button
                     variant="ghost"
                     size="sm"
                     type="button"
                     className="text-gray-500 hover:text-gray-700"
-                    onClick={() => {
-                      const dropdown = document.getElementById('upload-dropdown');
-                      if (dropdown) {
-                        dropdown.classList.toggle('hidden');
-                      }
-                    }}
                   >
                     <Paperclip className="h-4 w-4" />
                   </Button>
-                  <div id="upload-dropdown" className="hidden absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg z-10 py-1 w-48">
-                    <label htmlFor="photo-gallery-upload" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
-                      <ImageIcon className="h-4 w-4" />
-                      Photo Gallery
-                    </label>
-                    <input
-                      type="file"
-                      id="photo-gallery-upload"
-                      className="hidden"
-                      accept="image/*"
-                      multiple
-                      onChange={(e) => {
-                        if (e.target.files) {
-                          handleNewNoteFileUpload(e.target.files);
-                          document.getElementById('upload-dropdown')?.classList.add('hidden');
-                        }
-                      }}
-                    />
-                    <label htmlFor="video-upload" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
-                      <Video className="h-4 w-4" />
-                      Photo/Video
-                    </label>
-                    <input
-                      type="file"
-                      id="video-upload"
-                      className="hidden"
-                      accept="image/*,video/*"
-                      multiple
-                      onChange={(e) => {
-                        if (e.target.files) {
-                          handleNewNoteFileUpload(e.target.files);
-                          document.getElementById('upload-dropdown')?.classList.add('hidden');
-                        }
-                      }}
-                    />
-                    <label htmlFor="file-upload" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
-                      <FileText className="h-4 w-4" />
-                      Upload Files
-                    </label>
-                    <input
-                      type="file"
-                      id="file-upload"
-                      className="hidden"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
-                      multiple
-                      onChange={(e) => {
-                        if (e.target.files) {
-                          handleNewNoteFileUpload(e.target.files);
-                          document.getElementById('upload-dropdown')?.classList.add('hidden');
-                        }
-                      }}
-                    />
-                  </div>
-                </div>
+                </label>
                 
                 {/* Text Formatting Buttons */}
                 <Button
