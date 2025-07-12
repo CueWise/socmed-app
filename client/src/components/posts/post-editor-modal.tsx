@@ -289,7 +289,7 @@ export default function PostEditorModal({
         <DialogHeader>
           <DialogTitle>
             {initialData 
-              ? `Edit: ${initialData.content?.split('.')[0] || initialData.content?.split('!')[0] || initialData.content?.slice(0, 50)}...`
+              ? `${initialData.content?.split('.')[0] || initialData.content?.split('!')[0] || initialData.content?.slice(0, 50)}...`
               : "Create New Post"
             }
           </DialogTitle>
