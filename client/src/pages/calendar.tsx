@@ -252,6 +252,42 @@ export default function Calendar() {
                         {new Date(post.scheduledAt!).toLocaleTimeString()}
                       </span>
                     </div>
+                    {/* Media Preview */}
+                    {post.mediaUrls && post.mediaUrls.length > 0 && (
+                      <div className="mb-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          {post.mediaUrls.slice(0, 4).map((url, index) => (
+                            <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                              {url.includes('video') ? (
+                                <div className="w-full h-full flex items-center justify-center bg-gray-200">
+                                  <span className="text-xs text-gray-500">Video</span>
+                                </div>
+                              ) : (
+                                <img 
+                                  src={url} 
+                                  alt={`Media ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = `data:image/svg+xml;base64,${btoa(`
+                                      <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="100" height="100" fill="#f3f4f6"/>
+                                        <text x="50" y="50" font-family="Arial" font-size="12" fill="#9ca3af" text-anchor="middle" dy="4">Image</text>
+                                      </svg>
+                                    `)}`;
+                                  }}
+                                />
+                              )}
+                              {post.mediaUrls.length > 4 && index === 3 && (
+                                <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                  <span className="text-white text-xs font-medium">+{post.mediaUrls.length - 4}</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
                     <p className="text-sm text-gray-900 dark:text-gray-100 mb-2">
                       {post.content.slice(0, 150)}...
                     </p>
@@ -264,7 +300,14 @@ export default function Calendar() {
                       )}>
                         {post.status.replace('_', ' ')}
                       </span>
-                      <Button variant="ghost" size="sm">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          setShowPostEditor(true);
+                          // TODO: Pass post data to editor for editing
+                        }}
+                      >
                         Edit
                       </Button>
                     </div>
