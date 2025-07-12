@@ -3,7 +3,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import Sidebar from "./sidebar";
 import MobileNav from "./mobile-nav";
 import TopNavigation from "./top-navigation";
-import QuickActions from "@/components/mobile/quick-actions";
+// import QuickActions from "@/components/mobile/quick-actions"; // Temporarily disabled for debugging
 import MobileStatsBar from "@/components/mobile/mobile-stats-bar";
 import { cn } from "@/lib/utils";
 
