@@ -28,6 +28,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import { cn } from "@/lib/utils";
 import RichTextEditor from "@/components/ui/rich-text-editor";
 
 interface PostEditorModalProps {
@@ -155,6 +156,49 @@ export default function PostEditorModal({
     { value: "pending_approval", label: "Submit for Approval" },
     { value: "scheduled", label: "Schedule Post" },
     { value: "published", label: "Publish Now" },
+  ];
+
+  const emojiCategories = [
+    {
+      name: "Smileys & People",
+      icon: "😀",
+      emojis: ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃", "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜", "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟", "😕", "🙁", "😣", "😖", "😫", "😩", "🥺", "😢", "😭", "😤", "😠", "😡", "🤬", "🤯", "😳", "🥵", "🥶", "😱", "😨", "😰", "😥", "😓", "🤗", "🤔", "🤭", "🤫", "🤥", "😶", "😐", "😑", "😬", "🙄", "😯", "😦", "😧", "😮", "😲", "🥱", "😴", "🤤", "😪", "😵", "🤐", "🥴", "🤢", "🤮", "🤧", "😷", "🤒", "🤕", "🤑", "🤠", "😈", "👿", "👹", "👺", "🤡", "💩", "👻", "💀", "☠️", "👽", "👾", "🤖", "🎃", "😺", "😸", "😹", "😻", "😼", "😽", "🙀", "😿", "😾"]
+    },
+    {
+      name: "Animals & Nature",
+      icon: "🐶",
+      emojis: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐷", "🐽", "🐸", "🐵", "🙈", "🙉", "🙊", "🐒", "🐔", "🐧", "🐦", "🐤", "🐣", "🐥", "🦆", "🦅", "🦉", "🦇", "🐺", "🐗", "🐴", "🦄", "🐝", "🐛", "🦋", "🐌", "🐞", "🐜", "🦟", "🦗", "🕷️", "🕸️", "🦂", "🐢", "🐍", "🦎", "🦖", "🦕", "🐙", "🦑", "🦐", "🦞", "🦀", "🐡", "🐠", "🐟", "🐬", "🐳", "🐋", "🦈", "🐊", "🐅", "🐆", "🦓", "🦍", "🦧", "🐘", "🦛", "🦏", "🐪", "🐫", "🦒", "🦘", "🐃", "🐂", "🐄", "🐎", "🐖", "🐏", "🐑", "🦙", "🐐", "🦌", "🐕", "🐩", "🦮", "🐕‍🦺", "🐈", "🐓", "🦃", "🦚", "🦜", "🦢", "🦩", "🕊️", "🐇", "🦝", "🦨", "🦡", "🦦", "🦥", "🐁", "🐀", "🐿️", "🦔"]
+    },
+    {
+      name: "Food & Drink",
+      icon: "🍎",
+      emojis: ["🍎", "🍏", "🍊", "🍋", "🍌", "🍉", "🍇", "🍓", "🫐", "🍈", "🍒", "🍑", "🥭", "🍍", "🥥", "🥝", "🍅", "🍆", "🥑", "🥦", "🥬", "🥒", "🌶️", "🫑", "🌽", "🥕", "🫒", "🧄", "🧅", "🥔", "🍠", "🥐", "🥯", "🍞", "🥖", "🥨", "🧀", "🥚", "🍳", "🧈", "🥞", "🧇", "🥓", "🥩", "🍗", "🍖", "🦴", "🌭", "🍔", "🍟", "🍕", "🫓", "🥪", "🥙", "🧆", "🌮", "🌯", "🫔", "🥗", "🥘", "🫕", "🥫", "🍝", "🍜", "🍲", "🍛", "🍣", "🍱", "🥟", "🦪", "🍤", "🍙", "🍚", "🍘", "🍥", "🥠", "🥮", "🍢", "🍡", "🍧", "🍨", "🍦", "🥧", "🧁", "🍰", "🎂", "🍮", "🍭", "🍬", "🍫", "🍿", "🍩", "🍪", "🌰", "🥜", "🍯", "🥛", "🍼", "☕", "🍵", "🧃", "🥤", "🍶", "🍺", "🍻", "🥂", "🍷", "🥃", "🍸", "🍹", "🧉", "🍾"]
+    },
+    {
+      name: "Activities",
+      icon: "⚽",
+      emojis: ["⚽", "🏀", "🏈", "⚾", "🥎", "🎾", "🏐", "🏉", "🥏", "🎱", "🪀", "🏓", "🏸", "🏒", "🏑", "🥍", "🏏", "🪃", "🥅", "⛳", "🪁", "🏹", "🎣", "🤿", "🥊", "🥋", "🎽", "🛹", "🛷", "⛸️", "🥌", "🎿", "⛷️", "🏂", "🪂", "🏋️‍♀️", "🏋️", "🏋️‍♂️", "🤼‍♀️", "🤼", "🤼‍♂️", "🤸‍♀️", "🤸", "🤸‍♂️", "⛹️‍♀️", "⛹️", "⛹️‍♂️", "🤺", "🤾‍♀️", "🤾", "🤾‍♂️", "🏌️‍♀️", "🏌️", "🏌️‍♂️", "🏇", "🧘‍♀️", "🧘", "🧘‍♂️", "🏄‍♀️", "🏄", "🏄‍♂️", "🏊‍♀️", "🏊", "🏊‍♂️", "🤽‍♀️", "🤽", "🤽‍♂️", "🚣‍♀️", "🚣", "🚣‍♂️", "🧗‍♀️", "🧗", "🧗‍♂️", "🚵‍♀️", "🚵", "🚵‍♂️", "🚴‍♀️", "🚴", "🚴‍♂️", "🏆", "🥇", "🥈", "🥉", "🏅", "🎖️", "🏵️", "🎗️", "🎫", "🎟️", "🎪", "🤹‍♀️", "🤹", "🤹‍♂️", "🎭", "🩰", "🎨", "🎬", "🎤", "🎧", "🎼", "🎵", "🎶", "🥁", "🪘", "🎹", "🎸", "🪕", "🎺", "🎷", "🪗", "🎻", "🪈", "🎲", "♟️", "🎯", "🎳", "🎮", "🎰", "🧩"]
+    },
+    {
+      name: "Travel & Places",
+      icon: "🚗",
+      emojis: ["🚗", "🚕", "🚙", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚐", "🛻", "🚚", "🚛", "🚜", "🏍️", "🛵", "🚲", "🛴", "🛹", "🛼", "🚁", "🛸", "✈️", "🛩️", "🛫", "🛬", "🪂", "💺", "🚀", "🛰️", "🚢", "⛵", "🚤", "🛥️", "🛳️", "⛴️", "🚧", "⚓", "🪝", "⛽", "🚨", "🚥", "🚦", "🛑", "🚏", "🗺️", "🗿", "🗽", "🗼", "🏰", "🏯", "🏟️", "🎡", "🎢", "🎠", "⛲", "⛱️", "🏖️", "🏝️", "🏜️", "🌋", "⛰️", "🏔️", "🗻", "🏕️", "⛺", "🏠", "🏡", "🏘️", "🏚️", "🏗️", "🏭", "🏢", "🏬", "🏣", "🏤", "🏥", "🏦", "🏨", "🏪", "🏫", "🏩", "💒", "🏛️", "⛪", "🕌", "🛕", "🕍", "🕋", "⛩️", "🛤️", "🛣️", "🗾", "🎑", "🏞️", "🌅", "🌄", "🌠", "🎇", "🎆", "🌇", "🌆", "🏙️", "🌃", "🌌", "🌉", "🌁"]
+    },
+    {
+      name: "Objects",
+      icon: "⌚",
+      emojis: ["⌚", "📱", "📲", "💻", "⌨️", "🖥️", "🖨️", "🖱️", "🖲️", "🕹️", "🗜️", "💽", "💾", "💿", "📀", "📼", "📷", "📸", "📹", "🎥", "📽️", "🎞️", "📞", "☎️", "📟", "📠", "📺", "📻", "🎙️", "🎚️", "🎛️", "🧭", "⏱️", "⏲️", "⏰", "🕰️", "⌛", "⏳", "📡", "🔋", "🔌", "💡", "🔦", "🕯️", "🪔", "🧯", "🛢️", "💸", "💵", "💴", "💶", "💷", "🪙", "💰", "💳", "💎", "⚖️", "🪜", "🧰", "🔧", "🔨", "⚒️", "🛠️", "⛏️", "🪓", "🪚", "🔩", "⚙️", "🪤", "🧱", "⛓️", "🧲", "🔫", "💣", "🧨", "🪓", "🔪", "🗡️", "⚔️", "🛡️", "🚬", "⚰️", "🪦", "⚱️", "🏺", "🔮", "📿", "🧿", "💈", "⚗️", "🔭", "🔬", "🕳️", "🩹", "🩺", "💊", "💉", "🩸", "🧬", "🦠", "🧫", "🧪", "🌡️", "🧹", "🪣", "🧽", "🪒", "🧴", "🛎️", "🔑", "🗝️", "🚪", "🪑", "🛋️", "🛏️", "🛌", "🧸", "🖼️", "🛍️", "🛒", "🎁", "🎈", "🎏", "🎀", "🎊", "🎉", "🎎", "🏮", "🎐", "🧧", "✉️", "📩", "📨", "📧", "💌", "📥", "📤", "📦", "🏷️", "📪", "📫", "📬", "📭", "📮", "📯", "📜", "📃", "📄", "📑", "🧾", "📊", "📈", "📉", "🗒️", "🗓️", "📆", "📅", "🗑️", "📇", "🗃️", "🗳️", "🗄️", "📋", "📁", "📂", "🗂️", "🗞️", "📰", "📓", "📔", "📒", "📕", "📗", "📘", "📙", "📚", "📖", "🔖", "🧷", "🔗", "📎", "🖇️", "📐", "📏", "🧮", "📌", "📍", "✂️", "🖊️", "🖋️", "✒️", "🖌️", "🖍️", "📝", "✏️", "🔍", "🔎", "🔏", "🔐", "🔒", "🔓"]
+    },
+    {
+      name: "Symbols",
+      icon: "❤️",
+      emojis: ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔", "❣️", "💕", "💞", "💓", "💗", "💖", "💘", "💝", "💟", "☮️", "✝️", "☪️", "🕉️", "☸️", "✡️", "🔯", "🕎", "☯️", "☦️", "🛐", "⛎", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓", "🆔", "⚛️", "🉑", "☢️", "☣️", "📴", "📳", "🈶", "🈚", "🈸", "🈺", "🈷️", "✴️", "🆚", "💮", "🉐", "㊙️", "㊗️", "🈴", "🈵", "🈹", "🈲", "🅰️", "🅱️", "🆎", "🆑", "🅾️", "🆘", "❌", "⭕", "🛑", "⛔", "📛", "🚫", "💯", "💢", "♨️", "🚷", "🚯", "🚳", "🚱", "🔞", "📵", "🚭", "❗", "❕", "❓", "❔", "‼️", "⁉️", "🔅", "🔆", "〽️", "⚠️", "🚸", "🔱", "⚜️", "🔰", "♻️", "✅", "🈯", "💹", "❇️", "✳️", "❎", "🌐", "💠", "Ⓜ️", "🌀", "💤", "🏧", "🚾", "♿", "🅿️", "🛗", "🈳", "🈂️", "🛂", "🛃", "🛄", "🛅", "🚹", "🚺", "🚼", "⚧️", "🚻", "🚮", "🎦", "📶", "🈁", "🔣", "ℹ️", "🔤", "🔡", "🔠", "🆖", "🆗", "🆙", "🆒", "🆕", "🆓", "0️⃣", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟", "🔢", "#️⃣", "*️⃣", "⏏️", "▶️", "⏸️", "⏯️", "⏹️", "⏺️", "⏭️", "⏮️", "⏩", "⏪", "⏫", "⏬", "◀️", "🔼", "🔽", "➡️", "⬅️", "⬆️", "⬇️", "↗️", "↘️", "↙️", "↖️", "↕️", "↔️", "↪️", "↩️", "⤴️", "⤵️", "🔀", "🔁", "🔂", "🔄", "🔃", "🎵", "🎶", "➕", "➖", "➗", "✖️", "♾️", "💲", "💱", "™️", "©️", "®️", "〰️", "➰", "➿", "🔚", "🔙", "🔛", "🔝", "🔜", "✔️", "☑️", "🔘", "🔴", "🟠", "🟡", "🟢", "🔵", "🟣", "⚫", "⚪", "🟤", "🔺", "🔻", "🔸", "🔹", "🔶", "🔷", "🔳", "🔲", "▪️", "▫️", "◾", "◽", "◼️", "◻️", "🟥", "🟧", "🟨", "🟩", "🟦", "🟪", "⬛", "⬜", "🟫", "🔈", "🔇", "🔉", "🔊", "🔔", "🔕", "📣", "📢", "👁️‍🗨️", "💬", "💭", "🗯️", "♠️", "♣️", "♥️", "♦️", "🃏", "🎴", "🀄", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛", "🕜", "🕝", "🕞", "🕟", "🕠", "🕡", "🕢", "🕣", "🕤", "🕥", "🕦", "🕧"]
+    },
+    {
+      name: "Flags",
+      icon: "🏁",
+      emojis: ["🏁", "🚩", "🎌", "🏴", "🏳️", "🏳️‍🌈", "🏳️‍⚧️", "🏴‍☠️", "🇦🇫", "🇦🇽", "🇦🇱", "🇩🇿", "🇦🇸", "🇦🇩", "🇦🇴", "🇦🇮", "🇦🇶", "🇦🇬", "🇦🇷", "🇦🇲", "🇦🇼", "🇦🇺", "🇦🇹", "🇦🇿", "🇧🇸", "🇧🇭", "🇧🇩", "🇧🇧", "🇧🇾", "🇧🇪", "🇧🇿", "🇧🇯", "🇧🇲", "🇧🇹", "🇧🇴", "🇧🇦", "🇧🇼", "🇧🇷", "🇻🇬", "🇧🇳", "🇧🇬", "🇧🇫", "🇧🇮", "🇰🇭", "🇨🇲", "🇨🇦", "🇮🇨", "🇨🇻", "🇧🇶", "🇰🇾", "🇨🇫", "🇹🇩", "🇨🇱", "🇨🇳", "🇨🇽", "🇨🇨", "🇨🇴", "🇰🇲", "🇨🇬", "🇨🇩", "🇨🇰", "🇨🇷", "🇨🇮", "🇭🇷", "🇨🇺", "🇨🇼", "🇨🇾", "🇨🇿", "🇩🇰", "🇩🇯", "🇩🇲", "🇩🇴", "🇪🇨", "🇪🇬", "🇸🇻", "🇬🇶", "🇪🇷", "🇪🇪", "🇪🇹", "🇪🇺", "🇫🇰", "🇫🇴", "🇫🇯", "🇫🇮", "🇫🇷", "🇬🇫", "🇵🇫", "🇹🇫", "🇬🇦", "🇬🇲", "🇬🇪", "🇩🇪", "🇬🇭", "🇬🇮", "🇬🇷", "🇬🇱", "🇬🇩", "🇬🇵", "🇬🇺", "🇬🇹", "🇬🇬", "🇬🇳", "🇬🇼", "🇬🇾", "🇭🇹", "🇭🇳", "🇭🇰", "🇭🇺", "🇮🇸", "🇮🇳", "🇮🇩", "🇮🇷", "🇮🇶", "🇮🇪", "🇮🇲", "🇮🇱", "🇮🇹", "🇯🇲", "🇯🇵", "🎌", "🇯🇪", "🇯🇴", "🇰🇿", "🇰🇪", "🇰🇮", "🇽🇰", "🇰🇼", "🇰🇬", "🇱🇦", "🇱🇻", "🇱🇧", "🇱🇸", "🇱🇷", "🇱🇾", "🇱🇮", "🇱🇹", "🇱🇺", "🇲🇴", "🇲🇰", "🇲🇬", "🇲🇼", "🇲🇾", "🇲🇻", "🇲🇱", "🇲🇹", "🇲🇭", "🇲🇶", "🇲🇷", "🇲🇺", "🇾🇹", "🇲🇽", "🇫🇲", "🇲🇩", "🇲🇨", "🇲🇳", "🇲🇪", "🇲🇸", "🇲🇦", "🇲🇿", "🇲🇲", "🇳🇦", "🇳🇷", "🇳🇵", "🇳🇱", "🇳🇨", "🇳🇿", "🇳🇮", "🇳🇪", "🇳🇬", "🇳🇺", "🇳🇫", "🇰🇵", "🇲🇵", "🇳🇴", "🇴🇲", "🇵🇰", "🇵🇼", "🇵🇸", "🇵🇦", "🇵🇬", "🇵🇾", "🇵🇪", "🇵🇭", "🇵🇳", "🇵🇱", "🇵🇹", "🇵🇷", "🇶🇦", "🇷🇪", "🇷🇴", "🇷🇺", "🇷🇼", "🇼🇸", "🇸🇲", "🇸🇦", "🇸🇳", "🇷🇸", "🇸🇨", "🇸🇱", "🇸🇬", "🇸🇽", "🇸🇰", "🇸🇮", "🇬🇸", "🇸🇧", "🇸🇴", "🇿🇦", "🇰🇷", "🇸🇸", "🇪🇸", "🇱🇰", "🇧🇱", "🇸🇭", "🇰🇳", "🇱🇨", "🇲🇫", "🇵🇲", "🇻🇨", "🇸🇩", "🇸🇷", "🇸🇿", "🇸🇪", "🇨🇭", "🇸🇾", "🇹🇼", "🇹🇯", "🇹🇿", "🇹🇭", "🇹🇱", "🇹🇬", "🇹🇰", "🇹🇴", "🇹🇹", "🇹🇳", "🇹🇷", "🇹🇲", "🇹🇨", "🇹🇻", "🇻🇮", "🇺🇬", "🇺🇦", "🇦🇪", "🇬🇧", "🏴󠁧󠁢󠁥󠁮󠁧󠁿", "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "🏴󠁧󠁢󠁷󠁬󠁳󠁿", "🇺🇸", "🇺🇾", "🇺🇿", "🇻🇺", "🇻🇦", "🇻🇪", "🇻🇳", "🇼🇫", "🇪🇭", "🇾🇪", "🇿🇲", "🇿🇼"]
+    }
   ];
 
   const createPostMutation = useMutation({
@@ -331,121 +375,160 @@ export default function PostEditorModal({
   const resetForm = () => {
     setContent("");
     setSelectedPlatforms(["instagram"]);
-    setScheduledDate(new Date().toISOString().split('T')[0]);
-    setScheduledTime("14:00");
     setHashtags([]);
     setMediaUrls([]);
     setStatus("draft");
     setNotes("");
-    setHasUnsavedChanges(false);
+    setScheduledDate(new Date().toISOString().split('T')[0]);
+    setScheduledTime("14:00");
+    setShowNotes(false);
+    setNoteThreads([]);
+    setNewNoteText("");
+    setEditorKey(prev => prev + 1);
   };
 
   const handleClose = () => {
     if (hasUnsavedChanges) {
       setShowUnsavedDialog(true);
     } else {
-      setShowNotes(false); // Close notes panel when main form closes
       onOpenChange(false);
+      resetForm();
     }
+  };
+
+  const handleDiscardChanges = () => {
+    setShowUnsavedDialog(false);
+    onOpenChange(false);
+    resetForm();
+  };
+
+  const handleSaveAndClose = () => {
+    handleSubmit();
+    setShowUnsavedDialog(false);
+  };
+
+  const addEmoji = (emoji: string) => {
+    setNewNoteText(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const formatText = (format: string) => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+
+    const range = selection.getRangeAt(0);
+    const selectedText = range.toString();
+
+    if (!selectedText) return;
+
+    let formattedText = "";
+    switch (format) {
+      case 'bold':
+        formattedText = `**${selectedText}**`;
+        break;
+      case 'italic':
+        formattedText = `*${selectedText}*`;
+        break;
+      case 'bullet':
+        formattedText = `• ${selectedText}`;
+        break;
+      case 'number':
+        formattedText = `1. ${selectedText}`;
+        break;
+      case 'link':
+        setLinkText(selectedText);
+        setShowLinkDialog(true);
+        return;
+      default:
+        formattedText = selectedText;
+    }
+
+    range.deleteContents();
+    range.insertNode(document.createTextNode(formattedText));
+    selection.removeAllRanges();
+  };
+
+  const handleLinkSubmit = () => {
+    if (!linkText.trim() || !linkUrl.trim()) return;
+
+    const formattedLink = `[${linkText}](${linkUrl})`;
+    setNewNoteText(prev => prev + formattedLink);
+    setShowLinkDialog(false);
+    setLinkText("");
+    setLinkUrl("");
   };
 
   const handleAddNote = () => {
     if (!newNoteText.trim()) return;
-    
-    const newNote = {
+
+    const newThread = {
       id: Date.now(),
+      author: "Current User",
       text: newNoteText,
-      author: "Current User", // Mock author
       timestamp: new Date(),
-      attachments: newNoteAttachments,
+      edited: false,
+      attachments: [...newNoteAttachments],
       replies: []
     };
-    
-    setNoteThreads(prev => [...prev, newNote]);
+
+    setNoteThreads(prev => [...prev, newThread]);
     setNewNoteText("");
     setNewNoteAttachments([]);
-    setActiveFormats(new Set()); // Clear active formats
-    setHasSelectedText(false); // Clear selection state
-    setNotes(prev => prev + (prev ? "\n" : "") + newNoteText); // Update the notes field for backend
-    setEditorKey(prev => prev + 1); // Force editor re-render
-    setHasUnsavedChanges(true);
+    setEditorKey(prev => prev + 1);
+  };
+
+  const startEditMessage = (messageId: number, text: string) => {
+    setEditingMessageId(messageId);
+    setEditingText(text);
+  };
+
+  const saveEditMessage = () => {
+    if (!editingText.trim()) return;
+
+    setNoteThreads(prev => 
+      prev.map(thread => 
+        thread.id === editingMessageId 
+          ? { ...thread, text: editingText, edited: true }
+          : thread
+      )
+    );
+    setEditingMessageId(null);
+    setEditingText("");
+  };
+
+  const cancelEdit = () => {
+    setEditingMessageId(null);
+    setEditingText("");
+  };
+
+  const deleteMessage = (messageId: number) => {
+    setNoteThreads(prev => prev.filter(thread => thread.id !== messageId));
+  };
+
+  const getFileIcon = (type: string) => {
+    if (type.startsWith('image/')) return ImageIcon;
+    if (type.startsWith('video/')) return Video;
+    if (type.includes('spreadsheet') || type.includes('excel')) return FileSpreadsheet;
+    return FileText;
   };
 
   const handleNewNoteFileUpload = (files: FileList) => {
-    const attachments = Array.from(files).map(file => ({
-      id: Date.now() + Math.random(),
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      url: URL.createObjectURL(file)
-    }));
-    
-    setNewNoteAttachments(prev => [...prev, ...attachments]);
+    Array.from(files).forEach(file => {
+      const newAttachment = {
+        id: Date.now() + Math.random(),
+        name: file.name,
+        type: file.type,
+        size: file.size
+      };
+      setNewNoteAttachments(prev => [...prev, newAttachment]);
+    });
   };
 
-  const removeNewNoteAttachment = (id: number) => {
-    setNewNoteAttachments(prev => prev.filter(att => att.id !== id));
+  const removeNewNoteAttachment = (attachmentId: number) => {
+    setNewNoteAttachments(prev => prev.filter(att => att.id !== attachmentId));
   };
 
-  const formatText = (format: string) => {
-    const textarea = document.querySelector('#new-note-textarea') as HTMLTextAreaElement;
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = newNoteText.substring(start, end);
-    
-    if (format === 'link') {
-      // Set up link dialog with selected text
-      setLinkText(selectedText);
-      setLinkUrl('');
-      setShowLinkDialog(true);
-      return;
-    }
-    
-    // For other formats, toggle behavior
-    if (selectedText) {
-      // Apply formatting to selected text
-      let formattedText = selectedText;
-      
-      switch (format) {
-        case 'bold':
-          formattedText = `**${selectedText}**`;
-          break;
-        case 'italic':
-          formattedText = `*${selectedText}*`;
-          break;
-        case 'bullet':
-          const lines = selectedText.split('\n');
-          formattedText = lines.map(line => line.trim() ? `• ${line}` : line).join('\n');
-          break;
-        case 'number':
-          const numberedLines = selectedText.split('\n');
-          formattedText = numberedLines.map((line, index) => 
-            line.trim() ? `${index + 1}. ${line}` : line
-          ).join('\n');
-          break;
-      }
-      
-      const newText = newNoteText.substring(0, start) + formattedText + newNoteText.substring(end);
-      setNewNoteText(newText);
-      
-      setTimeout(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start, start + formattedText.length);
-      }, 0);
-    } else {
-      // Toggle format mode for new text
-      const newActiveFormats = new Set(activeFormats);
-      if (newActiveFormats.has(format)) {
-        newActiveFormats.delete(format);
-      } else {
-        newActiveFormats.add(format);
-      }
-      setActiveFormats(newActiveFormats);
-      textarea.focus();
-    }
-  };
+
 
   const handleTextChange = (text: string) => {
     setNewNoteText(text);
@@ -460,93 +543,7 @@ export default function PostEditorModal({
     }
   };
 
-  const handleLinkSubmit = () => {
-    if (!linkText.trim() || !linkUrl.trim()) return;
-    
-    const textarea = document.querySelector('#new-note-textarea') as HTMLTextAreaElement;
-    if (!textarea) return;
-    
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const linkMarkdown = `[${linkText}](${linkUrl})`;
-    
-    const newText = newNoteText.substring(0, start) + linkMarkdown + newNoteText.substring(end);
-    setNewNoteText(newText);
-    
-    setShowLinkDialog(false);
-    setLinkText('');
-    setLinkUrl('');
-    
-    setTimeout(() => {
-      textarea.focus();
-      const newPos = start + linkMarkdown.length;
-      textarea.setSelectionRange(newPos, newPos);
-    }, 0);
-  };
 
-  const deleteMessage = (messageId: number) => {
-    setNoteThreads(prev => prev.filter(thread => thread.id !== messageId));
-  };
-
-  const startEditMessage = (messageId: number, currentText: string) => {
-    setEditingMessageId(messageId);
-    setEditingText(currentText);
-  };
-
-  const saveEditMessage = () => {
-    if (!editingText.trim()) return;
-    
-    setNoteThreads(prev => prev.map(thread => 
-      thread.id === editingMessageId 
-        ? { ...thread, text: editingText, edited: true }
-        : thread
-    ));
-    setEditingMessageId(null);
-    setEditingText("");
-  };
-
-  const cancelEdit = () => {
-    setEditingMessageId(null);
-    setEditingText("");
-  };
-
-  const addEmoji = (emoji: string) => {
-    setNewNoteText(prev => prev + emoji);
-    setShowEmojiPicker(false);
-  };
-
-  const emojiCategories = [
-    {
-      name: "Smileys & Emotion",
-      icon: "😀",
-      emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏']
-    },
-    {
-      name: "Gestures & Hands",
-      icon: "👍",
-      emojis: ['👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👋', '🤚', '🖐️', '✋', '🖖', '👏', '🙌', '🤲', '🤝', '🙏', '✍️', '💪', '🦾', '🦿', '🦵', '🦶', '👂', '🦻']
-    },
-    {
-      name: "Hearts & Love",
-      icon: "❤️",
-      emojis: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '💌', '💋', '💍', '👨‍❤️‍👨', '👩‍❤️‍👩', '👨‍❤️‍👩', '💏', '💑', '🫶', '💒', '💐', '🌹', '🌷']
-    },
-    {
-      name: "Activities & Sports",
-      icon: "⚽",
-      emojis: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛷', '⛸️', '🥌', '🎿']
-    },
-    {
-      name: "Food & Drink",
-      icon: "🍎",
-      emojis: ['🍎', '🍌', '🍓', '🍇', '🍊', '🍋', '🍒', '🥭', '🍑', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥒', '🌶️', '🌽', '🥕', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓']
-    },
-    {
-      name: "Travel & Places",
-      icon: "🚗",
-      emojis: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛻', '🚲', '🛵', '🏍️', '🛺', '🚁', '🛸', '✈️', '🛩️', '⛵', '🚤', '🛥️', '🚢', '⚓', '🗺️', '🏖️', '🏝️', '🏔️', '⛰️']
-    }
-  ];
 
   const handleAddReply = (threadId: number) => {
     if (!replyText.trim()) return;
@@ -582,26 +579,6 @@ export default function PostEditorModal({
         ? { ...thread, attachments: [...thread.attachments, ...attachments] }
         : thread
     ));
-  };
-
-  const getFileIcon = (fileType: string) => {
-    if (fileType.startsWith('image/')) return ImageIcon;
-    if (fileType.startsWith('video/')) return Video;
-    if (fileType.includes('pdf')) return FileText;
-    if (fileType.includes('sheet') || fileType.includes('excel')) return FileSpreadsheet;
-    return FileText;
-  };
-
-  const handleSaveAndClose = () => {
-    handleSubmit();
-    setShowUnsavedDialog(false);
-  };
-
-  const handleDiscardChanges = () => {
-    setHasUnsavedChanges(false);
-    setShowUnsavedDialog(false);
-    setShowNotes(false); // Close notes panel when discarding changes
-    onOpenChange(false);
   };
 
   const handleStatusChange = (newStatus: string) => {
@@ -1392,10 +1369,6 @@ export default function PostEditorModal({
           </div>
         </div>
       )}
-    </div>
-  )}
-    </>
-  )}
 
     {/* Platform Selection Modal */}
     <Dialog open={showPlatformModal} onOpenChange={setShowPlatformModal}>
