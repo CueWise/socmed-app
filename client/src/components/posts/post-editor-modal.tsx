@@ -117,6 +117,7 @@ export default function PostEditorModal({
       toast({
         title: "Success",
         description: postId ? "Post updated successfully" : "Post created successfully",
+        variant: "success",
       });
       onOpenChange(false);
       resetForm();
