@@ -85,6 +85,53 @@ export const brandAssets = pgTable("brand_assets", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Gamification Tables
+export const achievements = pgTable("achievements", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 100 }).notNull(),
+  description: text("description").notNull(),
+  icon: varchar("icon", { length: 50 }).notNull(), // lucide icon name
+  category: varchar("category", { length: 50 }).notNull(), // posting, engagement, consistency, etc.
+  requirement: json("requirement").notNull(), // {type: "posts_count", value: 10}
+  points: integer("points").notNull().default(0),
+  rarity: varchar("rarity", { length: 20 }).notNull().default("common"), // common, rare, epic, legendary
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const userAchievements = pgTable("user_achievements", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  achievementId: integer("achievement_id").notNull().references(() => achievements.id, { onDelete: "cascade" }),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+  progress: integer("progress").default(0), // current progress towards achievement
+});
+
+export const userStats = pgTable("user_stats", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  totalPosts: integer("total_posts").default(0),
+  totalEngagement: integer("total_engagement").default(0),
+  totalReach: integer("total_reach").default(0),
+  streak: integer("streak").default(0), // consecutive days of posting
+  lastPostDate: timestamp("last_post_date"),
+  level: integer("level").default(1),
+  experience: integer("experience").default(0),
+  totalPoints: integer("total_points").default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const dailyGoals = pgTable("daily_goals", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  date: timestamp("date").notNull(),
+  postsGoal: integer("posts_goal").default(1),
+  postsCompleted: integer("posts_completed").default(0),
+  engagementGoal: integer("engagement_goal").default(100),
+  engagementCompleted: integer("engagement_completed").default(0),
+  completed: boolean("completed").default(false),
+  points: integer("points").default(0),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
@@ -124,6 +171,23 @@ export const brandAssetsRelations = relations(brandAssets, ({ one }) => ({
   brand: one(brands, { fields: [brandAssets.brandId], references: [brands.id] }),
 }));
 
+export const achievementsRelations = relations(achievements, ({ many }) => ({
+  userAchievements: many(userAchievements),
+}));
+
+export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
+  user: one(users, { fields: [userAchievements.userId], references: [users.id] }),
+  achievement: one(achievements, { fields: [userAchievements.achievementId], references: [achievements.id] }),
+}));
+
+export const userStatsRelations = relations(userStats, ({ one }) => ({
+  user: one(users, { fields: [userStats.userId], references: [users.id] }),
+}));
+
+export const dailyGoalsRelations = relations(dailyGoals, ({ one }) => ({
+  user: one(users, { fields: [dailyGoals.userId], references: [users.id] }),
+}));
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({ id: true, createdAt: true });
 export const insertBrandSchema = createInsertSchema(brands).omit({ id: true, createdAt: true });
@@ -132,6 +196,10 @@ export const insertApprovalSchema = createInsertSchema(approvals).omit({ id: tru
 export const insertCommentSchema = createInsertSchema(comments).omit({ id: true, createdAt: true });
 export const insertAnalyticsSchema = createInsertSchema(analytics).omit({ id: true, recordedAt: true });
 export const insertBrandAssetSchema = createInsertSchema(brandAssets).omit({ id: true, createdAt: true });
+export const insertAchievementSchema = createInsertSchema(achievements).omit({ id: true, createdAt: true });
+export const insertUserAchievementSchema = createInsertSchema(userAchievements).omit({ id: true, unlockedAt: true });
+export const insertUserStatsSchema = createInsertSchema(userStats).omit({ id: true, updatedAt: true });
+export const insertDailyGoalSchema = createInsertSchema(dailyGoals).omit({ id: true });
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -148,3 +216,11 @@ export type Analytics = typeof analytics.$inferSelect;
 export type InsertAnalytics = z.infer<typeof insertAnalyticsSchema>;
 export type BrandAsset = typeof brandAssets.$inferSelect;
 export type InsertBrandAsset = z.infer<typeof insertBrandAssetSchema>;
+export type Achievement = typeof achievements.$inferSelect;
+export type InsertAchievement = z.infer<typeof insertAchievementSchema>;
+export type UserAchievement = typeof userAchievements.$inferSelect;
+export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
+export type UserStats = typeof userStats.$inferSelect;
+export type InsertUserStats = z.infer<typeof insertUserStatsSchema>;
+export type DailyGoal = typeof dailyGoals.$inferSelect;
+export type InsertDailyGoal = z.infer<typeof insertDailyGoalSchema>;
