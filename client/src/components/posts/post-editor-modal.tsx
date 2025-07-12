@@ -1,16 +1,28 @@
 import { useState, useEffect } from "react";
-import { X, Sparkles, Hash, TrendingUp, Camera, Upload } from "lucide-react";
+import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle } from "lucide-react";
+import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -29,6 +41,8 @@ interface PostData {
   scheduledAt?: Date;
   mediaUrls?: string[];
   hashtags?: string[];
+  status?: string;
+  notes?: string;
 }
 
 export default function PostEditorModal({ 
@@ -54,9 +68,13 @@ export default function PostEditorModal({
   );
   const [hashtags, setHashtags] = useState<string[]>(initialData?.hashtags || []);
   const [mediaUrls, setMediaUrls] = useState<string[]>(initialData?.mediaUrls || []);
+  const [status, setStatus] = useState(initialData?.status || "draft");
+  const [notes, setNotes] = useState(initialData?.notes || "");
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [isGeneratingHashtags, setIsGeneratingHashtags] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -68,6 +86,8 @@ export default function PostEditorModal({
       setSelectedPlatforms(initialData.platforms || ["instagram"]);
       setHashtags(initialData.hashtags || []);
       setMediaUrls(initialData.mediaUrls || []);
+      setStatus(initialData.status || "draft");
+      setNotes(initialData.notes || "");
       
       if (initialData.scheduledAt) {
         const scheduleDate = new Date(initialData.scheduledAt);
@@ -80,16 +100,41 @@ export default function PostEditorModal({
       setSelectedPlatforms(["instagram"]);
       setHashtags([]);
       setMediaUrls([]);
+      setStatus("draft");
+      setNotes("");
       setScheduledDate(defaultDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0]);
       setScheduledTime("14:00");
     }
+    setHasUnsavedChanges(false);
   }, [initialData, defaultDate]);
 
+  // Track changes to show unsaved dialog
+  useEffect(() => {
+    if (initialData) {
+      const hasChanges = 
+        content !== (initialData.content || "") ||
+        JSON.stringify(selectedPlatforms) !== JSON.stringify(initialData.platforms || ["instagram"]) ||
+        JSON.stringify(hashtags) !== JSON.stringify(initialData.hashtags || []) ||
+        JSON.stringify(mediaUrls) !== JSON.stringify(initialData.mediaUrls || []) ||
+        status !== (initialData.status || "draft") ||
+        notes !== (initialData.notes || "");
+      setHasUnsavedChanges(hasChanges);
+    }
+  }, [content, selectedPlatforms, hashtags, mediaUrls, status, notes, initialData]);
+
   const platforms = [
-    { id: "instagram", name: "Instagram", color: "from-purple-500 to-pink-500" },
-    { id: "facebook", name: "Facebook", color: "bg-blue-600" },
-    { id: "tiktok", name: "TikTok", color: "bg-gray-900 dark:bg-gray-300" },
-    { id: "twitter", name: "Twitter", color: "bg-blue-400" },
+    { id: "instagram", name: "Instagram", icon: FaInstagram, color: "text-pink-500" },
+    { id: "facebook", name: "Facebook", icon: FaFacebook, color: "text-blue-600" },
+    { id: "tiktok", name: "TikTok", icon: FaTiktok, color: "text-gray-900" },
+    { id: "twitter", name: "Twitter", icon: FaTwitter, color: "text-blue-400" },
+  ];
+
+  const statusOptions = [
+    { value: "draft", label: "Draft" },
+    { value: "review", label: "Send for review" },
+    { value: "pending_approval", label: "Submit for approval" },
+    { value: "scheduled", label: "Schedule" },
+    { value: "published", label: "Publish now" },
   ];
 
   const createPostMutation = useMutation({
@@ -98,6 +143,8 @@ export default function PostEditorModal({
         // Update existing post
         const response = await apiRequest("PATCH", `/api/posts/${postId}`, {
           ...postData,
+          status,
+          notes,
           scheduledAt: new Date(`${scheduledDate}T${scheduledTime}`),
         });
         return response.json();
@@ -107,6 +154,8 @@ export default function PostEditorModal({
           ...postData,
           createdBy: 1, // Mock user ID
           brandId: 1, // Mock brand ID
+          status,
+          notes,
           scheduledAt: new Date(`${scheduledDate}T${scheduledTime}`),
         });
         return response.json();
@@ -119,6 +168,7 @@ export default function PostEditorModal({
         description: postId ? "Post updated successfully" : "Post created successfully",
         variant: "success",
       });
+      setHasUnsavedChanges(false);
       onOpenChange(false);
       resetForm();
     },
@@ -262,9 +312,31 @@ export default function PostEditorModal({
     setScheduledTime("14:00");
     setHashtags([]);
     setMediaUrls([]);
+    setStatus("draft");
+    setNotes("");
+    setHasUnsavedChanges(false);
   };
 
-  const handleSubmit = (action: 'draft' | 'review' | 'schedule') => {
+  const handleClose = () => {
+    if (hasUnsavedChanges) {
+      setShowUnsavedDialog(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
+  const handleSaveAndClose = () => {
+    handleSubmit('draft');
+    setShowUnsavedDialog(false);
+  };
+
+  const handleDiscardChanges = () => {
+    setHasUnsavedChanges(false);
+    setShowUnsavedDialog(false);
+    onOpenChange(false);
+  };
+
+  const handleSubmit = (action?: 'draft' | 'review' | 'schedule') => {
     if (!content.trim()) {
       toast({
         title: "Content required",
@@ -284,50 +356,79 @@ export default function PostEditorModal({
     }
 
     const postData: PostData = {
-      content: content + (hashtags.length > 0 ? '\n\n' + hashtags.map(tag => `#${tag}`).join(' ') : ''),
+      content: content.trim(),
       platforms: selectedPlatforms,
-      scheduledAt: new Date(`${scheduledDate}T${scheduledTime}`),
       hashtags,
       mediaUrls,
+      notes: notes.trim(),
     };
 
     createPostMutation.mutate(postData);
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {initialData 
-              ? `${initialData.content?.split('.')[0] || initialData.content?.split('!')[0] || initialData.content?.slice(0, 50)}...`
-              : "Create New Post"
-            }
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={handleClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {initialData 
+                ? `${initialData.content?.split('.')[0] || initialData.content?.split('!')[0] || initialData.content?.slice(0, 50)}...`
+                : "Create New Post"
+              }
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="absolute right-4 top-4"
+              onClick={handleClose}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </DialogHeader>
 
         <div className="space-y-6">
           {/* Platform Selection */}
           <div>
             <Label className="text-sm font-medium mb-3 block">Select Platforms</Label>
             <div className="flex flex-wrap gap-3">
-              {platforms.map((platform) => (
-                <div key={platform.id} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={platform.id}
-                    checked={selectedPlatforms.includes(platform.id)}
-                    onCheckedChange={() => handlePlatformToggle(platform.id)}
-                  />
-                  <Label 
-                    htmlFor={platform.id}
-                    className="flex items-center space-x-2 cursor-pointer"
-                  >
-                    <div className={`w-6 h-6 rounded ${platform.color.includes('gradient') ? 'bg-gradient-to-r ' + platform.color : platform.color}`} />
-                    <span className="text-sm">{platform.name}</span>
-                  </Label>
-                </div>
-              ))}
+              {platforms.map((platform) => {
+                const IconComponent = platform.icon;
+                return (
+                  <div key={platform.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={platform.id}
+                      checked={selectedPlatforms.includes(platform.id)}
+                      onCheckedChange={() => handlePlatformToggle(platform.id)}
+                    />
+                    <Label 
+                      htmlFor={platform.id}
+                      className="flex items-center space-x-2 cursor-pointer"
+                    >
+                      <IconComponent className={`w-5 h-5 ${platform.color}`} />
+                      <span className="text-sm">{platform.name}</span>
+                    </Label>
+                  </div>
+                );
+              })}
             </div>
+          </div>
+
+          {/* Status Selection */}
+          <div>
+            <Label className="text-sm font-medium mb-3 block">Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Content Editor */}
@@ -479,6 +580,27 @@ export default function PostEditorModal({
               </div>
             </div>
           </div>
+
+          {/* Notes Section */}
+          <div>
+            <Label className="text-sm font-medium mb-3 block">Notes</Label>
+            <div className="flex space-x-2">
+              <Textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add notes or instructions for this post..."
+                className="min-h-[100px]"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center space-x-2"
+              >
+                <StickyNote className="h-4 w-4" />
+                <span>Notes</span>
+              </Button>
+            </div>
+          </div>
         </div>
 
         {/* Modal Actions */}
@@ -508,5 +630,28 @@ export default function PostEditorModal({
         </div>
       </DialogContent>
     </Dialog>
-  );
+
+    {/* Unsaved Changes Dialog */}
+    <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center space-x-2">
+            <AlertTriangle className="h-5 w-5 text-amber-500" />
+            <span>Unsaved Changes</span>
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            You have unsaved changes that will be lost if you close the editor. Would you like to save your changes?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={handleDiscardChanges}>
+            Discard Changes
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleSaveAndClose}>
+            Save Changes
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </>);
 }
