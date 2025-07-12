@@ -1,6 +1,7 @@
 import { Bell, Menu, Sun, Moon, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme-provider";
+import ThemeCustomizer from "@/components/theme/theme-customizer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -42,6 +43,9 @@ export default function TopNavigation({ onMenuClick }: TopNavigationProps) {
 
         {/* Right Actions */}
         <div className="flex items-center space-x-2">
+          {/* Theme Customizer */}
+          <ThemeCustomizer />
+          
           {/* Theme Toggle */}
           <Button
             variant="ghost"
