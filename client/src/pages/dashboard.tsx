@@ -145,27 +145,8 @@ export default function Dashboard() {
           {/* AI Suggestions */}
           <AISuggestions />
 
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-3">
-                {quickActions.map((action, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    className="flex flex-col items-center space-y-2 h-auto p-4 touch-target"
-                    onClick={action.action}
-                  >
-                    <span className="material-icons text-2xl">{action.icon}</span>
-                    <span className="text-xs font-medium">{action.title}</span>
-                  </Button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Quick Actions - Temporarily removed for debugging */}
+          {/* Quick Actions card removed to identify floating button source */}
         </div>
       </div>
 
