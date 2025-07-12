@@ -58,48 +58,57 @@ export default function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        heading: false, // We'll use our own heading extension
-        codeBlock: false, // We'll use our own code block extension
-        strike: false, // We'll use our own strike extension
+        // Disable all formatting by default - user can enable via ellipsis menu
+        bold: false,
+        italic: false,
+        heading: false,
+        codeBlock: false,
+        strike: false,
+        bulletList: false,
+        orderedList: false,
+        code: false
       }),
-      Heading.configure({
-        levels: [1, 2, 3]
-      }),
-      Link.configure({
-        openOnClick: false,
-        HTMLAttributes: {
-          class: 'text-blue-600 underline hover:text-blue-800'
-        }
-      }),
-      Image.configure({
-        HTMLAttributes: {
-          class: 'max-w-full h-auto rounded-lg'
-        }
-      }),
-      Table.configure({
-        resizable: true,
-        HTMLAttributes: {
-          class: 'border-collapse border border-gray-300 w-full'
-        }
-      }),
-      TableRow,
-      TableHeader.configure({
-        HTMLAttributes: {
-          class: 'border border-gray-300 bg-gray-50 px-3 py-2 font-semibold'
-        }
-      }),
-      TableCell.configure({
-        HTMLAttributes: {
-          class: 'border border-gray-300 px-3 py-2'
-        }
-      }),
-      Underline,
-      Strike,
-      CodeBlock.configure({
-        HTMLAttributes: {
-          class: 'bg-gray-100 rounded p-4 font-mono text-sm overflow-x-auto'
-        }
-      }),
+      // Only add extensions when user wants rich text
+      ...(showToolbar ? [
+        Heading.configure({
+          levels: [1, 2, 3]
+        }),
+        Link.configure({
+          openOnClick: false,
+          HTMLAttributes: {
+            class: 'text-blue-600 underline hover:text-blue-800'
+          }
+        }),
+        Image.configure({
+          HTMLAttributes: {
+            class: 'max-w-full h-auto rounded-lg'
+          }
+        }),
+        Table.configure({
+          resizable: true,
+          HTMLAttributes: {
+            class: 'border-collapse border border-gray-300 w-full'
+          }
+        }),
+        TableRow,
+        TableHeader.configure({
+          HTMLAttributes: {
+            class: 'border border-gray-300 bg-gray-50 px-3 py-2 font-semibold'
+          }
+        }),
+        TableCell.configure({
+          HTMLAttributes: {
+            class: 'border border-gray-300 px-3 py-2'
+          }
+        }),
+        Underline,
+        Strike,
+        CodeBlock.configure({
+          HTMLAttributes: {
+            class: 'bg-gray-100 rounded p-4 font-mono text-sm overflow-x-auto'
+          }
+        })
+      ] : []),
       Placeholder.configure({
         placeholder
       })
@@ -111,7 +120,7 @@ export default function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[200px] p-4'
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[80px] p-3 text-sm'
       }
     }
   })
@@ -162,22 +171,21 @@ export default function RichTextEditor({
 
   return (
     <div className={`border border-gray-300 rounded-lg overflow-hidden ${className}`}>
-      {/* Compact Header with Ellipsis */}
-      <div className="bg-gray-50 border-b border-gray-300 p-2 flex justify-between items-center">
-        <div className="text-sm text-gray-600">Rich Text Editor</div>
+      {/* Simple header with just ellipsis button */}
+      <div className="bg-white p-2 flex justify-end">
         <div className="relative">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowToolbar(!showToolbar)}
-            className="p-2"
+            className="p-1 h-6 w-6"
           >
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal className="h-3 w-3" />
           </Button>
           
-          {/* Dropdown Toolbar */}
+          {/* Scrollable Dropdown Toolbar */}
           {showToolbar && (
-            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 min-w-[300px]">
+            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 min-w-[280px] max-h-[300px] overflow-y-auto">
               <div className="space-y-3">
                 {/* Text Formatting */}
                 <div>
@@ -380,7 +388,7 @@ export default function RichTextEditor({
           <textarea
             value={sourceContent}
             onChange={(e) => setSourceContent(e.target.value)}
-            className="w-full min-h-[200px] p-4 font-mono text-sm border-none resize-none focus:outline-none"
+            className="w-full min-h-[80px] p-3 font-mono text-sm border-none resize-none focus:outline-none"
             placeholder="HTML source..."
           />
         ) : (
@@ -388,13 +396,15 @@ export default function RichTextEditor({
         )}
       </div>
 
-      {/* Status Bar */}
-      <div className="bg-gray-50 border-t border-gray-300 px-4 py-2 text-xs text-gray-500 flex justify-between">
-        <span>
-          {editor.storage.characterCount?.characters() || 0} characters, {editor.storage.characterCount?.words() || 0} words
-        </span>
-        <span>{showSource ? 'HTML Source' : 'Rich Text'}</span>
-      </div>
+      {/* Minimal Status Bar - Only show when toolbar is active */}
+      {showToolbar && (
+        <div className="bg-gray-50 border-t border-gray-300 px-3 py-1 text-xs text-gray-400 flex justify-between">
+          <span>
+            {editor.storage.characterCount?.characters() || 0} chars
+          </span>
+          <span>{showSource ? 'HTML' : 'Text'}</span>
+        </div>
+      )}
     </div>
   )
 }
