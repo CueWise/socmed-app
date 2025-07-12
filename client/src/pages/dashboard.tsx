@@ -44,18 +44,12 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-1">
-      {/* Mobile Widgets */}
-      {isMobile && (
-        <div className="-mt-2">
-          <MobileWidgets />
-        </div>
-      )}
       
       {/* Dashboard Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-1">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-0">Dashboard</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-0">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">
             Manage your social media presence
           </p>
         </div>
@@ -76,7 +70,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 -mt-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatsCard
           title="Total Reach"
           value="2.4M"
