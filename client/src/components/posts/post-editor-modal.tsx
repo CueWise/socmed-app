@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus } from "lucide-react";
+import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,6 +76,11 @@ export default function PostEditorModal({
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showPlatformModal, setShowPlatformModal] = useState(false);
+  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [noteThreads, setNoteThreads] = useState<any[]>([]);
+  const [newNoteText, setNewNoteText] = useState("");
+  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+  const [replyText, setReplyText] = useState("");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -327,6 +332,68 @@ export default function PostEditorModal({
     } else {
       onOpenChange(false);
     }
+  };
+
+  const handleAddNote = () => {
+    if (!newNoteText.trim()) return;
+    
+    const newNote = {
+      id: Date.now(),
+      text: newNoteText,
+      author: "Current User", // Mock author
+      timestamp: new Date(),
+      attachments: [],
+      replies: []
+    };
+    
+    setNoteThreads(prev => [...prev, newNote]);
+    setNewNoteText("");
+    setNotes(prev => prev + (prev ? "\n" : "") + newNoteText); // Update the notes field for backend
+    setHasUnsavedChanges(true);
+  };
+
+  const handleAddReply = (threadId: number) => {
+    if (!replyText.trim()) return;
+    
+    const reply = {
+      id: Date.now(),
+      text: replyText,
+      author: "Current User",
+      timestamp: new Date(),
+      attachments: []
+    };
+    
+    setNoteThreads(prev => prev.map(thread => 
+      thread.id === threadId 
+        ? { ...thread, replies: [...thread.replies, reply] }
+        : thread
+    ));
+    setReplyText("");
+    setReplyingTo(null);
+  };
+
+  const handleFileUpload = (threadId: number, files: FileList) => {
+    const attachments = Array.from(files).map(file => ({
+      id: Date.now() + Math.random(),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: URL.createObjectURL(file) // In real app, upload to server
+    }));
+    
+    setNoteThreads(prev => prev.map(thread => 
+      thread.id === threadId 
+        ? { ...thread, attachments: [...thread.attachments, ...attachments] }
+        : thread
+    ));
+  };
+
+  const getFileIcon = (fileType: string) => {
+    if (fileType.startsWith('image/')) return ImageIcon;
+    if (fileType.startsWith('video/')) return Video;
+    if (fileType.includes('pdf')) return FileText;
+    if (fileType.includes('sheet') || fileType.includes('excel')) return FileSpreadsheet;
+    return FileText;
   };
 
   const handleSaveAndClose = () => {
@@ -602,25 +669,22 @@ export default function PostEditorModal({
             </div>
           </div>
 
-          {/* Notes Section */}
-          <div>
-            <Label className="text-sm font-medium mb-3 block">Notes</Label>
-            <div className="flex space-x-2">
-              <Textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Add notes or instructions for this post..."
-                className="min-h-[100px]"
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center space-x-2"
-              >
-                <StickyNote className="h-4 w-4" />
-                <span>Notes</span>
-              </Button>
-            </div>
+          {/* Notes Button */}
+          <div className="flex justify-between items-center">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowNotesModal(true)}
+              className="flex items-center gap-2"
+            >
+              <StickyNote className="h-4 w-4" />
+              Notes
+              {notes && notes.trim() && (
+                <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                  Has Notes
+                </span>
+              )}
+            </Button>
           </div>
         </div>
 
@@ -640,6 +704,158 @@ export default function PostEditorModal({
           >
             {createPostMutation.isPending ? "Saving..." : "Save Changes"}
           </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Notes Thread Modal */}
+    <Dialog open={showNotesModal} onOpenChange={setShowNotesModal}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogHeader>
+          <DialogTitle>Notes & Comments</DialogTitle>
+        </DialogHeader>
+        
+        <div className="flex-1 overflow-y-auto space-y-4">
+          {/* Note Threads */}
+          {noteThreads.map((thread) => (
+            <div key={thread.id} className="border rounded-lg p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                    <span className="font-medium">{thread.author}</span>
+                    <span>•</span>
+                    <span>{new Date(thread.timestamp).toLocaleString()}</span>
+                  </div>
+                  <p className="text-sm mb-3">{thread.text}</p>
+                  
+                  {/* Attachments */}
+                  {thread.attachments.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {thread.attachments.map((attachment: any) => {
+                        const FileIcon = getFileIcon(attachment.type);
+                        return (
+                          <div key={attachment.id} className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1 text-xs">
+                            <FileIcon className="h-3 w-3" />
+                            <span>{attachment.name}</span>
+                            <span className="text-gray-500">({Math.round(attachment.size / 1024)}KB)</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                  
+                  {/* File Upload */}
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      multiple
+                      onChange={(e) => e.target.files && handleFileUpload(thread.id, e.target.files)}
+                      className="hidden"
+                      id={`file-upload-${thread.id}`}
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi"
+                    />
+                    <label htmlFor={`file-upload-${thread.id}`} className="cursor-pointer">
+                      <Button variant="ghost" size="sm" className="text-gray-500 hover:text-gray-700">
+                        <Paperclip className="h-3 w-3 mr-1" />
+                        Attach
+                      </Button>
+                    </label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setReplyingTo(thread.id)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <Reply className="h-3 w-3 mr-1" />
+                      Reply
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Replies */}
+              {thread.replies.length > 0 && (
+                <div className="ml-6 space-y-2 border-l-2 border-gray-200 pl-4">
+                  {thread.replies.map((reply: any) => (
+                    <div key={reply.id} className="text-sm">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 mb-1">
+                        <span className="font-medium">{reply.author}</span>
+                        <span>•</span>
+                        <span>{new Date(reply.timestamp).toLocaleString()}</span>
+                      </div>
+                      <p>{reply.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Reply Input */}
+              {replyingTo === thread.id && (
+                <div className="ml-6 flex gap-2">
+                  <Textarea
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder="Write a reply..."
+                    className="flex-1 min-h-[60px]"
+                  />
+                  <div className="flex flex-col gap-1">
+                    <Button
+                      size="sm"
+                      onClick={() => handleAddReply(thread.id)}
+                      disabled={!replyText.trim()}
+                    >
+                      <Send className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setReplyingTo(null)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+          
+          {noteThreads.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <StickyNote className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+              <p>No notes yet. Add a note to start the conversation.</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Add New Note */}
+        <div className="border-t pt-4 space-y-3">
+          <Textarea
+            value={newNoteText}
+            onChange={(e) => setNewNoteText(e.target.value)}
+            placeholder="Add a note or comment..."
+            className="min-h-[80px]"
+          />
+          <div className="flex justify-between items-center">
+            <div className="text-xs text-gray-500">
+              Supports: PDF, Images, Videos, Excel, Word documents
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowNotesModal(false)}
+              >
+                Close
+              </Button>
+              <Button
+                onClick={handleAddNote}
+                disabled={!newNoteText.trim()}
+                className="bg-primary hover:bg-primary/90"
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Add Note
+              </Button>
+            </div>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
