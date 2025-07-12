@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import PostEditorModal from "@/components/posts/post-editor-modal";
+import QuickThemePicker from "@/components/theme/quick-theme-picker";
 
 const navigationItems = [
   {
@@ -92,6 +93,9 @@ export default function MobileNav() {
             );
           })}
         </div>
+        
+        {/* Quick Theme Picker for Mobile */}
+        <QuickThemePicker />
       </nav>
 
       <PostEditorModal 

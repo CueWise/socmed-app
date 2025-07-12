@@ -62,7 +62,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const [user] = await db.insert(users).values([insertUser]).returning();
     return user;
   }
 
@@ -77,7 +77,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBrand(brand: InsertBrand): Promise<Brand> {
-    const [newBrand] = await db.insert(brands).values(brand).returning();
+    const [newBrand] = await db.insert(brands).values([brand]).returning();
     return newBrand;
   }
 
@@ -102,7 +102,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPost(post: InsertPost): Promise<Post> {
-    const [newPost] = await db.insert(posts).values(post).returning();
+    const [newPost] = await db.insert(posts).values([post]).returning();
     return newPost;
   }
 
@@ -150,7 +150,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createApproval(approval: InsertApproval): Promise<Approval> {
-    const [newApproval] = await db.insert(approvals).values(approval).returning();
+    const [newApproval] = await db.insert(approvals).values([approval]).returning();
     return newApproval;
   }
 
@@ -171,7 +171,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createComment(comment: InsertComment): Promise<Comment> {
-    const [newComment] = await db.insert(comments).values(comment).returning();
+    const [newComment] = await db.insert(comments).values([comment]).returning();
     return newComment;
   }
 
@@ -191,7 +191,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createAnalytics(analyticsData: InsertAnalytics): Promise<Analytics> {
-    const [newAnalytics] = await db.insert(analytics).values(analyticsData).returning();
+    const [newAnalytics] = await db.insert(analytics).values([analyticsData]).returning();
     return newAnalytics;
   }
 
@@ -232,7 +232,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBrandAsset(asset: InsertBrandAsset): Promise<BrandAsset> {
-    const [newAsset] = await db.insert(brandAssets).values(asset).returning();
+    const [newAsset] = await db.insert(brandAssets).values([asset]).returning();
     return newAsset;
   }
 }
