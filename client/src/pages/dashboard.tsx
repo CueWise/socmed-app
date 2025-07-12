@@ -56,13 +56,13 @@ export default function Dashboard() {
           </p>
         </div>
         
-        <div className="flex items-center space-x-3 mt-4 sm:mt-0">
+        <div className="hidden md:flex items-center space-x-3 mt-4 sm:mt-0">
           <Button
             onClick={() => setShowPostEditor(true)}
             className="bg-primary hover:bg-primary/90 material-shadow"
           >
             <Plus className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">Create Post</span>
+            <span>Create Post</span>
           </Button>
           
           <Button variant="outline" size="icon" className="touch-target">
