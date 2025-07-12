@@ -89,6 +89,7 @@ export default function PostEditorModal({
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkText, setLinkText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
+  const [hasSelectedText, setHasSelectedText] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -358,6 +359,7 @@ export default function PostEditorModal({
     setNewNoteText("");
     setNewNoteAttachments([]);
     setActiveFormats(new Set()); // Clear active formats
+    setHasSelectedText(false); // Clear selection state
     setNotes(prev => prev + (prev ? "\n" : "") + newNoteText); // Update the notes field for backend
     setHasUnsavedChanges(true);
   };
@@ -440,42 +442,14 @@ export default function PostEditorModal({
 
   const handleTextChange = (text: string) => {
     setNewNoteText(text);
-    
-    // Apply active formats to new text being typed
-    if (activeFormats.size > 0) {
-      const textarea = document.querySelector('#new-note-textarea') as HTMLTextAreaElement;
-      if (textarea) {
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        
-        if (start === end && text.length > newNoteText.length) {
-          // New character was typed, apply formats
-          const newChar = text.charAt(start - 1);
-          if (newChar && newChar !== '\n') {
-            let formattedChar = newChar;
-            
-            if (activeFormats.has('bold')) {
-              formattedChar = `**${formattedChar}**`;
-            }
-            if (activeFormats.has('italic')) {
-              formattedChar = `*${formattedChar}*`;
-            }
-            
-            if (formattedChar !== newChar) {
-              const beforeCursor = text.substring(0, start - 1);
-              const afterCursor = text.substring(start);
-              const newText = beforeCursor + formattedChar + afterCursor;
-              setNewNoteText(newText);
-              
-              setTimeout(() => {
-                const newPos = start + formattedChar.length - 1;
-                textarea.setSelectionRange(newPos, newPos);
-              }, 0);
-              return;
-            }
-          }
-        }
-      }
+  };
+
+  const handleTextSelection = () => {
+    const textarea = document.querySelector('#new-note-textarea') as HTMLTextAreaElement;
+    if (textarea) {
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      setHasSelectedText(start !== end);
     }
   };
 
@@ -1065,6 +1039,9 @@ export default function PostEditorModal({
               id="new-note-textarea"
               value={newNoteText}
               onChange={(e) => handleTextChange(e.target.value)}
+              onSelect={handleTextSelection}
+              onMouseUp={handleTextSelection}
+              onKeyUp={handleTextSelection}
               placeholder="Type a message..."
               className="min-h-[60px] border-2 focus:border-primary resize-none"
               onKeyDown={(e) => {
@@ -1100,9 +1077,8 @@ export default function PostEditorModal({
             
             {/* Rich Text Formatting Toolbar */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1">
-                {/* Attachment Button */}
-
+              <div className="flex items-center gap-2">
+                {/* Always visible: Upload and Emoji */}
                 <input
                   type="file"
                   id="mobile-file-upload"
@@ -1121,65 +1097,19 @@ export default function PostEditorModal({
                     variant="ghost"
                     size="sm"
                     type="button"
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 hover:text-gray-700 p-2"
                   >
                     <Paperclip className="h-4 w-4" />
                   </Button>
                 </label>
                 
-                {/* Text Formatting Buttons */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  onClick={() => formatText('bold')}
-                  className={`${activeFormats.has('bold') ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                  <Bold className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  onClick={() => formatText('italic')}
-                  className={`${activeFormats.has('italic') ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
-                >
-                  <Italic className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  onClick={() => formatText('bullet')}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  onClick={() => formatText('number')}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <ListOrdered className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  type="button"
-                  onClick={() => formatText('link')}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <Link className="h-4 w-4" />
-                </Button>
                 <div className="relative">
                   <Button
                     variant="ghost"
                     size="sm"
                     type="button"
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 hover:text-gray-700 p-2"
                   >
                     <Smile className="h-4 w-4" />
                   </Button>
@@ -1197,6 +1127,57 @@ export default function PostEditorModal({
                     </div>
                   )}
                 </div>
+                
+                {/* Text Formatting Buttons - Only visible when text is selected */}
+                {hasSelectedText && (
+                  <div className="flex items-center gap-1 ml-2 border-l pl-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      onClick={() => formatText('bold')}
+                      className="text-gray-500 hover:text-gray-700 p-1"
+                    >
+                      <Bold className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      onClick={() => formatText('italic')}
+                      className="text-gray-500 hover:text-gray-700 p-1"
+                    >
+                      <Italic className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      onClick={() => formatText('bullet')}
+                      className="text-gray-500 hover:text-gray-700 p-1"
+                    >
+                      <List className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      onClick={() => formatText('number')}
+                      className="text-gray-500 hover:text-gray-700 p-1"
+                    >
+                      <ListOrdered className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      onClick={() => formatText('link')}
+                      className="text-gray-500 hover:text-gray-700 p-1"
+                    >
+                      <Link className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
                 
                 {/* Link Dialog */}
                 {showLinkDialog && (
@@ -1251,7 +1232,8 @@ export default function PostEditorModal({
                 <Button
                   onClick={handleAddNote}
                   disabled={!newNoteText.trim()}
-                  className="bg-primary hover:bg-primary/90 px-3"
+                  className="bg-primary hover:bg-primary/90 px-4 py-2"
+                  size="sm"
                 >
                   <Send className="h-4 w-4" />
                 </Button>
