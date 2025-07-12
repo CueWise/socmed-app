@@ -253,20 +253,8 @@ export default function ContentCalendar() {
         )}
       </CardContent>
       
-      {/* Mobile Floating Action Button */}
-      {isMobile && (
-        <Button
-          className={cn(
-            "fixed bottom-20 right-4 w-14 h-14 rounded-full shadow-lg z-30",
-            "bg-primary hover:bg-primary/90 text-primary-foreground",
-            "touch-manipulation select-none-touch touch-active"
-          )}
-          onClick={() => selectedDate && console.log('Create post for', selectedDate)}
-          size="lg"
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
-      )}
+      {/* Mobile Floating Action Button - Temporarily removed to prevent conflicts */}
+      {/* Floating button removed to avoid conflicts with mobile navigation */}
     </Card>
   );
 }
