@@ -26,6 +26,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import RichTextEditor from "@/components/ui/rich-text-editor";
 
 interface PostEditorModalProps {
   open: boolean;
@@ -1067,22 +1068,11 @@ export default function PostEditorModal({
         {/* Add New Message */}
         <div className="border-t pt-4 bg-white">
           <div className="space-y-2">
-            <Textarea
-              id="new-note-textarea"
-              value={newNoteText}
-              onChange={(e) => handleTextChange(e.target.value)}
-              onSelect={handleTextSelection}
-              onMouseUp={handleTextSelection}
-              onKeyUp={handleTextSelection}
+            <RichTextEditor
+              content={newNoteText}
+              onChange={(html) => setNewNoteText(html)}
               placeholder="Type a message..."
-              className="min-h-[60px] border-2 focus:border-primary resize-none"
-              onKeyDown={(e) => {
-                // Only allow Enter to send on desktop (not mobile)
-                if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 768) {
-                  e.preventDefault();
-                  if (newNoteText.trim()) handleAddNote();
-                }
-              }}
+              className="min-h-[150px]"
             />
             
             {/* New Note Attachments */}
