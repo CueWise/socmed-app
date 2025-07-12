@@ -97,7 +97,7 @@ export default function Analytics() {
           value="156"
           change="+23"
           changeType="positive"
-          icon="published_with_changes"
+          icon="article"
           color="success"
         />
         <StatsCard
