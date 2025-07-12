@@ -932,7 +932,10 @@ export default function PostEditorModal({
             </Button>
           </div>
         </div>
-      </div>
+            </div>
+          </div>
+        </>
+      )}
       
       {/* Notes Slide-in Panel - Slides from right, positioned next to edit form */}
       {showNotes && (
@@ -1367,6 +1370,7 @@ export default function PostEditorModal({
               </div>
             </div>
           </div>
+        </div>
         </div>
       )}
 
