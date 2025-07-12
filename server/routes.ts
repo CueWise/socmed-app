@@ -52,9 +52,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const id = parseInt(req.params.id);
       const updates = req.body;
+      
+      // Log the incoming data for debugging
+      console.log('Updating post:', id, 'with data:', updates);
+      
       const post = await storage.updatePost(id, updates);
       res.json(post);
     } catch (error) {
+      console.error('Route error updating post:', error);
       res.status(500).json({ error: "Failed to update post" });
     }
   });
