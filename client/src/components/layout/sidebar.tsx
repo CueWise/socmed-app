@@ -76,9 +76,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
 
           return (
             <Link key={item.name} href={item.href}>
-              <a
+              <div
                 className={cn(
-                  "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors w-full",
+                  "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors w-full cursor-pointer",
                   isActive 
                     ? "bg-primary/10 text-primary dark:bg-primary/20" 
                     : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
@@ -92,7 +92,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
                     {item.badge}
                   </Badge>
                 )}
-              </a>
+              </div>
             </Link>
           );
         })}
