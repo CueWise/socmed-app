@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Analytics } from "@shared/schema";
+import { useBrand } from "./use-brand";
 
 interface AnalyticsSummary {
   totalReach: number;
@@ -30,19 +31,33 @@ export function useAnalytics(postId?: number, platform?: string) {
 }
 
 export function useAnalyticsSummary(
-  brandId: number, 
-  startDate: Date, 
-  endDate: Date
+  brandId?: number, 
+  startDate?: Date, 
+  endDate?: Date
 ) {
+  const { brandId: selectedBrandId } = useBrand();
+  const effectiveBrandId = brandId || selectedBrandId;
+  const defaultStartDate = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const defaultEndDate = endDate || new Date();
+  
   return useQuery<AnalyticsSummary>({
-    queryKey: ["/api/analytics/summary", brandId, startDate.toISOString(), endDate.toISOString()],
+    queryKey: ["/api/analytics/summary", effectiveBrandId, defaultStartDate.toISOString(), defaultEndDate.toISOString()],
     queryFn: async () => {
+      if (!effectiveBrandId) {
+        return {
+          totalReach: 0,
+          totalEngagement: 0,
+          totalPosts: 0,
+          totalViews: 0
+        };
+      }
+      
       const params = new URLSearchParams({
-        start: startDate.toISOString(),
-        end: endDate.toISOString(),
+        start: defaultStartDate.toISOString(),
+        end: defaultEndDate.toISOString(),
       });
       
-      const response = await fetch(`/api/analytics/summary/${brandId}?${params.toString()}`, {
+      const response = await fetch(`/api/analytics/summary/${effectiveBrandId}?${params.toString()}`, {
         credentials: "include",
       });
       
@@ -52,5 +67,6 @@ export function useAnalyticsSummary(
       
       return response.json();
     },
+    enabled: !!effectiveBrandId
   });
 }

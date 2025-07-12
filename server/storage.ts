@@ -47,6 +47,10 @@ export interface IStorage {
   // Brand Assets
   getBrandAssets(brandId: number): Promise<BrandAsset[]>;
   createBrandAsset(asset: InsertBrandAsset): Promise<BrandAsset>;
+
+  // Brand management
+  updateBrand(id: number, updates: Partial<Brand>): Promise<Brand>;
+  deleteBrand(id: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -234,6 +238,20 @@ export class DatabaseStorage implements IStorage {
   async createBrandAsset(asset: InsertBrandAsset): Promise<BrandAsset> {
     const [newAsset] = await db.insert(brandAssets).values([asset]).returning();
     return newAsset;
+  }
+
+  // Brand management methods
+  async updateBrand(id: number, updates: Partial<Brand>): Promise<Brand> {
+    const [updatedBrand] = await db
+      .update(brands)
+      .set(updates)
+      .where(eq(brands.id, id))
+      .returning();
+    return updatedBrand;
+  }
+
+  async deleteBrand(id: number): Promise<void> {
+    await db.delete(brands).where(eq(brands.id, id));
   }
 }
 
