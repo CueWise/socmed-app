@@ -192,10 +192,13 @@ export default function RichTextEditor({
   const handleSend = useCallback(() => {
     if (onSend) {
       onSend()
-      // Clear editor after sending
-      setTimeout(() => clearEditor(), 100)
+      // Clear editor after sending - use editor commands directly
+      if (editor) {
+        editor.commands.clearContent()
+        editor.commands.focus()
+      }
     }
-  }, [onSend, clearEditor])
+  }, [onSend, editor])
 
   if (!editor) {
     return null
@@ -217,7 +220,7 @@ export default function RichTextEditor({
           
           {/* Scrollable Dropdown Toolbar */}
           {showToolbar && (
-            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 min-w-[280px] max-h-[300px] overflow-y-auto">
+            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-[9999] p-3 min-w-[280px] max-h-[300px] overflow-y-auto">
               <div className="space-y-3">
                 {/* Text Formatting */}
                 <div>
@@ -386,7 +389,7 @@ export default function RichTextEditor({
 
       {/* Link Input */}
       {showLinkInput && (
-        <div className="bg-blue-50 border-b border-gray-300 p-3 flex gap-2">
+        <div className="bg-blue-50 border-b border-gray-300 p-3 flex gap-2 z-[9999] relative">
           <Input
             placeholder="Enter URL..."
             value={linkUrl}
@@ -401,7 +404,7 @@ export default function RichTextEditor({
 
       {/* Image Input */}
       {showImageInput && (
-        <div className="bg-green-50 border-b border-gray-300 p-3 flex gap-2">
+        <div className="bg-green-50 border-b border-gray-300 p-3 flex gap-2 z-[9999] relative">
           <Input
             placeholder="Enter image URL..."
             value={imageUrl}
