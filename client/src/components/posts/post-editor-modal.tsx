@@ -1085,7 +1085,6 @@ export default function PostEditorModal({
                   className="hidden"
                   accept="image/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
                   multiple
-                  capture="environment"
                   onChange={(e) => {
                     if (e.target.files) {
                       handleNewNoteFileUpload(e.target.files);
@@ -1096,7 +1095,7 @@ export default function PostEditorModal({
                   variant="outline"
                   size="sm"
                   type="button"
-                  className="text-gray-700 hover:text-gray-900 px-3 py-2 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200"
+                  className="text-gray-700 hover:text-gray-900 p-2 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200"
                   onClick={() => {
                     const fileInput = document.getElementById('mobile-file-upload') as HTMLInputElement;
                     if (fileInput) {
@@ -1105,7 +1104,6 @@ export default function PostEditorModal({
                   }}
                 >
                   <Paperclip className="h-4 w-4" />
-                  <span className="ml-1 text-xs">Upload</span>
                 </Button>
                 
                 <div className="relative z-10">
@@ -1114,10 +1112,9 @@ export default function PostEditorModal({
                     size="sm"
                     type="button"
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="text-gray-700 hover:text-gray-900 px-3 py-2 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200"
+                    className="text-gray-700 hover:text-gray-900 p-2 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200"
                   >
                     <Smile className="h-4 w-4" />
-                    <span className="ml-1 text-xs">Emoji</span>
                   </Button>
                   {showEmojiPicker && (
                     <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-1 z-20">
