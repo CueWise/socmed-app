@@ -85,6 +85,10 @@ export default function PostEditorModal({
   const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
+  const [showLinkDialog, setShowLinkDialog] = useState(false);
+  const [linkText, setLinkText] = useState("");
+  const [linkUrl, setLinkUrl] = useState("");
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -353,6 +357,7 @@ export default function PostEditorModal({
     setNoteThreads(prev => [...prev, newNote]);
     setNewNoteText("");
     setNewNoteAttachments([]);
+    setActiveFormats(new Set()); // Clear active formats
     setNotes(prev => prev + (prev ? "\n" : "") + newNoteText); // Update the notes field for backend
     setHasUnsavedChanges(true);
   };
@@ -380,39 +385,121 @@ export default function PostEditorModal({
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = newNoteText.substring(start, end);
-    let formattedText = selectedText;
     
-    switch (format) {
-      case 'bold':
-        formattedText = selectedText ? `**${selectedText}**` : '**bold text**';
-        break;
-      case 'italic':
-        formattedText = selectedText ? `*${selectedText}*` : '*italic text*';
-        break;
-      case 'bullet':
-        formattedText = selectedText ? `• ${selectedText}` : '• list item';
-        break;
-      case 'number':
-        formattedText = selectedText ? `1. ${selectedText}` : '1. numbered item';
-        break;
-      case 'link':
-        const url = prompt('Enter URL:');
-        if (url) {
-          formattedText = selectedText ? `[${selectedText}](${url})` : `[link text](${url})`;
-        } else {
-          return;
-        }
-        break;
+    if (format === 'link') {
+      // Set up link dialog with selected text
+      setLinkText(selectedText);
+      setLinkUrl('');
+      setShowLinkDialog(true);
+      return;
     }
     
-    const newText = newNoteText.substring(0, start) + formattedText + newNoteText.substring(end);
+    // For other formats, toggle behavior
+    if (selectedText) {
+      // Apply formatting to selected text
+      let formattedText = selectedText;
+      
+      switch (format) {
+        case 'bold':
+          formattedText = `**${selectedText}**`;
+          break;
+        case 'italic':
+          formattedText = `*${selectedText}*`;
+          break;
+        case 'bullet':
+          const lines = selectedText.split('\n');
+          formattedText = lines.map(line => line.trim() ? `• ${line}` : line).join('\n');
+          break;
+        case 'number':
+          const numberedLines = selectedText.split('\n');
+          formattedText = numberedLines.map((line, index) => 
+            line.trim() ? `${index + 1}. ${line}` : line
+          ).join('\n');
+          break;
+      }
+      
+      const newText = newNoteText.substring(0, start) + formattedText + newNoteText.substring(end);
+      setNewNoteText(newText);
+      
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start, start + formattedText.length);
+      }, 0);
+    } else {
+      // Toggle format mode for new text
+      const newActiveFormats = new Set(activeFormats);
+      if (newActiveFormats.has(format)) {
+        newActiveFormats.delete(format);
+      } else {
+        newActiveFormats.add(format);
+      }
+      setActiveFormats(newActiveFormats);
+      textarea.focus();
+    }
+  };
+
+  const handleTextChange = (text: string) => {
+    setNewNoteText(text);
+    
+    // Apply active formats to new text being typed
+    if (activeFormats.size > 0) {
+      const textarea = document.querySelector('#new-note-textarea') as HTMLTextAreaElement;
+      if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        
+        if (start === end && text.length > newNoteText.length) {
+          // New character was typed, apply formats
+          const newChar = text.charAt(start - 1);
+          if (newChar && newChar !== '\n') {
+            let formattedChar = newChar;
+            
+            if (activeFormats.has('bold')) {
+              formattedChar = `**${formattedChar}**`;
+            }
+            if (activeFormats.has('italic')) {
+              formattedChar = `*${formattedChar}*`;
+            }
+            
+            if (formattedChar !== newChar) {
+              const beforeCursor = text.substring(0, start - 1);
+              const afterCursor = text.substring(start);
+              const newText = beforeCursor + formattedChar + afterCursor;
+              setNewNoteText(newText);
+              
+              setTimeout(() => {
+                const newPos = start + formattedChar.length - 1;
+                textarea.setSelectionRange(newPos, newPos);
+              }, 0);
+              return;
+            }
+          }
+        }
+      }
+    }
+  };
+
+  const handleLinkSubmit = () => {
+    if (!linkText.trim() || !linkUrl.trim()) return;
+    
+    const textarea = document.querySelector('#new-note-textarea') as HTMLTextAreaElement;
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const linkMarkdown = `[${linkText}](${linkUrl})`;
+    
+    const newText = newNoteText.substring(0, start) + linkMarkdown + newNoteText.substring(end);
     setNewNoteText(newText);
     
-    // Set cursor position after the formatted text
+    setShowLinkDialog(false);
+    setLinkText('');
+    setLinkUrl('');
+    
     setTimeout(() => {
       textarea.focus();
-      const newCursorPos = start + formattedText.length;
-      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      const newPos = start + linkMarkdown.length;
+      textarea.setSelectionRange(newPos, newPos);
     }, 0);
   };
 
@@ -977,7 +1064,7 @@ export default function PostEditorModal({
             <Textarea
               id="new-note-textarea"
               value={newNoteText}
-              onChange={(e) => setNewNoteText(e.target.value)}
+              onChange={(e) => handleTextChange(e.target.value)}
               placeholder="Type a message..."
               className="min-h-[60px] border-2 focus:border-primary resize-none"
               onKeyDown={(e) => {
@@ -1023,11 +1110,75 @@ export default function PostEditorModal({
                   id="new-note-file-upload"
                   accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi"
                 />
-                <label htmlFor="new-note-file-upload" className="cursor-pointer">
-                  <Button variant="ghost" size="sm" type="button" className="text-gray-500 hover:text-gray-700">
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    type="button"
+                    className="text-gray-500 hover:text-gray-700"
+                    onClick={() => {
+                      const dropdown = document.getElementById('upload-dropdown');
+                      if (dropdown) {
+                        dropdown.classList.toggle('hidden');
+                      }
+                    }}
+                  >
                     <Paperclip className="h-4 w-4" />
                   </Button>
-                </label>
+                  <div id="upload-dropdown" className="hidden absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg z-10 py-1 w-48">
+                    <label htmlFor="photo-gallery-upload" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                      <ImageIcon className="h-4 w-4" />
+                      Photo Gallery
+                    </label>
+                    <input
+                      type="file"
+                      id="photo-gallery-upload"
+                      className="hidden"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        if (e.target.files) {
+                          handleNewNoteFileUpload(e.target.files);
+                          document.getElementById('upload-dropdown')?.classList.add('hidden');
+                        }
+                      }}
+                    />
+                    <label htmlFor="video-upload" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                      <Video className="h-4 w-4" />
+                      Photo/Video
+                    </label>
+                    <input
+                      type="file"
+                      id="video-upload"
+                      className="hidden"
+                      accept="image/*,video/*"
+                      multiple
+                      onChange={(e) => {
+                        if (e.target.files) {
+                          handleNewNoteFileUpload(e.target.files);
+                          document.getElementById('upload-dropdown')?.classList.add('hidden');
+                        }
+                      }}
+                    />
+                    <label htmlFor="file-upload" className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 cursor-pointer">
+                      <FileText className="h-4 w-4" />
+                      Upload Files
+                    </label>
+                    <input
+                      type="file"
+                      id="file-upload"
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                      multiple
+                      onChange={(e) => {
+                        if (e.target.files) {
+                          handleNewNoteFileUpload(e.target.files);
+                          document.getElementById('upload-dropdown')?.classList.add('hidden');
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
                 
                 {/* Text Formatting Buttons */}
                 <Button
@@ -1035,7 +1186,7 @@ export default function PostEditorModal({
                   size="sm"
                   type="button"
                   onClick={() => formatText('bold')}
-                  className="text-gray-500 hover:text-gray-700"
+                  className={`${activeFormats.has('bold') ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   <Bold className="h-4 w-4" />
                 </Button>
@@ -1044,7 +1195,7 @@ export default function PostEditorModal({
                   size="sm"
                   type="button"
                   onClick={() => formatText('italic')}
-                  className="text-gray-500 hover:text-gray-700"
+                  className={`${activeFormats.has('italic') ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700'}`}
                 >
                   <Italic className="h-4 w-4" />
                 </Button>
@@ -1086,7 +1237,7 @@ export default function PostEditorModal({
                     <Smile className="h-4 w-4" />
                   </Button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-1">
+                    <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-1 z-20">
                       {commonEmojis.map((emoji, index) => (
                         <button
                           key={index}
@@ -1099,6 +1250,48 @@ export default function PostEditorModal({
                     </div>
                   )}
                 </div>
+                
+                {/* Link Dialog */}
+                {showLinkDialog && (
+                  <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-4 w-80 z-20">
+                    <div className="space-y-3">
+                      <div>
+                        <label className="text-sm font-medium">Link Text</label>
+                        <Input
+                          value={linkText}
+                          onChange={(e) => setLinkText(e.target.value)}
+                          placeholder="Enter link text..."
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">URL</label>
+                        <Input
+                          value={linkUrl}
+                          onChange={(e) => setLinkUrl(e.target.value)}
+                          placeholder="https://example.com"
+                          className="mt-1"
+                        />
+                      </div>
+                      <div className="flex gap-2 justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowLinkDialog(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={handleLinkSubmit}
+                          disabled={!linkText.trim() || !linkUrl.trim()}
+                        >
+                          Add Link
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <div className="flex gap-2">
