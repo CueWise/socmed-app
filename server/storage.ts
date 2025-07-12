@@ -51,6 +51,19 @@ export interface IStorage {
   // Brand management
   updateBrand(id: number, updates: Partial<Brand>): Promise<Brand>;
   deleteBrand(id: number): Promise<void>;
+
+  // Gamification
+  getUserStats(userId: number): Promise<UserStats | undefined>;
+  updateUserStats(userId: number, stats: Partial<UserStats>): Promise<UserStats>;
+  createUserStats(stats: InsertUserStats): Promise<UserStats>;
+  
+  getAchievements(): Promise<Achievement[]>;
+  getUserAchievements(userId: number): Promise<UserAchievement[]>;
+  unlockAchievement(userId: number, achievementId: number): Promise<UserAchievement>;
+  
+  getDailyGoal(userId: number, date: Date): Promise<DailyGoal | undefined>;
+  createDailyGoal(goal: InsertDailyGoal): Promise<DailyGoal>;
+  updateDailyGoal(id: number, updates: Partial<DailyGoal>): Promise<DailyGoal>;
 }
 
 export class DatabaseStorage implements IStorage {
