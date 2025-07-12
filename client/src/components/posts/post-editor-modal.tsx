@@ -20,6 +20,7 @@ interface PostEditorModalProps {
   onOpenChange: (open: boolean) => void;
   defaultDate?: Date;
   postId?: number;
+  initialData?: any;
 }
 
 interface PostData {
@@ -34,15 +35,24 @@ export default function PostEditorModal({
   open, 
   onOpenChange, 
   defaultDate,
-  postId 
+  postId,
+  initialData
 }: PostEditorModalProps) {
-  const [content, setContent] = useState("");
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["instagram"]);
-  const [scheduledDate, setScheduledDate] = useState(
-    defaultDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0]
+  const [content, setContent] = useState(initialData?.content || "");
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(
+    initialData?.platforms || ["instagram"]
   );
-  const [scheduledTime, setScheduledTime] = useState("14:00");
-  const [hashtags, setHashtags] = useState<string[]>([]);
+  const [scheduledDate, setScheduledDate] = useState(
+    initialData?.scheduledAt 
+      ? new Date(initialData.scheduledAt).toISOString().split('T')[0]
+      : defaultDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0]
+  );
+  const [scheduledTime, setScheduledTime] = useState(
+    initialData?.scheduledAt 
+      ? new Date(initialData.scheduledAt).toTimeString().split(' ')[0].slice(0, 5)
+      : "14:00"
+  );
+  const [hashtags, setHashtags] = useState<string[]>(initialData?.hashtags || []);
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [isGeneratingHashtags, setIsGeneratingHashtags] = useState(false);
   const [isOptimizing, setIsOptimizing] = useState(false);
@@ -71,7 +81,7 @@ export default function PostEditorModal({
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
       toast({
         title: "Success",
-        description: "Post created successfully",
+        description: postId ? "Post updated successfully" : "Post created successfully",
       });
       onOpenChange(false);
       resetForm();
