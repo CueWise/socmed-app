@@ -132,7 +132,7 @@ export default function QuickActions() {
                 <Button
                   size="icon"
                   className={cn(
-                    "w-12 h-12 rounded-full shadow-lg text-white border-2 border-white",
+                    "w-12 h-12 rounded-full shadow-lg hover:shadow-xl text-white border-2 border-white transition-all duration-200 transform hover:scale-110",
                     action.color
                   )}
                   onClick={() => {
@@ -151,9 +151,10 @@ export default function QuickActions() {
         <Button
           size="icon"
           className={cn(
-            "w-14 h-14 rounded-full shadow-lg transition-all duration-300 text-white z-50 relative",
+            "w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out text-white z-50 relative transform",
             mainAction.color,
-            isExpanded && "rotate-45"
+            isExpanded && "rotate-45 scale-110",
+            !isExpanded && "hover:scale-105"
           )}
           onClick={() => {
             if (isExpanded) {

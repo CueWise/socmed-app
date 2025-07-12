@@ -68,10 +68,10 @@ export default function StatsCard({
           </div>
           
           <div className={cn(
-            "w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0",
+            "w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden",
             colorClasses[color]
           )}>
-            <span className="material-icons text-sm sm:text-base">
+            <span className="material-icons text-xs leading-none">
               {icon}
             </span>
           </div>
