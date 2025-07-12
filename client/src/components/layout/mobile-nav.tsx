@@ -3,14 +3,10 @@ import {
   LayoutDashboard, 
   Calendar, 
   FileText, 
-  BarChart3, 
-  Plus 
+  BarChart3
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
-import PostEditorModal from "@/components/posts/post-editor-modal";
 
 
 const navigationItems = [
@@ -40,39 +36,21 @@ const navigationItems = [
 
 export default function MobileNav() {
   const [location] = useLocation();
-  const [showPostEditor, setShowPostEditor] = useState(false);
 
   return (
-    <>
-      <nav className="bg-white border-t border-gray-200 shadow-lg safe-area-inset-bottom">
-        <div className="flex items-center justify-around py-1">
+    <nav className="bg-white border-t border-gray-200 shadow-lg safe-area-inset-bottom">
+        <div className="flex items-center justify-around py-1 px-2">
           {navigationItems.map((item, index) => {
             const Icon = item.icon;
             const isActive = item.exact 
               ? location === item.href 
               : location.startsWith(item.href) && item.href !== "/";
 
-            // Add FAB in the middle
-            if (index === 2) {
-              return (
-                <div key="fab" className="flex flex-col items-center">
-                  <Button
-                    size="icon"
-                    className="w-12 h-12 rounded-full bg-primary hover:bg-primary/90 shadow-lg touch-manipulation select-none-touch touch-active"
-                    onClick={() => setShowPostEditor(true)}
-                    aria-label="Create new post"
-                  >
-                    <Plus className="h-6 w-6 text-white" />
-                  </Button>
-                </div>
-              );
-            }
-
             return (
               <Link key={item.name} href={item.href}>
                 <div
                   className={cn(
-                    "flex flex-col items-center space-y-1 px-2 py-3 relative transition-colors touch-manipulation select-none-touch min-w-[60px] min-h-[44px] cursor-pointer",
+                    "flex flex-col items-center space-y-1 px-3 py-3 relative transition-colors touch-manipulation select-none-touch min-w-[60px] min-h-[44px] cursor-pointer",
                     isActive 
                       ? "text-primary" 
                       : "text-gray-500 hover:text-gray-700"
@@ -93,14 +71,6 @@ export default function MobileNav() {
             );
           })}
         </div>
-        
-
       </nav>
-
-      <PostEditorModal 
-        open={showPostEditor} 
-        onOpenChange={setShowPostEditor} 
-      />
-    </>
   );
 }
