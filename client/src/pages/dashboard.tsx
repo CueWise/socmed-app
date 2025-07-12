@@ -72,7 +72,7 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 -mt-2">
         <StatsCard
           title="Total Reach"
           value="2.4M"
