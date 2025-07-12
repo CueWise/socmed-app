@@ -80,6 +80,7 @@ export default function PostEditorModal({
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [noteThreads, setNoteThreads] = useState<any[]>([]);
   const [newNoteText, setNewNoteText] = useState("");
+  const [editorKey, setEditorKey] = useState(0);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
   const [newNoteAttachments, setNewNoteAttachments] = useState<any[]>([]);
@@ -363,6 +364,7 @@ export default function PostEditorModal({
     setActiveFormats(new Set()); // Clear active formats
     setHasSelectedText(false); // Clear selection state
     setNotes(prev => prev + (prev ? "\n" : "") + newNoteText); // Update the notes field for backend
+    setEditorKey(prev => prev + 1); // Force editor re-render
     setHasUnsavedChanges(true);
   };
 
@@ -1069,6 +1071,7 @@ export default function PostEditorModal({
         <div className="border-t pt-4 bg-white">
           <div className="space-y-2">
             <RichTextEditor
+              key={editorKey}
               content={newNoteText}
               onChange={(content, isHtml) => {
                 // Always just store the content as is
@@ -1076,7 +1079,7 @@ export default function PostEditorModal({
               }}
               onSend={handleAddNote}
               placeholder="Type a message..."
-              className="min-h-[80px]"
+              className="min-h-[50px]"
             />
             
             {/* New Note Attachments */}
