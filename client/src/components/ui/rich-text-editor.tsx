@@ -30,7 +30,8 @@ import {
   Table as TableIcon,
   Eye,
   EyeOff,
-  Type
+  Type,
+  MoreHorizontal
 } from 'lucide-react'
 
 interface RichTextEditorProps {
@@ -52,12 +53,14 @@ export default function RichTextEditor({
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [showImageInput, setShowImageInput] = useState(false)
+  const [showToolbar, setShowToolbar] = useState(false)
 
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         heading: false, // We'll use our own heading extension
         codeBlock: false, // We'll use our own code block extension
+        strike: false, // We'll use our own strike extension
       }),
       Heading.configure({
         levels: [1, 2, 3]
@@ -159,149 +162,186 @@ export default function RichTextEditor({
 
   return (
     <div className={`border border-gray-300 rounded-lg overflow-hidden ${className}`}>
-      {/* Toolbar */}
-      <div className="bg-gray-50 border-b border-gray-300 p-2 flex flex-wrap gap-1">
-        {/* Text Formatting */}
-        <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
+      {/* Compact Header with Ellipsis */}
+      <div className="bg-gray-50 border-b border-gray-300 p-2 flex justify-between items-center">
+        <div className="text-sm text-gray-600">Rich Text Editor</div>
+        <div className="relative">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`p-2 ${editor.isActive('bold') ? 'bg-gray-200' : ''}`}
-          >
-            <Bold className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`p-2 ${editor.isActive('italic') ? 'bg-gray-200' : ''}`}
-          >
-            <Italic className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={`p-2 ${editor.isActive('underline') ? 'bg-gray-200' : ''}`}
-          >
-            <UnderlineIcon className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={`p-2 ${editor.isActive('strike') ? 'bg-gray-200' : ''}`}
-          >
-            <Strikethrough className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Headings */}
-        <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={`p-2 ${editor.isActive('heading', { level: 1 }) ? 'bg-gray-200' : ''}`}
-          >
-            <Heading1 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={`p-2 ${editor.isActive('heading', { level: 2 }) ? 'bg-gray-200' : ''}`}
-          >
-            <Heading2 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-            className={`p-2 ${editor.isActive('heading', { level: 3 }) ? 'bg-gray-200' : ''}`}
-          >
-            <Heading3 className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Lists */}
-        <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`p-2 ${editor.isActive('bulletList') ? 'bg-gray-200' : ''}`}
-          >
-            <List className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`p-2 ${editor.isActive('orderedList') ? 'bg-gray-200' : ''}`}
-          >
-            <ListOrdered className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Code */}
-        <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleCode().run()}
-            className={`p-2 ${editor.isActive('code') ? 'bg-gray-200' : ''}`}
-          >
-            <Code className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            className={`p-2 ${editor.isActive('codeBlock') ? 'bg-gray-200' : ''}`}
-          >
-            <Type className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Media & Links */}
-        <div className="flex gap-1 border-r border-gray-300 pr-2 mr-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowLinkInput(!showLinkInput)}
+            onClick={() => setShowToolbar(!showToolbar)}
             className="p-2"
           >
-            <LinkIcon className="h-4 w-4" />
+            <MoreHorizontal className="h-4 w-4" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowImageInput(!showImageInput)}
-            className="p-2"
-          >
-            <ImageIcon className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={addTable}
-            className="p-2"
-          >
-            <TableIcon className="h-4 w-4" />
-          </Button>
-        </div>
+          
+          {/* Dropdown Toolbar */}
+          {showToolbar && (
+            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50 p-3 min-w-[300px]">
+              <div className="space-y-3">
+                {/* Text Formatting */}
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Text Formatting</div>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleBold().run()}
+                      className={`p-2 ${editor.isActive('bold') ? 'bg-blue-100' : ''}`}
+                    >
+                      <Bold className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleItalic().run()}
+                      className={`p-2 ${editor.isActive('italic') ? 'bg-blue-100' : ''}`}
+                    >
+                      <Italic className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleUnderline().run()}
+                      className={`p-2 ${editor.isActive('underline') ? 'bg-blue-100' : ''}`}
+                    >
+                      <UnderlineIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleStrike().run()}
+                      className={`p-2 ${editor.isActive('strike') ? 'bg-blue-100' : ''}`}
+                    >
+                      <Strikethrough className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
 
-        {/* View Toggle */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleSource}
-          className="p-2 ml-auto"
-        >
-          {showSource ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-        </Button>
+                {/* Headings */}
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Headings</div>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+                      className={`p-2 ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-100' : ''}`}
+                    >
+                      <Heading1 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+                      className={`p-2 ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-100' : ''}`}
+                    >
+                      <Heading2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+                      className={`p-2 ${editor.isActive('heading', { level: 3 }) ? 'bg-blue-100' : ''}`}
+                    >
+                      <Heading3 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Lists */}
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Lists</div>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleBulletList().run()}
+                      className={`p-2 ${editor.isActive('bulletList') ? 'bg-blue-100' : ''}`}
+                    >
+                      <List className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleOrderedList().run()}
+                      className={`p-2 ${editor.isActive('orderedList') ? 'bg-blue-100' : ''}`}
+                    >
+                      <ListOrdered className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Code */}
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Code</div>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleCode().run()}
+                      className={`p-2 ${editor.isActive('code') ? 'bg-blue-100' : ''}`}
+                    >
+                      <Code className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+                      className={`p-2 ${editor.isActive('codeBlock') ? 'bg-blue-100' : ''}`}
+                    >
+                      <Type className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Media & Links */}
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Insert</div>
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowLinkInput(!showLinkInput)}
+                      className="p-2"
+                    >
+                      <LinkIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowImageInput(!showImageInput)}
+                      className="p-2"
+                    >
+                      <ImageIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={addTable}
+                      className="p-2"
+                    >
+                      <TableIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* View Toggle */}
+                <div>
+                  <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">View</div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={toggleSource}
+                    className="p-2"
+                  >
+                    {showSource ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Link Input */}
