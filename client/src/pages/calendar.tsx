@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 
 export default function Calendar() {
   const [showPostEditor, setShowPostEditor] = useState(false);
+  const [editingPost, setEditingPost] = useState<any>(null);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [platformFilter, setPlatformFilter] = useState("all");
@@ -258,7 +259,7 @@ export default function Calendar() {
                         <div className="grid grid-cols-2 gap-2">
                           {post.mediaUrls.slice(0, 4).map((url, index) => (
                             <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
-                              {url.includes('video') ? (
+                              {url.includes('.mp4') || url.includes('video') ? (
                                 <div className="w-full h-full flex items-center justify-center bg-gray-200">
                                   <span className="text-xs text-gray-500">Video</span>
                                 </div>
@@ -304,8 +305,8 @@ export default function Calendar() {
                         variant="ghost" 
                         size="sm"
                         onClick={() => {
+                          setEditingPost(post);
                           setShowPostEditor(true);
-                          // TODO: Pass post data to editor for editing
                         }}
                       >
                         Edit
@@ -321,8 +322,13 @@ export default function Calendar() {
 
       <PostEditorModal 
         open={showPostEditor} 
-        onOpenChange={setShowPostEditor}
+        onOpenChange={(open) => {
+          setShowPostEditor(open);
+          if (!open) setEditingPost(null);
+        }}
         defaultDate={selectedDate || undefined}
+        postId={editingPost?.id}
+        initialData={editingPost}
       />
     </div>
   );
