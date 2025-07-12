@@ -37,29 +37,29 @@ export default function StatsCard({
 
   return (
     <Card className="hover:shadow-md transition-shadow">
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className="p-2 sm:p-3">
         <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-hidden">
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1 truncate">
               {title}
             </p>
-            <p className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-white truncate">
+            <p className="text-base sm:text-lg lg:text-xl font-bold text-gray-900 dark:text-white truncate leading-tight">
               {value}
             </p>
             {(change || subtitle) && (
               <div className="mt-1 sm:mt-2 flex flex-col sm:flex-row sm:items-center gap-1">
                 {change && (
                   <div className={cn(
-                    "flex items-center text-xs sm:text-sm font-medium",
+                    "flex items-center text-xs font-medium",
                     changeColorClasses[changeType]
                   )}>
-                    {changeType === "positive" && <TrendingUp className="h-3 w-3 mr-1 flex-shrink-0" />}
-                    {changeType === "negative" && <TrendingDown className="h-3 w-3 mr-1 flex-shrink-0" />}
+                    {changeType === "positive" && <TrendingUp className="h-2.5 w-2.5 mr-1 flex-shrink-0" />}
+                    {changeType === "negative" && <TrendingDown className="h-2.5 w-2.5 mr-1 flex-shrink-0" />}
                     <span className="truncate">{change}</span>
                   </div>
                 )}
                 {subtitle && (
-                  <span className="text-xs sm:text-sm text-gray-500 truncate">
+                  <span className="text-xs text-gray-500 truncate">
                     {subtitle}
                   </span>
                 )}
@@ -68,10 +68,10 @@ export default function StatsCard({
           </div>
           
           <div className={cn(
-            "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0",
+            "w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0",
             colorClasses[color]
           )}>
-            <span className="material-icons text-lg sm:text-xl">
+            <span className="material-icons text-sm sm:text-base">
               {icon}
             </span>
           </div>

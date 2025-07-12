@@ -159,14 +159,15 @@ export default function QuickActions() {
             if (isExpanded) {
               setIsExpanded(false);
             } else {
-              // Primary action: create post
-              mainAction.action();
+              // Single click expands the menu
+              setIsExpanded(true);
             }
           }}
           onDoubleClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            setIsExpanded(!isExpanded);
+            // Double click creates a post
+            mainAction.action();
           }}
         >
           <Plus className="h-6 w-6" />
