@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Sparkles, Hash, TrendingUp, Camera, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +59,28 @@ export default function PostEditorModal({
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Update form when initialData changes
+  useEffect(() => {
+    if (initialData) {
+      setContent(initialData.content || "");
+      setSelectedPlatforms(initialData.platforms || ["instagram"]);
+      setHashtags(initialData.hashtags || []);
+      
+      if (initialData.scheduledAt) {
+        const scheduleDate = new Date(initialData.scheduledAt);
+        setScheduledDate(scheduleDate.toISOString().split('T')[0]);
+        setScheduledTime(scheduleDate.toTimeString().split(' ')[0].slice(0, 5));
+      }
+    } else {
+      // Reset form for new post
+      setContent("");
+      setSelectedPlatforms(["instagram"]);
+      setHashtags([]);
+      setScheduledDate(defaultDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0]);
+      setScheduledTime("14:00");
+    }
+  }, [initialData, defaultDate]);
 
   const platforms = [
     { id: "instagram", name: "Instagram", color: "from-purple-500 to-pink-500" },
