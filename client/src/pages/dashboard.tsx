@@ -104,6 +104,67 @@ export default function Dashboard() {
         />
       </div>
 
+      {/* Platform Performance */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <span className="material-icons mr-2 text-primary">trending_up</span>
+            Platform Performance
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-pink-50 to-pink-100 dark:from-pink-900/20 dark:to-pink-800/20 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                  IG
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Instagram</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">2.3K engagement</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-green-600 font-semibold">+12%</div>
+                <div className="text-xs text-gray-500">vs last week</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                  FB
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">Facebook</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">1.8K engagement</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-green-600 font-semibold">+8%</div>
+                <div className="text-xs text-gray-500">vs last week</div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900/20 dark:to-gray-800/20 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gray-900 dark:bg-gray-300 rounded-lg flex items-center justify-center text-white dark:text-gray-900 font-bold text-sm">
+                  TT
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">TikTok</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">5.1K engagement</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-green-600 font-semibold">+25%</div>
+                <div className="text-xs text-gray-500">vs last week</div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Content Calendar */}
         <div className="lg:col-span-2">
