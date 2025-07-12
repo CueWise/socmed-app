@@ -1076,8 +1076,8 @@ export default function PostEditorModal({
             )}
             
             {/* Rich Text Formatting Toolbar */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between relative">
+              <div className="flex items-center gap-2 z-10">
                 {/* Always visible: Upload and Emoji */}
                 <input
                   type="file"
@@ -1092,24 +1092,24 @@ export default function PostEditorModal({
                     }
                   }}
                 />
-                <label htmlFor="mobile-file-upload" className="cursor-pointer">
+                <label htmlFor="mobile-file-upload" className="cursor-pointer z-20 relative">
                   <Button
                     variant="ghost"
                     size="sm"
                     type="button"
-                    className="text-gray-500 hover:text-gray-700 p-2"
+                    className="text-gray-500 hover:text-gray-700 p-2 bg-white border border-gray-200 shadow-sm"
                   >
                     <Paperclip className="h-4 w-4" />
                   </Button>
                 </label>
                 
-                <div className="relative">
+                <div className="relative z-10">
                   <Button
                     variant="ghost"
                     size="sm"
                     type="button"
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="text-gray-500 hover:text-gray-700 p-2"
+                    className="text-gray-500 hover:text-gray-700 p-2 bg-white border border-gray-200 shadow-sm"
                   >
                     <Smile className="h-4 w-4" />
                   </Button>
@@ -1130,13 +1130,13 @@ export default function PostEditorModal({
                 
                 {/* Text Formatting Buttons - Only visible when text is selected */}
                 {hasSelectedText && (
-                  <div className="flex items-center gap-1 ml-2 border-l pl-2">
+                  <div className="flex items-center gap-1 ml-2 border-l pl-2 bg-white z-10 relative">
                     <Button
                       variant="ghost"
                       size="sm"
                       type="button"
                       onClick={() => formatText('bold')}
-                      className="text-gray-500 hover:text-gray-700 p-1"
+                      className="text-gray-500 hover:text-gray-700 p-1 bg-white border border-gray-200 shadow-sm"
                     >
                       <Bold className="h-3 w-3" />
                     </Button>
@@ -1145,7 +1145,7 @@ export default function PostEditorModal({
                       size="sm"
                       type="button"
                       onClick={() => formatText('italic')}
-                      className="text-gray-500 hover:text-gray-700 p-1"
+                      className="text-gray-500 hover:text-gray-700 p-1 bg-white border border-gray-200 shadow-sm"
                     >
                       <Italic className="h-3 w-3" />
                     </Button>
@@ -1154,7 +1154,7 @@ export default function PostEditorModal({
                       size="sm"
                       type="button"
                       onClick={() => formatText('bullet')}
-                      className="text-gray-500 hover:text-gray-700 p-1"
+                      className="text-gray-500 hover:text-gray-700 p-1 bg-white border border-gray-200 shadow-sm"
                     >
                       <List className="h-3 w-3" />
                     </Button>
@@ -1163,7 +1163,7 @@ export default function PostEditorModal({
                       size="sm"
                       type="button"
                       onClick={() => formatText('number')}
-                      className="text-gray-500 hover:text-gray-700 p-1"
+                      className="text-gray-500 hover:text-gray-700 p-1 bg-white border border-gray-200 shadow-sm"
                     >
                       <ListOrdered className="h-3 w-3" />
                     </Button>
@@ -1172,7 +1172,7 @@ export default function PostEditorModal({
                       size="sm"
                       type="button"
                       onClick={() => formatText('link')}
-                      className="text-gray-500 hover:text-gray-700 p-1"
+                      className="text-gray-500 hover:text-gray-700 p-1 bg-white border border-gray-200 shadow-sm"
                     >
                       <Link className="h-3 w-3" />
                     </Button>
@@ -1232,7 +1232,7 @@ export default function PostEditorModal({
                 <Button
                   onClick={handleAddNote}
                   disabled={!newNoteText.trim()}
-                  className="bg-primary hover:bg-primary/90 px-4 py-2"
+                  className="bg-primary hover:bg-primary/90 px-4 py-2 z-10 relative"
                   size="sm"
                 >
                   <Send className="h-4 w-4" />
