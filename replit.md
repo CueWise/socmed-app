@@ -1,0 +1,133 @@
+# SocialFlow - Social Media Management Platform
+
+## Overview
+
+SocialFlow is a mobile-first social media management platform with AI-powered content creation and analytics. The application enables users to create, schedule, and manage social media posts across multiple platforms (Instagram, Facebook, TikTok, Twitter) with collaborative approval workflows and comprehensive analytics.
+
+## User Preferences
+
+Preferred communication style: Simple, everyday language.
+
+## System Architecture
+
+### Frontend Architecture
+- **Framework**: React with TypeScript using Vite as the build tool
+- **UI Library**: Shadcn/ui components with Radix UI primitives
+- **Styling**: Tailwind CSS with CSS variables for theming
+- **Routing**: Wouter for client-side routing
+- **State Management**: TanStack Query (React Query) for server state
+- **Mobile-First Design**: Progressive Web App (PWA) with responsive design
+
+### Backend Architecture
+- **Runtime**: Node.js with Express.js server
+- **Language**: TypeScript with ES modules
+- **API Design**: RESTful API with structured error handling
+- **File Structure**: Monorepo with shared schema between client and server
+
+### Data Storage Solutions
+- **Database**: PostgreSQL with Neon serverless database
+- **ORM**: Drizzle ORM with type-safe queries
+- **Schema**: Shared TypeScript schema definitions using Drizzle and Zod
+- **Migrations**: Drizzle Kit for database migrations
+
+## Key Components
+
+### Core Domain Models
+- **Users**: Role-based (creator, editor, approver, admin) with authentication
+- **Brands**: Multi-brand support with visual identity management
+- **Posts**: Content with multi-platform publishing and status tracking
+- **Approvals**: Collaborative workflow with comments and status updates
+- **Analytics**: Performance tracking across platforms
+- **Platforms**: Social media platform integrations and credentials
+
+### Authentication & Authorization
+- **Role-Based Access**: Four user roles with different permissions
+- **Session Management**: Express sessions with PostgreSQL storage
+- **Route Protection**: API endpoints protected by role-based middleware
+
+### AI Integration
+- **Content Generation**: OpenAI GPT-4o for caption generation
+- **Hashtag Suggestions**: AI-powered hashtag recommendations
+- **Content Optimization**: Engagement optimization suggestions
+- **Posting Time Optimization**: AI-suggested optimal posting times
+
+### PWA Features
+- **Service Worker**: Offline functionality with caching strategies
+- **App Manifest**: Native app-like installation and experience
+- **Mobile Navigation**: Touch-optimized interface with bottom navigation
+- **Responsive Design**: Adaptive layout for mobile and desktop
+
+## Data Flow
+
+### Content Creation Flow
+1. User creates post draft with content and media
+2. AI suggestions for captions, hashtags, and timing
+3. Multi-platform content adaptation and preview
+4. Save as draft or submit for approval
+
+### Approval Workflow
+1. Post submitted for approval by creator
+2. Approvers receive notifications
+3. Comment threads for feedback and revisions
+4. Approve/reject with status updates
+5. Approved posts ready for scheduling
+
+### Publishing Flow
+1. Schedule posts with optimal timing suggestions
+2. Platform-specific API integration for publishing
+3. Real-time status updates and notifications
+4. Analytics collection post-publication
+
+### Analytics Pipeline
+1. Data collection from platform APIs
+2. Aggregation and calculation of metrics
+3. Dashboard visualization with charts
+4. Export functionality for reporting
+
+## External Dependencies
+
+### Core Infrastructure
+- **Database**: Neon PostgreSQL serverless database
+- **AI Services**: OpenAI API for content generation
+- **Build Tools**: Vite for development and bundling
+- **WebSocket**: For real-time notifications (via Neon)
+
+### Social Media Platforms
+- **Meta Business Suite API**: Instagram and Facebook publishing
+- **TikTok Business API**: TikTok content management
+- **Twitter API**: Tweet scheduling and analytics
+- **Platform OAuth**: Authentication flows for social accounts
+
+### UI and Styling
+- **Shadcn/ui**: Pre-built accessible components
+- **Radix UI**: Unstyled component primitives
+- **Tailwind CSS**: Utility-first styling framework
+- **Lucide React**: Icon library
+
+## Deployment Strategy
+
+### Development Environment
+- **Replit Integration**: Native Replit development support
+- **Hot Module Replacement**: Vite HMR for fast development
+- **TypeScript Checking**: Real-time type validation
+- **Environment Variables**: Secure credential management
+
+### Production Build
+- **Client Build**: Vite production build with optimization
+- **Server Build**: ESBuild for Node.js bundle creation
+- **Static Assets**: Optimized and cached public assets
+- **Service Worker**: Cached for offline functionality
+
+### Database Management
+- **Schema Synchronization**: Drizzle Kit push for development
+- **Migration Strategy**: Version-controlled schema changes
+- **Connection Pooling**: Neon serverless connection management
+- **Backup Strategy**: Automated PostgreSQL backups
+
+### Performance Optimization
+- **Code Splitting**: Route-based and component-based splitting
+- **Image Optimization**: Unsplash integration with optimized sizing
+- **Caching Strategy**: Service worker with cache-first/network-first patterns
+- **Bundle Analysis**: Tree shaking and dead code elimination
+
+The application follows a modern full-stack architecture with emphasis on developer experience, type safety, and mobile-first design principles.

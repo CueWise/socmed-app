@@ -1,0 +1,284 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mobile-first touch optimizations */
+@layer base {
+  /* Touch manipulation for better mobile interactions */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  
+  /* Ensure minimum touch target size (44px) for mobile accessibility */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Smooth scrolling for better mobile experience */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent text selection during touch interactions */
+  .select-none-touch {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  
+  /* Safe area support for mobile devices */
+  .safe-area-inset-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Touch-optimized transitions */
+  .touch-transition {
+    transition: transform 0.15s ease-out, opacity 0.15s ease-out;
+  }
+  
+  /* Active state for touch feedback */
+  .touch-active:active {
+    transform: scale(0.97);
+    opacity: 0.8;
+  }
+  
+  /* Mobile-optimized calendar styles */
+  .calendar-day {
+    transition: all 0.15s ease-out;
+  }
+  
+  .calendar-day:hover {
+    transform: translateY(-1px);
+  }
+  
+  .calendar-day:active {
+    transform: scale(0.98);
+  }
+  
+  /* Mobile navigation enhancement */
+  .mobile-nav-item {
+    tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Pull-to-refresh optimization */
+  body {
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Smooth transitions for mobile interactions */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* High contrast borders for touch targets */
+  @media (max-width: 768px) {
+    .touch-target {
+      border: 2px solid transparent;
+    }
+    
+    .touch-target:focus {
+      border-color: hsl(var(--primary));
+      outline: none;
+    }
+  }
+}
+
+:root {
+  --background: hsl(0, 0%, 98%);
+  --foreground: hsl(210, 40%, 20%);
+  --muted: hsl(210, 20%, 96%);
+  --muted-foreground: hsl(215, 15%, 45%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 40%, 20%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(210, 40%, 20%);
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(210, 20%, 96%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(210, 20%, 96%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(207, 90%, 54%);
+  --radius: 0.5rem;
+  
+  /* Material Design specific colors */
+  --primary-50: hsl(207, 100%, 97%);
+  --primary-100: hsl(207, 94%, 93%);
+  --primary-600: hsl(207, 90%, 54%);
+  --primary-700: hsl(207, 90%, 48%);
+  --primary-900: hsl(207, 100%, 15%);
+  
+  --secondary-400: hsl(340, 82%, 52%);
+  --secondary-500: hsl(340, 60%, 50%);
+  
+  --success-600: hsl(142, 71%, 45%);
+  --warning-600: hsl(25, 95%, 53%);
+  --error-600: hsl(4, 90%, 58%);
+  
+  /* PWA specific */
+  --theme-color: hsl(207, 90%, 54%);
+}
+
+.dark {
+  --background: hsl(222.2, 84%, 4.9%);
+  --foreground: hsl(210, 40%, 98%);
+  --muted: hsl(217.2, 32.6%, 17.5%);
+  --muted-foreground: hsl(215, 20.2%, 65.1%);
+  --popover: hsl(222.2, 84%, 4.9%);
+  --popover-foreground: hsl(210, 40%, 98%);
+  --card: hsl(222.2, 84%, 4.9%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --border: hsl(217.2, 32.6%, 17.5%);
+  --input: hsl(217.2, 32.6%, 17.5%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(217.2, 32.6%, 17.5%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+  --accent: hsl(217.2, 32.6%, 17.5%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+  --ring: hsl(212.7, 26.8%, 83.9%);
+  
+  /* Material Design dark colors */
+  --primary-50: hsl(207, 100%, 5%);
+  --primary-100: hsl(207, 94%, 8%);
+  --primary-900: hsl(207, 100%, 85%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@layer components {
+  .material-shadow {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 8px 16px rgba(0,0,0,0.1);
+  }
+  
+  .material-shadow-lg {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 12px 24px rgba(0,0,0,0.15);
+  }
+  
+  .ripple {
+    position: relative;
+    overflow: hidden;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .ripple:before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+  
+  .ripple:active:before {
+    width: 300px;
+    height: 300px;
+  }
+  
+  .calendar-day {
+    aspect-ratio: 1;
+    min-height: 48px;
+  }
+  
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+  
+  .platform-instagram { 
+    border-left: 4px solid hsl(340, 82%, 52%); 
+  }
+  
+  .platform-facebook { 
+    border-left: 4px solid hsl(221, 83%, 53%); 
+  }
+  
+  .platform-tiktok { 
+    border-left: 4px solid hsl(0, 0%, 0%); 
+  }
+  
+  .platform-twitter { 
+    border-left: 4px solid hsl(203, 89%, 53%); 
+  }
+  
+  .scroll-smooth {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@layer utilities {
+  .dark .material-shadow {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.3);
+  }
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+  body {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+  
+  .pwa-installed {
+    --background: hsl(0, 0%, 100%);
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .calendar-day {
+    min-height: 44px;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .ripple:before {
+    transition: none;
+  }
+  
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
