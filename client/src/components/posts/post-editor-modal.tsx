@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered } from "lucide-react";
+import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered, MoreHorizontal, Edit, Trash2, Link, Smile } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +82,9 @@ export default function PostEditorModal({
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
   const [newNoteAttachments, setNewNoteAttachments] = useState<any[]>([]);
+  const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -381,22 +384,70 @@ export default function PostEditorModal({
     
     switch (format) {
       case 'bold':
-        formattedText = `**${selectedText}**`;
+        formattedText = selectedText ? `**${selectedText}**` : '**bold text**';
         break;
       case 'italic':
-        formattedText = `*${selectedText}*`;
+        formattedText = selectedText ? `*${selectedText}*` : '*italic text*';
         break;
       case 'bullet':
-        formattedText = `• ${selectedText}`;
+        formattedText = selectedText ? `• ${selectedText}` : '• list item';
         break;
       case 'number':
-        formattedText = `1. ${selectedText}`;
+        formattedText = selectedText ? `1. ${selectedText}` : '1. numbered item';
+        break;
+      case 'link':
+        const url = prompt('Enter URL:');
+        if (url) {
+          formattedText = selectedText ? `[${selectedText}](${url})` : `[link text](${url})`;
+        } else {
+          return;
+        }
         break;
     }
     
     const newText = newNoteText.substring(0, start) + formattedText + newNoteText.substring(end);
     setNewNoteText(newText);
+    
+    // Set cursor position after the formatted text
+    setTimeout(() => {
+      textarea.focus();
+      const newCursorPos = start + formattedText.length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+    }, 0);
   };
+
+  const deleteMessage = (messageId: number) => {
+    setNoteThreads(prev => prev.filter(thread => thread.id !== messageId));
+  };
+
+  const startEditMessage = (messageId: number, currentText: string) => {
+    setEditingMessageId(messageId);
+    setEditingText(currentText);
+  };
+
+  const saveEditMessage = () => {
+    if (!editingText.trim()) return;
+    
+    setNoteThreads(prev => prev.map(thread => 
+      thread.id === editingMessageId 
+        ? { ...thread, text: editingText, edited: true }
+        : thread
+    ));
+    setEditingMessageId(null);
+    setEditingText("");
+  };
+
+  const cancelEdit = () => {
+    setEditingMessageId(null);
+    setEditingText("");
+  };
+
+  const addEmoji = (emoji: string) => {
+    setNewNoteText(prev => prev + emoji);
+    setShowEmojiPicker(false);
+  };
+
+  const commonEmojis = ['😀', '😂', '😍', '🤔', '👍', '👎', '❤️', '🎉', '💯', '🔥', '✅', '❌'];
 
   const handleAddReply = (threadId: number) => {
     if (!replyText.trim()) return;
@@ -773,31 +824,101 @@ export default function PostEditorModal({
                 
                 <div className="flex-1 min-w-0">
                   {/* Message Header */}
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="font-medium text-gray-900 text-sm">{thread.author}</span>
-                    <span className="text-xs text-gray-500">
-                      {new Date(thread.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                  <div className="flex items-baseline justify-between mb-1">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-medium text-gray-900 text-sm">{thread.author}</span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(thread.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {thread.edited && (
+                        <span className="text-xs text-gray-400">(edited)</span>
+                      )}
+                    </div>
+                    
+                    {/* Message Actions */}
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 w-6 p-0 text-gray-400 hover:text-gray-600"
+                        onClick={() => {
+                          const dropdown = document.getElementById(`dropdown-${thread.id}`);
+                          if (dropdown) {
+                            dropdown.classList.toggle('hidden');
+                          }
+                        }}
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                      <div id={`dropdown-${thread.id}`} className="hidden absolute right-0 mt-1 bg-white border rounded-lg shadow-lg z-10 py-1">
+                        <button
+                          onClick={() => startEditMessage(thread.id, thread.text)}
+                          className="flex items-center gap-2 px-3 py-1 text-sm hover:bg-gray-100 w-full text-left"
+                        >
+                          <Edit className="h-3 w-3" />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deleteMessage(thread.id)}
+                          className="flex items-center gap-2 px-3 py-1 text-sm hover:bg-gray-100 w-full text-left text-red-600"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   
-                  {/* Message Content */}
-                  <div className="text-sm text-gray-800 leading-relaxed">
-                    {thread.text.split('\n').map((line, index) => (
-                      <div key={index}>
-                        {line.startsWith('**') && line.endsWith('**') ? (
-                          <strong>{line.slice(2, -2)}</strong>
-                        ) : line.startsWith('*') && line.endsWith('*') ? (
-                          <em>{line.slice(1, -1)}</em>
-                        ) : line.startsWith('• ') ? (
-                          <div className="ml-4">• {line.slice(2)}</div>
-                        ) : line.match(/^\d+\. /) ? (
-                          <div className="ml-4">{line}</div>
-                        ) : (
-                          line
-                        )}
+                  {/* Message Content or Edit Input */}
+                  {editingMessageId === thread.id ? (
+                    <div className="space-y-2">
+                      <Textarea
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        className="text-sm"
+                      />
+                      <div className="flex gap-2">
+                        <Button size="sm" onClick={saveEditMessage}>Save</Button>
+                        <Button variant="ghost" size="sm" onClick={cancelEdit}>Cancel</Button>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="text-sm text-gray-800 leading-relaxed">
+                      {thread.text.split('\n').map((line, index) => {
+                        // Handle links [text](url)
+                        const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+                        const parts = line.split(linkRegex);
+                        
+                        return (
+                          <div key={index}>
+                            {parts.map((part, partIndex) => {
+                              if (partIndex % 3 === 1) {
+                                // This is link text
+                                const url = parts[partIndex + 1];
+                                return <a key={partIndex} href={url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{part}</a>;
+                              } else if (partIndex % 3 === 2) {
+                                // This is the URL, skip it
+                                return null;
+                              } else {
+                                // Regular text formatting
+                                if (part.startsWith('**') && part.endsWith('**')) {
+                                  return <strong key={partIndex}>{part.slice(2, -2)}</strong>;
+                                } else if (part.startsWith('*') && part.endsWith('*')) {
+                                  return <em key={partIndex}>{part.slice(1, -1)}</em>;
+                                } else if (part.startsWith('• ')) {
+                                  return <div key={partIndex} className="ml-4">• {part.slice(2)}</div>;
+                                } else if (part.match(/^\d+\. /)) {
+                                  return <div key={partIndex} className="ml-4">{part}</div>;
+                                } else {
+                                  return <span key={partIndex}>{part}</span>;
+                                }
+                              }
+                            })}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                   
                   {/* Attachments */}
                   {thread.attachments.length > 0 && (
@@ -860,7 +981,8 @@ export default function PostEditorModal({
               placeholder="Type a message..."
               className="min-h-[60px] border-2 focus:border-primary resize-none"
               onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
+                // Only allow Enter to send on desktop (not mobile)
+                if (e.key === 'Enter' && !e.shiftKey && window.innerWidth > 768) {
                   e.preventDefault();
                   if (newNoteText.trim()) handleAddNote();
                 }
@@ -944,6 +1066,39 @@ export default function PostEditorModal({
                 >
                   <ListOrdered className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  onClick={() => formatText('link')}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <Link className="h-4 w-4" />
+                </Button>
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    type="button"
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <Smile className="h-4 w-4" />
+                  </Button>
+                  {showEmojiPicker && (
+                    <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-2 grid grid-cols-6 gap-1">
+                      {commonEmojis.map((emoji, index) => (
+                        <button
+                          key={index}
+                          onClick={() => addEmoji(emoji)}
+                          className="hover:bg-gray-100 rounded p-1 text-lg"
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <div className="flex gap-2">
