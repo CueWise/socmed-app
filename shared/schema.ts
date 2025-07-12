@@ -40,6 +40,7 @@ export const posts = pgTable("posts", {
   createdBy: integer("created_by").references(() => users.id).notNull(),
   brandId: integer("brand_id").references(() => brands.id).notNull(),
   hashtags: json("hashtags").$type<string[]>(),
+  notes: text("notes"),
   aiGenerated: boolean("ai_generated").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
