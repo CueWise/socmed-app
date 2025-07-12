@@ -7,11 +7,14 @@ import StatsCard from "@/components/analytics/stats-card";
 import ApprovalCard from "@/components/approvals/approval-card";
 import AISuggestions from "@/components/ai/ai-suggestions";
 import PostEditorModal from "@/components/posts/post-editor-modal";
+import MobileWidgets from "@/components/mobile/mobile-widgets";
 import { useApprovals } from "@/hooks/use-approvals";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function Dashboard() {
   const [showPostEditor, setShowPostEditor] = useState(false);
+  const isMobile = useIsMobile();
   const { data: approvals } = useApprovals();
   const { data: analytics } = useAnalytics();
 
@@ -41,6 +44,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Mobile Widgets */}
+      {isMobile && <MobileWidgets />}
+      
       {/* Dashboard Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
