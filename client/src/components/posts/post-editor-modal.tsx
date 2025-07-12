@@ -85,6 +85,7 @@ export default function PostEditorModal({
   const [editingMessageId, setEditingMessageId] = useState<number | null>(null);
   const [editingText, setEditingText] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [emojiCategory, setEmojiCategory] = useState(0);
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkText, setLinkText] = useState("");
@@ -508,22 +509,37 @@ export default function PostEditorModal({
     setShowEmojiPicker(false);
   };
 
-  const commonEmojis = [
-    // Smileys & Emotion
-    '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', 
-    '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏',
-    // Gestures & Hands
-    '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👋', '🤚',
-    '🖐️', '✋', '🖖', '👏', '🙌', '🤲', '🤝', '🙏', '✍️', '💪', '🦾', '🦿', '🦵', '🦶', '👂', '🦻',
-    // Hearts & Symbols
-    '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖',
-    '💘', '💝', '💟', '☮️', '✝️', '☪️', '🕉️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈',
-    // Activities & Objects
-    '⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍',
-    '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛷', '⛸️', '🥌', '🎿',
-    // Food & Drink
-    '🍎', '🍌', '🍓', '🍇', '🍊', '🍋', '🍒', '🥭', '🍑', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦',
-    '🥒', '🌶️', '🌽', '🥕', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓'
+  const emojiCategories = [
+    {
+      name: "Smileys & Emotion",
+      icon: "😀",
+      emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏']
+    },
+    {
+      name: "Gestures & Hands",
+      icon: "👍",
+      emojis: ['👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '👋', '🤚', '🖐️', '✋', '🖖', '👏', '🙌', '🤲', '🤝', '🙏', '✍️', '💪', '🦾', '🦿', '🦵', '🦶', '👂', '🦻']
+    },
+    {
+      name: "Hearts & Love",
+      icon: "❤️",
+      emojis: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '💌', '💋', '💍', '👨‍❤️‍👨', '👩‍❤️‍👩', '👨‍❤️‍👩', '💏', '💑', '🫶', '💒', '💐', '🌹', '🌷']
+    },
+    {
+      name: "Activities & Sports",
+      icon: "⚽",
+      emojis: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛷', '⛸️', '🥌', '🎿']
+    },
+    {
+      name: "Food & Drink",
+      icon: "🍎",
+      emojis: ['🍎', '🍌', '🍓', '🍇', '🍊', '🍋', '🍒', '🥭', '🍑', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥒', '🌶️', '🌽', '🥕', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🧇', '🥓']
+    },
+    {
+      name: "Travel & Places",
+      icon: "🚗",
+      emojis: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎️', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🛻', '🚲', '🛵', '🏍️', '🛺', '🚁', '🛸', '✈️', '🛩️', '⛵', '🚤', '🛥️', '🚢', '⚓', '🗺️', '🏖️', '🏝️', '🏔️', '⛰️']
+    }
   ];
 
   const handleAddReply = (threadId: number) => {
@@ -1133,17 +1149,66 @@ export default function PostEditorModal({
                     <Smile className="h-4 w-4" />
                   </Button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-3 z-20 w-64 max-h-48 overflow-y-auto">
-                      <div className="grid grid-cols-8 gap-2">
-                        {commonEmojis.map((emoji, index) => (
+                    <div className="absolute bottom-full left-0 mb-2 bg-white border-2 border-gray-200 rounded-xl shadow-2xl z-20 w-80 animate-in slide-in-from-bottom-2 duration-300">
+                      {/* Category Tabs */}
+                      <div className="flex border-b border-gray-200 bg-gray-50 rounded-t-xl">
+                        {emojiCategories.map((category, index) => (
                           <button
                             key={index}
-                            onClick={() => addEmoji(emoji)}
-                            className="hover:bg-gray-100 rounded p-2 text-lg flex items-center justify-center min-h-[2rem] min-w-[2rem]"
+                            onClick={() => setEmojiCategory(index)}
+                            className={`flex-1 p-3 text-lg transition-all duration-200 ${
+                              emojiCategory === index 
+                                ? 'bg-white border-b-2 border-blue-500 text-blue-600' 
+                                : 'hover:bg-gray-100 text-gray-600'
+                            }`}
+                            title={category.name}
                           >
-                            {emoji}
+                            {category.icon}
                           </button>
                         ))}
+                      </div>
+                      
+                      {/* Category Content */}
+                      <div className="p-4">
+                        <div className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
+                          {emojiCategories[emojiCategory].name}
+                        </div>
+                        <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
+                          {emojiCategories[emojiCategory].emojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              onClick={() => addEmoji(emoji)}
+                              className="hover:bg-blue-50 hover:scale-110 rounded-lg p-2 text-lg flex items-center justify-center min-h-[2.5rem] min-w-[2.5rem] transition-all duration-150 hover:shadow-sm"
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Navigation Arrows */}
+                      <div className="flex justify-between items-center px-4 pb-3">
+                        <button
+                          onClick={() => setEmojiCategory(Math.max(0, emojiCategory - 1))}
+                          disabled={emojiCategory === 0}
+                          className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                          </svg>
+                        </button>
+                        <div className="text-xs text-gray-400">
+                          {emojiCategory + 1} / {emojiCategories.length}
+                        </div>
+                        <button
+                          onClick={() => setEmojiCategory(Math.min(emojiCategories.length - 1, emojiCategory + 1))}
+                          disabled={emojiCategory === emojiCategories.length - 1}
+                          className="p-2 rounded-full hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
                   )}
