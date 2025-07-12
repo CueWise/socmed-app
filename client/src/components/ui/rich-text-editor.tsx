@@ -11,7 +11,7 @@ import Strike from '@tiptap/extension-strike'
 import CodeBlock from '@tiptap/extension-code-block'
 import Heading from '@tiptap/extension-heading'
 import Placeholder from '@tiptap/extension-placeholder'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -40,6 +40,7 @@ interface RichTextEditorProps {
   placeholder?: string
   className?: string
   onSend?: () => void
+  autoFocus?: boolean
 }
 
 export default function RichTextEditor({
@@ -47,7 +48,8 @@ export default function RichTextEditor({
   onChange,
   placeholder = 'Start typing...',
   className = '',
-  onSend
+  onSend,
+  autoFocus = false
 }: RichTextEditorProps) {
   const [showSource, setShowSource] = useState(false)
   const [sourceContent, setSourceContent] = useState('')
@@ -188,6 +190,15 @@ export default function RichTextEditor({
     editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()
   }, [editor])
 
+  // Handle autoFocus
+  useEffect(() => {
+    if (autoFocus && editor) {
+      setTimeout(() => {
+        editor.commands.focus()
+      }, 100)
+    }
+  }, [autoFocus, editor])
+
   // Handle clearing editor after sending
   const handleSend = useCallback(() => {
     if (onSend && editor) {
@@ -223,7 +234,7 @@ export default function RichTextEditor({
           
           {/* Scrollable Dropdown Toolbar */}
           {showToolbar && (
-            <div className="absolute top-full right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-[9999] p-3 min-w-[280px] max-h-[300px] overflow-y-auto">
+            <div className="absolute bottom-full right-0 mb-1 bg-white border border-gray-300 rounded-lg shadow-lg z-[9999] p-3 min-w-[280px] max-h-[300px] overflow-y-auto">
               <div className="space-y-3">
                 {/* Text Formatting */}
                 <div>

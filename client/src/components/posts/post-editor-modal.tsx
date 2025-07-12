@@ -921,7 +921,7 @@ export default function PostEditorModal({
         {/* Slide-in Panel */}
         <div className={`fixed top-4 right-4 bottom-4 w-96 bg-white z-[110] transform transition-transform duration-300 ease-in-out ${
           showNotesModal ? 'translate-x-0' : 'translate-x-full'
-        } flex flex-col rounded-lg shadow-2xl border`}>
+        } flex flex-col rounded-lg shadow-2xl border min-h-[600px]`}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b bg-white">
             <h2 className="text-lg font-semibold">Notes & Comments</h2>
@@ -936,7 +936,7 @@ export default function PostEditorModal({
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4">
+          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[400px]">
             {/* Note Messages - Slack Style */}
           {noteThreads.map((thread) => (
             <div key={thread.id} className="group hover:bg-gray-100 rounded p-2 transition-colors">
@@ -1096,7 +1096,7 @@ export default function PostEditorModal({
         </div>
         
         {/* Add New Message */}
-        <div className="border-t pt-4 bg-white">
+        <div className="border-t pt-4 bg-white flex-shrink-0">
           <div className="space-y-2">
             <RichTextEditor
               key={editorKey}
@@ -1108,6 +1108,7 @@ export default function PostEditorModal({
               onSend={handleAddNote}
               placeholder="Type a message..."
               className="min-h-[50px]"
+              autoFocus={showNotesModal}
             />
             
             {/* New Note Attachments */}
