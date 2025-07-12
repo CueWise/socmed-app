@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import PostEditorModal from "@/components/posts/post-editor-modal";
-import QuickThemePicker from "@/components/theme/quick-theme-picker";
+
 
 const navigationItems = [
   {
@@ -44,7 +44,7 @@ export default function MobileNav() {
 
   return (
     <>
-      <nav className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg safe-area-inset-bottom">
+      <nav className="bg-white border-t border-gray-200 shadow-lg safe-area-inset-bottom">
         <div className="flex items-center justify-around py-1">
           {navigationItems.map((item, index) => {
             const Icon = item.icon;
@@ -70,12 +70,12 @@ export default function MobileNav() {
 
             return (
               <Link key={item.name} href={item.href}>
-                <a
+                <div
                   className={cn(
-                    "flex flex-col items-center space-y-1 px-2 py-3 relative transition-colors touch-manipulation select-none-touch min-w-[60px] min-h-[44px]",
+                    "flex flex-col items-center space-y-1 px-2 py-3 relative transition-colors touch-manipulation select-none-touch min-w-[60px] min-h-[44px] cursor-pointer",
                     isActive 
                       ? "text-primary" 
-                      : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                      : "text-gray-500 hover:text-gray-700"
                   )}
                 >
                   <Icon className="h-5 w-5" />
@@ -88,14 +88,13 @@ export default function MobileNav() {
                       {item.badge}
                     </Badge>
                   )}
-                </a>
+                </div>
               </Link>
             );
           })}
         </div>
         
-        {/* Quick Theme Picker for Mobile */}
-        <QuickThemePicker />
+
       </nav>
 
       <PostEditorModal 
