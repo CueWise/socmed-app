@@ -79,7 +79,7 @@ export default function PostEditorModal({
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showPlatformModal, setShowPlatformModal] = useState(false);
-  const [showNotesModal, setShowNotesModal] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const [noteThreads, setNoteThreads] = useState<any[]>([]);
   const [newNoteText, setNewNoteText] = useState("");
   const [editorKey, setEditorKey] = useState(0);
@@ -344,6 +344,7 @@ export default function PostEditorModal({
     if (hasUnsavedChanges) {
       setShowUnsavedDialog(true);
     } else {
+      setShowNotes(false); // Close notes panel when main form closes
       onOpenChange(false);
     }
   };
@@ -599,6 +600,7 @@ export default function PostEditorModal({
   const handleDiscardChanges = () => {
     setHasUnsavedChanges(false);
     setShowUnsavedDialog(false);
+    setShowNotes(false); // Close notes panel when discarding changes
     onOpenChange(false);
   };
 
@@ -644,22 +646,69 @@ export default function PostEditorModal({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              {initialData 
-                ? `${initialData.content?.split('.')[0] || initialData.content?.split('!')[0] || initialData.content?.slice(0, 50)}...`
-                : "Create New Post"
-              }
-            </DialogTitle>
-            <DialogDescription>
-              {initialData 
-                ? "Edit your social media post content, platforms, and scheduling settings."
-                : "Create and schedule your social media post across multiple platforms."
-              }
-            </DialogDescription>
-          </DialogHeader>
+      {/* Main Edit Form - Slides up from bottom */}
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black/50 z-50"
+            onClick={() => handleClose()}
+          />
+          
+          {/* Sliding Panel */}
+          <div className={cn(
+            "fixed bottom-0 right-0 bg-white rounded-t-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-out",
+            "max-h-[90vh] overflow-hidden flex flex-col",
+            showNotes ? "left-[30%]" : "left-0", // Show partially when notes are open
+            open ? "translate-y-0" : "translate-y-full"
+          )}>
+            {/* Header */}
+            <div className="p-6 border-b bg-white rounded-t-2xl flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <h2 className="text-lg font-semibold">
+                    {initialData 
+                      ? `${initialData.content?.split('.')[0] || initialData.content?.split('!')[0] || initialData.content?.slice(0, 50)}...`
+                      : "Create New Post"
+                    }
+                  </h2>
+                  {postId && (
+                    <span className="text-sm text-gray-500">#{postId}</span>
+                  )}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowNotes(!showNotes)}
+                    className={cn(
+                      "flex items-center space-x-1",
+                      showNotes && "bg-blue-50 border-blue-200"
+                    )}
+                  >
+                    <StickyNote className="h-4 w-4" />
+                    <span>Notes</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleClose()}
+                    className="p-2"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              <p className="text-gray-600 mt-1">
+                {initialData 
+                  ? "Edit your social media post content, platforms, and scheduling settings."
+                  : "Create and schedule your social media post across multiple platforms."
+                }
+              </p>
+            </div>
+
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto p-6">
 
         <div className="space-y-6">
           {/* Platform Selection - Clickable Icons */}
@@ -870,65 +919,54 @@ export default function PostEditorModal({
             </div>
           </div>
 
-          {/* Notes Button */}
+          {/* Status Selection */}
           <div className="flex justify-between items-center">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowNotesModal(true)}
-              className="flex items-center gap-2"
-            >
-              <StickyNote className="h-4 w-4" />
-              Notes
-              {noteThreads.length > 0 && (
-                <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                  {noteThreads.length}
-                </span>
-              )}
-            </Button>
+            <Select value={status} onValueChange={handleStatusChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* Modal Actions */}
-        <div className="flex justify-end space-x-3 pt-6 border-t">
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            disabled={createPostMutation.isPending}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={() => handleSubmit()}
-            disabled={createPostMutation.isPending || !content.trim() || selectedPlatforms.length === 0}
-            className="bg-primary hover:bg-primary/90"
-          >
-            {createPostMutation.isPending ? "Saving..." : "Save Changes"}
-          </Button>
+        <div className="p-6 border-t bg-white flex-shrink-0">
+          <div className="flex justify-end space-x-3">
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={createPostMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleSubmit()}
+              disabled={createPostMutation.isPending || !content.trim() || selectedPlatforms.length === 0}
+              className="bg-primary hover:bg-primary/90"
+            >
+              {createPostMutation.isPending ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
         </div>
-      </DialogContent>
-    </Dialog>
-
-    {/* Notes Slide-in Panel - Rendered as Portal */}
-    {showNotesModal && createPortal(
-      <>
-        {/* Backdrop */}
-        <div 
-          className="fixed inset-0 bg-black/30 z-[100]"
-          onClick={() => setShowNotesModal(false)}
-        />
-        
-        {/* Slide-in Panel */}
-        <div className={`fixed top-4 right-4 bottom-4 w-96 bg-white z-[110] transform transition-transform duration-300 ease-in-out ${
-          showNotesModal ? 'translate-x-0' : 'translate-x-full'
-        } flex flex-col rounded-lg shadow-2xl border min-h-[600px]`}>
+      </div>
+      
+      {/* Notes Slide-in Panel - Slides from right, positioned next to edit form */}
+      {showNotes && (
+        <div className="fixed top-0 right-0 bottom-0 w-96 bg-white z-[110] transform transition-transform duration-300 ease-in-out translate-x-0 flex flex-col shadow-2xl border-l min-h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b bg-white">
             <h2 className="text-lg font-semibold">Notes & Comments</h2>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setShowNotesModal(false)}
+              onClick={() => setShowNotes(false)}
               className="h-8 w-8 p-0"
             >
               <X className="h-4 w-4" />
@@ -1108,7 +1146,7 @@ export default function PostEditorModal({
               onSend={handleAddNote}
               placeholder="Type a message..."
               className="min-h-[50px]"
-              autoFocus={showNotesModal}
+              autoFocus={showNotes}
             />
             
             {/* New Note Attachments */}
@@ -1337,7 +1375,7 @@ export default function PostEditorModal({
               <div className="flex gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => setShowNotesModal(false)}
+                  onClick={() => setShowNotes(false)}
                 >
                   Close
                 </Button>
@@ -1353,10 +1391,11 @@ export default function PostEditorModal({
             </div>
           </div>
         </div>
-        </div>
-      </>,
-      document.body
-    )}
+      )}
+    </div>
+  )}
+    </>
+  )}
 
     {/* Platform Selection Modal */}
     <Dialog open={showPlatformModal} onOpenChange={setShowPlatformModal}>
@@ -1424,5 +1463,6 @@ export default function PostEditorModal({
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  </>);
+  </>
+);
 }

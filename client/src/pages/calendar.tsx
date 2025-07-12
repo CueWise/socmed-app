@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, Plus, Filter } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, Filter, X } from "lucide-react";
+import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -19,6 +20,11 @@ export default function Calendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [platformFilter, setPlatformFilter] = useState("all");
+  const [tooltip, setTooltip] = useState<{
+    visible: boolean;
+    post: any;
+    position: { x: number; y: number };
+  }>({ visible: false, post: null, position: { x: 0, y: 0 } });
   
   const { data: posts } = usePosts();
 
@@ -76,6 +82,46 @@ export default function Calendar() {
     facebook: "bg-blue-600", 
     tiktok: "bg-gray-900 dark:bg-gray-300",
     twitter: "bg-blue-400",
+  };
+
+  // Helper function to render platform icons
+  const renderPlatformIcon = (platform: string) => {
+    const iconProps = { className: "h-4 w-4", style: { color: 'white' } };
+    switch (platform) {
+      case 'instagram': return <FaInstagram {...iconProps} />;
+      case 'facebook': return <FaFacebook {...iconProps} />;
+      case 'tiktok': return <FaTiktok {...iconProps} />;
+      case 'twitter': return <FaTwitter {...iconProps} />;
+      default: return null;
+    }
+  };
+
+  // Handle calendar day click with tooltip
+  const handleDayClick = (event: React.MouseEvent, date: Date) => {
+    const postsForDate = getPostsForDate(date);
+    if (postsForDate.length > 0) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      setTooltip({
+        visible: true,
+        post: postsForDate[0], // Show first post for now
+        position: {
+          x: rect.left + rect.width / 2,
+          y: rect.top - 10
+        }
+      });
+    }
+  };
+
+  // Handle tooltip click to open editor
+  const handleTooltipClick = (post: any) => {
+    setEditingPost(post);
+    setShowPostEditor(true);
+    setTooltip({ visible: false, post: null, position: { x: 0, y: 0 } });
+  };
+
+  // Close tooltip
+  const closeTooltip = () => {
+    setTooltip({ visible: false, post: null, position: { x: 0, y: 0 } });
   };
 
   return (
@@ -169,7 +215,7 @@ export default function Calendar() {
                     isToday && "bg-primary/10 dark:bg-primary/20 border-primary",
                     isSelected && "bg-primary/20 dark:bg-primary/30"
                   )}
-                  onClick={() => setSelectedDate(date)}
+                  onClick={(e) => handleDayClick(e, date)}
                 >
                   <div className={cn(
                     "text-sm font-medium mb-1",
@@ -318,6 +364,111 @@ export default function Calendar() {
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Content Preview Tooltip */}
+      {tooltip.visible && tooltip.post && (
+        <>
+          {/* Backdrop to close tooltip */}
+          <div 
+            className="fixed inset-0 z-40" 
+            onClick={closeTooltip}
+          />
+          {/* Tooltip */}
+          <div 
+            className="fixed z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 max-w-sm"
+            style={{
+              left: tooltip.position.x - 150, // Center horizontally
+              top: tooltip.position.y - 200, // Position above click point
+            }}
+          >
+            {/* Close button */}
+            <button
+              onClick={closeTooltip}
+              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
+            >
+              <X className="h-4 w-4 text-gray-500" />
+            </button>
+
+            {/* Clickable content area */}
+            <div 
+              className="cursor-pointer space-y-3 pr-8"
+              onClick={() => handleTooltipClick(tooltip.post)}
+            >
+              {/* Thumbnail */}
+              {tooltip.post.mediaUrls && tooltip.post.mediaUrls.length > 0 && (
+                <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
+                  <img 
+                    src={tooltip.post.mediaUrls[0]} 
+                    alt="Post preview"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = `data:image/svg+xml;base64,${btoa(`
+                        <svg width="100" height="60" xmlns="http://www.w3.org/2000/svg">
+                          <rect width="100" height="60" fill="#f3f4f6"/>
+                          <text x="50" y="30" font-family="Arial" font-size="10" fill="#9ca3af" text-anchor="middle" dy="3">Image</text>
+                        </svg>
+                      `)}`;
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* Platform icons */}
+              <div className="flex space-x-2">
+                {tooltip.post.platforms?.map((platform: string) => (
+                  <div 
+                    key={platform}
+                    className={cn(
+                      "rounded-full p-2 flex items-center justify-center",
+                      platformColors[platform] || "bg-gray-400"
+                    )}
+                  >
+                    {renderPlatformIcon(platform)}
+                  </div>
+                ))}
+              </div>
+
+              {/* Status */}
+              <div className="flex items-center space-x-2">
+                <span className={cn(
+                  "text-xs px-2 py-1 rounded-full font-medium",
+                  tooltip.post.status === 'scheduled' && "bg-blue-100 text-blue-800",
+                  tooltip.post.status === 'draft' && "bg-gray-100 text-gray-800",
+                  tooltip.post.status === 'pending_approval' && "bg-orange-100 text-orange-800"
+                )}>
+                  {tooltip.post.status.replace('_', ' ')}
+                </span>
+              </div>
+
+              {/* Date and Time */}
+              <div className="text-sm text-gray-600">
+                <div className="font-medium">
+                  {new Date(tooltip.post.scheduledAt).toLocaleDateString('en-US', { 
+                    weekday: 'short', 
+                    month: 'short', 
+                    day: 'numeric' 
+                  })}
+                </div>
+                <div className="text-gray-500">
+                  {new Date(tooltip.post.scheduledAt).toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                  })}
+                </div>
+              </div>
+
+              {/* Caption preview */}
+              <div className="text-sm text-gray-700">
+                <p className="line-clamp-3">
+                  {tooltip.post.content.slice(0, 120)}
+                  {tooltip.post.content.length > 120 && '...'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
       )}
 
       <PostEditorModal 
