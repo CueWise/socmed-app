@@ -56,7 +56,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
   const [location] = useLocation();
 
   return (
-    <nav className="w-64 bg-white dark:bg-gray-800 material-shadow flex flex-col h-full">
+    <nav className="w-64 bg-white border-r border-gray-200 flex flex-col h-full shadow-sm">
       {/* Mobile close button */}
       {onClose && (
         <div className="p-4 flex justify-end md:hidden">
@@ -80,15 +80,15 @@ export default function Sidebar({ onClose }: SidebarProps) {
                 className={cn(
                   "flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors w-full cursor-pointer",
                   isActive 
-                    ? "bg-primary/10 text-primary dark:bg-primary/20" 
-                    : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                    ? "bg-primary/10 text-primary" 
+                    : "hover:bg-gray-100 text-gray-700"
                 )}
                 onClick={onClose}
               >
                 <Icon className="h-5 w-5" />
                 <span className="font-medium">{item.name}</span>
                 {item.badge && (
-                  <Badge variant="secondary" className="ml-auto bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200">
+                  <Badge variant="secondary" className="ml-auto bg-orange-100 text-orange-800">
                     {item.badge}
                   </Badge>
                 )}
@@ -99,7 +99,7 @@ export default function Sidebar({ onClose }: SidebarProps) {
       </div>
 
       {/* Brand Switcher */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-t border-gray-200">
         <BrandSwitcher />
       </div>
     </nav>

@@ -1,7 +1,5 @@
-import { Bell, Menu, Sun, Moon, User } from "lucide-react";
+import { Bell, Menu, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "@/components/theme-provider";
-import ThemeCustomizer from "@/components/theme/theme-customizer";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -15,10 +13,8 @@ interface TopNavigationProps {
 }
 
 export default function TopNavigation({ onMenuClick }: TopNavigationProps) {
-  const { theme, setTheme } = useTheme();
-
   return (
-    <header className="bg-white dark:bg-gray-800 material-shadow sticky top-0 z-50">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="flex items-center justify-between p-4">
         {/* Mobile Menu Button */}
         <Button
@@ -36,28 +32,13 @@ export default function TopNavigation({ onMenuClick }: TopNavigationProps) {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
             <div className="w-4 h-4 bg-white rounded-sm" />
           </div>
-          <h1 className="text-xl font-medium hidden sm:block text-foreground">
+          <h1 className="text-xl font-medium hidden sm:block text-gray-900">
             SocialFlow
           </h1>
         </div>
 
         {/* Right Actions */}
         <div className="flex items-center space-x-2">
-          {/* Theme Customizer */}
-          <ThemeCustomizer />
-          
-          {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="touch-target"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            aria-label="Toggle theme"
-          >
-            <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          </Button>
-
           {/* Notifications */}
           <Button
             variant="ghost"
