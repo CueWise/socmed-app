@@ -37,11 +37,13 @@ export function useAnalyticsSummary(
 ) {
   const { brandId: selectedBrandId } = useBrand();
   const effectiveBrandId = brandId || selectedBrandId;
-  const defaultStartDate = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-  const defaultEndDate = endDate || new Date();
+  
+  // Use stable date strings to prevent infinite re-renders
+  const defaultStart = startDate ? startDate.toISOString() : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const defaultEnd = endDate ? endDate.toISOString() : new Date().toISOString().split('T')[0];
   
   return useQuery<AnalyticsSummary>({
-    queryKey: ["/api/analytics/summary", effectiveBrandId, defaultStartDate.toISOString(), defaultEndDate.toISOString()],
+    queryKey: ["/api/analytics/summary", effectiveBrandId, defaultStart, defaultEnd],
     queryFn: async () => {
       if (!effectiveBrandId) {
         return {
@@ -53,8 +55,8 @@ export function useAnalyticsSummary(
       }
       
       const params = new URLSearchParams({
-        start: defaultStartDate.toISOString(),
-        end: defaultEndDate.toISOString(),
+        start: startDate ? startDate.toISOString() : defaultStart,
+        end: endDate ? endDate.toISOString() : defaultEnd,
       });
       
       const response = await fetch(`/api/analytics/summary/${effectiveBrandId}?${params.toString()}`, {

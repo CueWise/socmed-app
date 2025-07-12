@@ -132,8 +132,8 @@ export default function AppShell({ children }: AppShellProps) {
       {/* Mobile Bottom Navigation */}
       {isMobile && <MobileNav />}
       
-      {/* Quick Actions */}
-      <QuickActions />
+      {/* Quick Actions - Temporarily disabled for debugging */}
+      {/* <QuickActions /> */}
     </div>
   );
 }
