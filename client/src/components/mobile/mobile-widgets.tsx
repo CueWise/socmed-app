@@ -30,7 +30,7 @@ export default function MobileWidgets() {
 
   // Quick stats widget
   const QuickStats = () => (
-    <Card className="mb-4">
+    <Card className="mb-2">
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center">
           <TrendingUp className="h-5 w-5 mr-2 text-green-500" />

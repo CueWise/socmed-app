@@ -122,7 +122,7 @@ export default function AppShell({ children }: AppShellProps) {
         <main className={cn(
           "flex-1 p-4 md:p-6 overflow-auto scroll-smooth",
           "touch-pan-y safe-area-inset-bottom",
-          isMobile && "pb-20", // Extra padding for mobile nav
+          isMobile && "pb-20 pt-2", // Extra padding for mobile nav, reduced top padding
           "focus:outline-none"
         )}>
           {children}
