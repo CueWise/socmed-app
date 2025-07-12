@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet } from "lucide-react";
+import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +81,7 @@ export default function PostEditorModal({
   const [newNoteText, setNewNoteText] = useState("");
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [replyText, setReplyText] = useState("");
+  const [newNoteAttachments, setNewNoteAttachments] = useState<any[]>([]);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -342,14 +343,59 @@ export default function PostEditorModal({
       text: newNoteText,
       author: "Current User", // Mock author
       timestamp: new Date(),
-      attachments: [],
+      attachments: newNoteAttachments,
       replies: []
     };
     
     setNoteThreads(prev => [...prev, newNote]);
     setNewNoteText("");
+    setNewNoteAttachments([]);
     setNotes(prev => prev + (prev ? "\n" : "") + newNoteText); // Update the notes field for backend
     setHasUnsavedChanges(true);
+  };
+
+  const handleNewNoteFileUpload = (files: FileList) => {
+    const attachments = Array.from(files).map(file => ({
+      id: Date.now() + Math.random(),
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      url: URL.createObjectURL(file)
+    }));
+    
+    setNewNoteAttachments(prev => [...prev, ...attachments]);
+  };
+
+  const removeNewNoteAttachment = (id: number) => {
+    setNewNoteAttachments(prev => prev.filter(att => att.id !== id));
+  };
+
+  const formatText = (format: string) => {
+    const textarea = document.querySelector('#new-note-textarea') as HTMLTextAreaElement;
+    if (!textarea) return;
+    
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = newNoteText.substring(start, end);
+    let formattedText = selectedText;
+    
+    switch (format) {
+      case 'bold':
+        formattedText = `**${selectedText}**`;
+        break;
+      case 'italic':
+        formattedText = `*${selectedText}*`;
+        break;
+      case 'bullet':
+        formattedText = `• ${selectedText}`;
+        break;
+      case 'number':
+        formattedText = `1. ${selectedText}`;
+        break;
+    }
+    
+    const newText = newNoteText.substring(0, start) + formattedText + newNoteText.substring(end);
+    setNewNoteText(newText);
   };
 
   const handleAddReply = (threadId: number) => {
@@ -679,9 +725,9 @@ export default function PostEditorModal({
             >
               <StickyNote className="h-4 w-4" />
               Notes
-              {notes && notes.trim() && (
+              {noteThreads.length > 0 && (
                 <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                  Has Notes
+                  {noteThreads.length}
                 </span>
               )}
             </Button>
@@ -829,31 +875,110 @@ export default function PostEditorModal({
         
         {/* Add New Note */}
         <div className="border-t pt-4 space-y-3">
-          <Textarea
-            value={newNoteText}
-            onChange={(e) => setNewNoteText(e.target.value)}
-            placeholder="Add a note or comment..."
-            className="min-h-[80px]"
-          />
-          <div className="flex justify-between items-center">
-            <div className="text-xs text-gray-500">
-              Supports: PDF, Images, Videos, Excel, Word documents
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowNotesModal(false)}
-              >
-                Close
-              </Button>
-              <Button
-                onClick={handleAddNote}
-                disabled={!newNoteText.trim()}
-                className="bg-primary hover:bg-primary/90"
-              >
-                <Send className="h-4 w-4 mr-2" />
-                Add Note
-              </Button>
+          <div className="space-y-2">
+            <Textarea
+              id="new-note-textarea"
+              value={newNoteText}
+              onChange={(e) => setNewNoteText(e.target.value)}
+              placeholder="Add a note or comment..."
+              className="min-h-[80px]"
+            />
+            
+            {/* New Note Attachments */}
+            {newNoteAttachments.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {newNoteAttachments.map((attachment) => {
+                  const FileIcon = getFileIcon(attachment.type);
+                  return (
+                    <div key={attachment.id} className="flex items-center gap-2 bg-gray-100 rounded px-2 py-1 text-xs">
+                      <FileIcon className="h-3 w-3" />
+                      <span>{attachment.name}</span>
+                      <span className="text-gray-500">({Math.round(attachment.size / 1024)}KB)</span>
+                      <button
+                        onClick={() => removeNewNoteAttachment(attachment.id)}
+                        className="ml-1 text-red-500 hover:text-red-700"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            
+            {/* Rich Text Formatting Toolbar */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                {/* Attachment Button */}
+                <input
+                  type="file"
+                  multiple
+                  onChange={(e) => e.target.files && handleNewNoteFileUpload(e.target.files)}
+                  className="hidden"
+                  id="new-note-file-upload"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.mp4,.mov,.avi"
+                />
+                <label htmlFor="new-note-file-upload" className="cursor-pointer">
+                  <Button variant="ghost" size="sm" type="button" className="text-gray-500 hover:text-gray-700">
+                    <Paperclip className="h-4 w-4" />
+                  </Button>
+                </label>
+                
+                {/* Text Formatting Buttons */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  onClick={() => formatText('bold')}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <Bold className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  onClick={() => formatText('italic')}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <Italic className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  onClick={() => formatText('bullet')}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  type="button"
+                  onClick={() => formatText('number')}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <ListOrdered className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowNotesModal(false)}
+                >
+                  Close
+                </Button>
+                <Button
+                  onClick={handleAddNote}
+                  disabled={!newNoteText.trim()}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  Add Note
+                </Button>
+              </div>
             </div>
           </div>
         </div>
