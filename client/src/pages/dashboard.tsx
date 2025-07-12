@@ -90,11 +90,11 @@ export default function Dashboard() {
           color="secondary"
         />
         <StatsCard
-          title="Posts Published"
+          title="Published"
           value="156"
           change="+15"
           changeType="positive"
-          icon="published_with_changes"
+          icon="publish"
           color="success"
         />
         <StatsCard
