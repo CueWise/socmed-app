@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered, MoreHorizontal, Edit, Trash2, Link, Smile } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
@@ -908,17 +909,17 @@ export default function PostEditorModal({
       </DialogContent>
     </Dialog>
 
-    {/* Notes Slide-in Panel */}
-    {showNotesModal && (
+    {/* Notes Slide-in Panel - Rendered as Portal */}
+    {showNotesModal && createPortal(
       <>
         {/* Backdrop */}
         <div 
-          className="fixed inset-0 bg-black/30 z-[60]"
+          className="fixed inset-0 bg-black/30 z-[100]"
           onClick={() => setShowNotesModal(false)}
         />
         
         {/* Slide-in Panel */}
-        <div className={`fixed top-4 right-4 bottom-4 w-96 bg-white z-[70] transform transition-transform duration-300 ease-in-out ${
+        <div className={`fixed top-4 right-4 bottom-4 w-96 bg-white z-[110] transform transition-transform duration-300 ease-in-out ${
           showNotesModal ? 'translate-x-0' : 'translate-x-full'
         } flex flex-col rounded-lg shadow-2xl border`}>
           {/* Header */}
@@ -1352,7 +1353,8 @@ export default function PostEditorModal({
           </div>
         </div>
         </div>
-      </>
+      </>,
+      document.body
     )}
 
     {/* Platform Selection Modal */}
