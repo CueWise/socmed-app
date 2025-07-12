@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle } from "lucide-react";
+import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,6 +75,7 @@ export default function PostEditorModal({
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showPlatformModal, setShowPlatformModal] = useState(false);
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -393,52 +394,45 @@ export default function PostEditorModal({
           </DialogHeader>
 
         <div className="space-y-6">
-          {/* Platform Selection */}
-          <div>
-            <Label className="text-sm font-medium mb-3 block">Select Platforms</Label>
-            <Select>
-              <SelectTrigger className="w-full">
-                <SelectValue>
-                  {selectedPlatforms.length > 0 ? (
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {selectedPlatforms.map((platformId) => {
-                        const platform = platforms.find(p => p.id === platformId);
-                        if (!platform) return null;
-                        const IconComponent = platform.icon;
-                        return (
-                          <div key={platformId} className="flex items-center gap-1 bg-blue-100 px-2 py-1 rounded-md">
-                            <IconComponent className={`w-4 h-4 ${platform.color}`} />
-                            <span className="text-sm">{platform.name}</span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <span className="text-gray-500">Choose platforms</span>
-                  )}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {platforms.map((platform) => {
+          {/* Platform Selection - Clickable Icons */}
+          <div className="mb-6">
+            <Label className="text-sm font-medium mb-3 block">Platforms</Label>
+            <div className="flex items-center gap-2">
+              {selectedPlatforms.length > 0 ? (
+                selectedPlatforms.map((platformId) => {
+                  const platform = platforms.find(p => p.id === platformId);
+                  if (!platform) return null;
                   const IconComponent = platform.icon;
-                  const isSelected = selectedPlatforms.includes(platform.id);
                   return (
-                    <div 
-                      key={platform.id}
-                      className="flex items-center gap-2 w-full p-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handlePlatformToggle(platform.id)}
+                    <button
+                      key={platformId}
+                      type="button"
+                      onClick={() => setShowPlatformModal(true)}
+                      className="p-2 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
                     >
-                      <Checkbox
-                        checked={isSelected}
-                        readOnly
-                      />
-                      <IconComponent className={`w-4 h-4 ${platform.color}`} />
-                      <span>{platform.name}</span>
-                    </div>
+                      <IconComponent className={`w-6 h-6 ${platform.color}`} />
+                    </button>
                   );
-                })}
-              </SelectContent>
-            </Select>
+                })
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowPlatformModal(true)}
+                  className="p-2 rounded-lg border border-dashed border-gray-300 hover:border-gray-400 transition-colors text-gray-500"
+                >
+                  <Plus className="w-6 h-6" />
+                </button>
+              )}
+              {selectedPlatforms.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowPlatformModal(true)}
+                  className="p-2 rounded-lg border border-dashed border-gray-300 hover:border-gray-400 transition-colors text-gray-500"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Status Selection */}
@@ -645,6 +639,50 @@ export default function PostEditorModal({
             className="bg-primary hover:bg-primary/90"
           >
             {createPostMutation.isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+
+    {/* Platform Selection Modal */}
+    <Dialog open={showPlatformModal} onOpenChange={setShowPlatformModal}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Select Platforms</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          {platforms.map((platform) => {
+            const IconComponent = platform.icon;
+            const isSelected = selectedPlatforms.includes(platform.id);
+            return (
+              <div 
+                key={platform.id}
+                className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-gray-300 cursor-pointer transition-colors"
+                onClick={() => handlePlatformToggle(platform.id)}
+              >
+                <Checkbox
+                  checked={isSelected}
+                  readOnly
+                />
+                <IconComponent className={`w-6 h-6 ${platform.color}`} />
+                <span className="text-sm font-medium">{platform.name}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex justify-end space-x-3 pt-4">
+          <Button
+            variant="outline"
+            onClick={() => setShowPlatformModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => setShowPlatformModal(false)}
+            disabled={selectedPlatforms.length === 0}
+            className="bg-primary hover:bg-primary/90"
+          >
+            Done
           </Button>
         </div>
       </DialogContent>
