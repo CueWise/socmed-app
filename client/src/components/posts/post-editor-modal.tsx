@@ -1072,7 +1072,7 @@ export default function PostEditorModal({
               content={newNoteText}
               onChange={(html) => setNewNoteText(html)}
               placeholder="Type a message..."
-              className="min-h-[150px]"
+              className="min-h-[80px]"
             />
             
             {/* New Note Attachments */}
