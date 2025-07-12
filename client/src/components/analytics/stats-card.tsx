@@ -38,13 +38,15 @@ export default function StatsCard({
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-3 sm:p-4">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1 mb-1">
-              <span className="material-icons text-sm text-gray-600 dark:text-gray-400 flex-shrink-0">
-                {icon}
-              </span>
-              <p className="text-xs text-gray-600 dark:text-gray-400 truncate leading-tight">
+            <div className="mb-2">
+              <div className="flex items-center gap-1 mb-1">
+                <span className="material-icons text-sm text-gray-600 dark:text-gray-400 flex-shrink-0">
+                  {icon}
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 dark:text-gray-400 leading-tight">
                 {title}
               </p>
             </div>
@@ -73,7 +75,7 @@ export default function StatsCard({
           </div>
           
           <div className={cn(
-            "w-2 h-10 rounded-full flex-shrink-0",
+            "w-1 h-8 rounded-full flex-shrink-0",
             colorClasses[color]
           )}>
           </div>
