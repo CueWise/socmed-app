@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import BrandSwitcher from "@/components/brands/brand-switcher";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -97,22 +98,9 @@ export default function Sidebar({ onClose }: SidebarProps) {
         })}
       </div>
 
-      {/* Team Switcher */}
+      {/* Brand Switcher */}
       <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <Button 
-          variant="ghost" 
-          className="w-full flex items-center justify-between p-3"
-        >
-          <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-              <span className="text-white text-sm font-bold">TC</span>
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-medium">TechCorp</div>
-              <div className="text-xs text-gray-500">Pro Plan</div>
-            </div>
-          </div>
-        </Button>
+        <BrandSwitcher />
       </div>
     </nav>
   );
