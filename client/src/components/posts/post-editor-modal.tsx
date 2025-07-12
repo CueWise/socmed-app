@@ -94,13 +94,23 @@ export default function PostEditorModal({
 
   const createPostMutation = useMutation({
     mutationFn: async (postData: PostData) => {
-      const response = await apiRequest("POST", "/api/posts", {
-        ...postData,
-        createdBy: 1, // Mock user ID
-        brandId: 1, // Mock brand ID
-        scheduledAt: new Date(`${scheduledDate}T${scheduledTime}`),
-      });
-      return response.json();
+      if (postId) {
+        // Update existing post
+        const response = await apiRequest("PATCH", `/api/posts/${postId}`, {
+          ...postData,
+          scheduledAt: new Date(`${scheduledDate}T${scheduledTime}`),
+        });
+        return response.json();
+      } else {
+        // Create new post
+        const response = await apiRequest("POST", "/api/posts", {
+          ...postData,
+          createdBy: 1, // Mock user ID
+          brandId: 1, // Mock brand ID
+          scheduledAt: new Date(`${scheduledDate}T${scheduledTime}`),
+        });
+        return response.json();
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/posts"] });
@@ -114,7 +124,7 @@ export default function PostEditorModal({
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to create post",
+        description: postId ? "Failed to update post" : "Failed to create post",
         variant: "destructive",
       });
     },
