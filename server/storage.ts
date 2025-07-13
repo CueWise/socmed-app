@@ -144,12 +144,18 @@ export class DatabaseStorage implements IStorage {
   async getPostsByDateRange(start: Date, end: Date, brandId?: number): Promise<Post[]> {
     console.log('Calendar query - Start:', start.toISOString(), 'End:', end.toISOString(), 'BrandId:', brandId);
     
+    // Convert dates to local date strings for text comparison
+    const startDateString = start.toISOString().split('T')[0]; // "2025-07-01"
+    const endDateString = end.toISOString().split('T')[0]; // "2025-07-31"
+    
+    console.log('Converted date strings - Start:', startDateString, 'End:', endDateString);
+    
     // Include posts with scheduledAt within range OR posts without scheduledAt but created recently
     const conditions = [
       or(
         and(
-          gte(posts.scheduledAt, start),
-          lte(posts.scheduledAt, end)
+          gte(posts.scheduledAt, startDateString),
+          lte(posts.scheduledAt, endDateString + 'T23:59:59')
         ),
         and(
           isNull(posts.scheduledAt),
