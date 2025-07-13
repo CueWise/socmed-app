@@ -27,8 +27,8 @@ export default function Calendar() {
     setShowPostEditor(true);
   };
 
-  const handleEditPost = (postId: number, date?: Date) => {
-    setEditingPost({ id: postId });
+  const handleEditPost = (post: any, date?: Date) => {
+    setEditingPost(post);
     setSelectedDate(date || null);
     setShowPostEditor(true);
   };
