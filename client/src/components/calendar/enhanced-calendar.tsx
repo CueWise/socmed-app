@@ -414,7 +414,12 @@ export default function EnhancedCalendar({
                                 src={post.mediaUrls[0]} 
                                 alt="" 
                                 className="w-full h-full object-cover"
+                                loading="lazy"
+                                onLoad={(e) => {
+                                  console.log('Image loaded successfully:', e.currentTarget.src);
+                                }}
                                 onError={(e) => {
+                                  console.log('Image failed to load:', e.currentTarget.src);
                                   // Show placeholder text if image fails to load
                                   const target = e.currentTarget;
                                   target.style.display = 'none';

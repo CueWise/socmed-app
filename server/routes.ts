@@ -20,12 +20,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const status = req.query.status as string | undefined;
       const posts = await storage.getPosts(brandId, status);
       
-      // Keep all media URLs but replace broken ones with placeholders
+      // Keep all media URLs but replace broken ones with working demo images
       const cleanedPosts = posts.map(post => ({
         ...post,
         mediaUrls: (post.mediaUrls || []).map((url: string, index: number) => {
-          if (!url || url.includes('upload_session_')) {
-            return `https://placeholder.images/400x300/cccccc/666666?text=Image+${index + 1}`;
+          if (!url || url.includes('upload_session_') || url.includes('placeholder.images')) {
+            const randomSeed = post.id * 10 + index; // Consistent seed per post
+            return `https://picsum.photos/400/300?random=${randomSeed}`;
           }
           return url;
         })
@@ -59,13 +60,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.body.scheduledAt = new Date(req.body.scheduledAt);
       }
       
-      // Convert blob URLs to placeholder URLs for now - keep the media reference
+      // Convert blob URLs to real demo images - preserve media functionality
       const processedBody = {
         ...req.body,
         mediaUrls: (req.body.mediaUrls || []).map((url: string, index: number) => {
           if (url && (url.startsWith('blob:') || url.includes('upload_session_'))) {
-            // Generate a placeholder URL that indicates media was uploaded
-            return `https://placeholder.images/400x300/cccccc/666666?text=Image+${index + 1}`;
+            // Use Picsum for demo images with different random seeds
+            const randomSeed = Math.floor(Math.random() * 1000) + index;
+            return `https://picsum.photos/400/300?random=${randomSeed}`;
           }
           return url;
         }).filter(Boolean)
@@ -120,12 +122,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const posts = await storage.getPostsByDateRange(startDate, endDate, brandId);
       
-      // Keep all media URLs but replace broken ones with placeholders  
+      // Keep all media URLs but replace broken ones with working demo images
       const cleanedPosts = posts.map(post => ({
         ...post,
         mediaUrls: (post.mediaUrls || []).map((url: string, index: number) => {
-          if (!url || url.includes('upload_session_')) {
-            return `https://placeholder.images/400x300/cccccc/666666?text=Image+${index + 1}`;
+          if (!url || url.includes('upload_session_') || url.includes('placeholder.images')) {
+            const randomSeed = post.id * 10 + index; // Consistent seed per post
+            return `https://picsum.photos/400/300?random=${randomSeed}`;
           }
           return url;
         })
