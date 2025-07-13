@@ -723,43 +723,52 @@ export default function PostEditorModal({
                   </div>
                 </div>
 
-                {/* Media Thumbnails - positioned below hashtags */}
-                {attachedMedia.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-sm font-medium text-gray-700">Attached Media ({attachedMedia.length})</span>
+                {/* Media Thumbnails - Always visible section below hashtags */}
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      Attached Media ({attachedMedia.length})
+                    </span>
+                    {attachedMedia.length > 0 && (
                       <button
                         onClick={() => setShowPreviewPanel(true)}
                         className="text-xs px-2 py-1 h-6 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
                       >
                         Preview
                       </button>
-                    </div>
-                    <div className="flex gap-2 overflow-x-auto">
+                    )}
+                  </div>
+                  
+                  {attachedMedia.length > 0 ? (
+                    <div className="flex gap-2 overflow-x-auto p-2 bg-gray-50 rounded border">
                       {attachedMedia.map((media, index) => (
                         <div key={index} className="relative flex-shrink-0">
                           {media.type === 'image' ? (
                             <img 
                               src={media.url} 
                               alt={`Attachment ${index + 1}`}
-                              className="w-16 h-16 object-cover rounded border"
+                              className="w-20 h-20 object-cover rounded border shadow-sm"
                             />
                           ) : (
-                            <div className="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center">
-                              <Play className="h-6 w-6 text-gray-500" />
+                            <div className="w-20 h-20 bg-gray-800 rounded border shadow-sm flex items-center justify-center">
+                              <Play className="h-8 w-8 text-white" />
                             </div>
                           )}
                           <button
                             onClick={() => setAttachedMedia(prev => prev.filter((_, i) => i !== index))}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 shadow-sm"
                           >
-                            <X className="h-3 w-3" />
+                            <X className="h-4 w-4" />
                           </button>
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="p-4 bg-gray-50 rounded border text-center text-gray-500 text-sm">
+                      No media attached. Use the upload button above to add images or videos.
+                    </div>
+                  )}
+                </div>
 
                 {/* Debug: Test Preview Panel Button */}
                 <div className="mt-4">
