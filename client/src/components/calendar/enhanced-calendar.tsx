@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Plus, X, Edit2 } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useCalendarPosts } from "@/hooks/use-posts";
 import { useBrand } from "@/hooks/use-brand";
@@ -26,7 +26,7 @@ interface EnhancedCalendarProps {
   onDateSelect?: (date: Date | null) => void;
   selectedDate?: Date | null;
   onCreatePost?: (date?: Date) => void;
-  onEditPost?: (postId: number, date?: Date) => void;
+  onEditPost?: (post: any, date?: Date) => void;
   showCreateButton?: boolean;
   title?: string;
   className?: string;
@@ -128,8 +128,8 @@ export default function EnhancedCalendar({
         const timeSinceLastClick = now - lastClickTime;
         if (timeSinceLastClick < 500) { // Double-click detected (within 500ms)
           // Open first post for editing on double-click
-          if (dayPosts[0]?.id) {
-            onEditPost?.(dayPosts[0].id, date);
+          if (dayPosts[0]) {
+            onEditPost?.(dayPosts[0], date);
             return;
           }
         }
@@ -176,8 +176,8 @@ export default function EnhancedCalendar({
     setMobilePopout({ visible: false, posts: [], date: null });
   };
   
-  const handlePostEdit = (postId: number) => {
-    onEditPost?.(postId, mobilePopout.date || undefined);
+  const handlePostEdit = (post: any) => {
+    onEditPost?.(post, mobilePopout.date || undefined);
     closeMobilePopout();
   };
 
@@ -536,6 +536,11 @@ export default function EnhancedCalendar({
                 })}
               </span>
             </DialogTitle>
+            <DialogDescription>
+              {mobilePopout.posts.length > 0 
+                ? "Tap any post below to edit it" 
+                : "No posts scheduled for this date"}
+            </DialogDescription>
           </DialogHeader>
           
           {mobilePopout.posts.length > 0 ? (
@@ -544,7 +549,7 @@ export default function EnhancedCalendar({
                 <div 
                   key={index} 
                   className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => handlePostEdit(post.id)}
+                  onClick={() => handlePostEdit(post)}
                 >
                   {/* Platforms */}
                   <div className="flex items-center space-x-3 mb-3">
