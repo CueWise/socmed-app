@@ -35,7 +35,7 @@ export const posts = pgTable("posts", {
   mediaUrls: json("media_urls").$type<string[]>(),
   platforms: json("platforms").$type<string[]>().notNull(),
   status: text("status", { enum: ['draft', 'pending_approval', 'approved', 'scheduled', 'published', 'rejected'] }).notNull().default('draft'),
-  scheduledAt: timestamp("scheduled_at", { mode: 'date' }),
+  scheduledAt: text("scheduled_at"),
   publishedAt: timestamp("published_at"),
   createdBy: integer("created_by").references(() => users.id).notNull(),
   brandId: integer("brand_id").references(() => brands.id).notNull(),
