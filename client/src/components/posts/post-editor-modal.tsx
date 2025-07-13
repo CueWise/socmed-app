@@ -317,6 +317,11 @@ export default function PostEditorModal({
   const queryClient = useQueryClient();
   const { selectedBrand } = useBrandStore();
 
+  // Utility function to detect mobile device
+  const isMobileDevice = () => {
+    return window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  };
+
   // Enhanced emoji categories
   const emojiCategories = {
     faces: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '🥹', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '🥸', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭'],
@@ -950,9 +955,15 @@ export default function PostEditorModal({
                         <div key={index} className="relative flex-shrink-0">
                           <button
                             onClick={() => {
-                              setCurrentMediaIndex(index);
-                              setMediaPlayerSource('edit');
-                              setShowMediaPlayer(true);
+                              if (isMobileDevice() && (media.type === 'video' || media.type === 'audio')) {
+                                // Open in native media player on mobile
+                                window.open(media.url, '_blank');
+                              } else {
+                                // Use custom media player for desktop or images
+                                setCurrentMediaIndex(index);
+                                setMediaPlayerSource('edit');
+                                setShowMediaPlayer(true);
+                              }
                             }}
                             className="block"
                           >
@@ -1617,9 +1628,15 @@ export default function PostEditorModal({
                               <div className="mt-3 rounded-2xl overflow-hidden border">
                                 <button
                                   onClick={() => {
-                                    setCurrentMediaIndex(0);
-                                    setMediaPlayerSource('preview');
-                                    setShowMediaPlayer(true);
+                                    if (isMobileDevice() && (allMedia[0].type === 'video' || allMedia[0].type === 'audio')) {
+                                      // Open in native media player on mobile
+                                      window.open(allMedia[0].url, '_blank');
+                                    } else {
+                                      // Use custom media player for desktop or images
+                                      setCurrentMediaIndex(0);
+                                      setMediaPlayerSource('preview');
+                                      setShowMediaPlayer(true);
+                                    }
                                   }}
                                   className="block w-full"
                                 >
@@ -1665,9 +1682,15 @@ export default function PostEditorModal({
                           {allMedia.length > 0 ? (
                             <button
                               onClick={() => {
-                                setCurrentMediaIndex(0);
-                                setMediaPlayerSource('preview');
-                                setShowMediaPlayer(true);
+                                if (isMobileDevice() && (allMedia[0].type === 'video' || allMedia[0].type === 'audio')) {
+                                  // Open in native media player on mobile
+                                  window.open(allMedia[0].url, '_blank');
+                                } else {
+                                  // Use custom media player for desktop or images
+                                  setCurrentMediaIndex(0);
+                                  setMediaPlayerSource('preview');
+                                  setShowMediaPlayer(true);
+                                }
                               }}
                               className="block w-full h-full"
                             >

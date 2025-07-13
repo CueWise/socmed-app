@@ -6,6 +6,13 @@ CueWise is a web-based social media management platform with AI-powered content 
 
 ## Recent Changes (July 2025)
 
+✓ **Native Mobile Media Player Integration** - Enhanced mobile UX with device-native playback
+  - Implemented automatic mobile device detection using screen width and user agent
+  - Video and audio files now open in native mobile media players on touch devices
+  - Images continue to use custom lightbox modal for consistent experience
+  - Download functionality preserved with proper file extension detection
+  - Desktop users still get full-featured custom media player with navigation
+
 ✓ **Multi-Media File Upload System Fixed** - Complete support for all social media formats
   - Fixed critical bug where video files were saved with .jpg extensions
   - Updated multer configuration to properly handle MP4, MOV, WebM, AVI video formats
