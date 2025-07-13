@@ -33,6 +33,7 @@ export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
   content: text("content").notNull(),
   mediaUrls: json("media_urls").$type<string[]>(),
+  mediaTypes: json("media_types").$type<string[]>().default([]), // Store file types: image, video, audio
   platforms: json("platforms").$type<string[]>().notNull(),
   status: text("status", { enum: ['draft', 'pending_approval', 'approved', 'scheduled', 'published', 'rejected'] }).notNull().default('draft'),
   scheduledAt: text("scheduled_at"),

@@ -45,6 +45,7 @@ interface PostData {
   platforms: string[];
   scheduledAt?: Date;
   mediaUrls?: string[];
+  mediaTypes?: string[];
   hashtags?: string[];
   status: string;
   notes?: string;
@@ -290,7 +291,7 @@ export default function PostEditorModal({
   const [isDesktop, setIsDesktop] = useState(false);
   const [attachedMedia, setAttachedMedia] = useState<{
     url: string, 
-    type: 'image' | 'video', 
+    type: 'image' | 'video' | 'audio', 
     file?: File,
     uniqueId?: string,
     sessionId?: string,
@@ -298,6 +299,7 @@ export default function PostEditorModal({
     brandId?: number,
     uploadedAt?: string
   }[]>([]);
+  const [mediaTypes, setMediaTypes] = useState<string[]>([]);
   const [emojiTarget, setEmojiTarget] = useState<'content' | 'note' | 'reply'>('content');
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [showMediaConfirm, setShowMediaConfirm] = useState(false);
@@ -504,33 +506,10 @@ export default function PostEditorModal({
     mutationFn: async (postData: PostData) => {
       console.log('Creating post with data:', postData);
       
-      // Upload any blob URLs to real files first
-      const blobUrls = postData.mediaUrls?.filter(url => url.startsWith('blob:')) || [];
-      let uploadedUrls: string[] = [];
-      
-      if (blobUrls.length > 0) {
-        try {
-          // Convert blob URLs to files and upload them
-          const { convertBlobUrlsToFiles, uploadFiles } = await import('@/lib/upload');
-          const files = await convertBlobUrlsToFiles(blobUrls);
-          uploadedUrls = await uploadFiles(files);
-        } catch (error) {
-          console.error('Failed to upload media files:', error);
-          throw new Error('Failed to upload media files');
-        }
-      }
-      
-      // Replace blob URLs with uploaded URLs
-      const finalMediaUrls = postData.mediaUrls?.map(url => {
-        if (url.startsWith('blob:')) {
-          return uploadedUrls.shift() || url; // Replace with uploaded URL
-        }
-        return url;
-      }) || [];
-
+      // Since we now upload files immediately, there shouldn't be any blob URLs
+      // Just use the data as-is
       const finalPostData = {
-        ...postData,
-        mediaUrls: finalMediaUrls
+        ...postData
       };
       
       const url = `/api/posts${postId ? `/${postId}` : ""}`;
@@ -652,6 +631,7 @@ export default function PostEditorModal({
       platforms: selectedPlatforms,
       hashtags,
       mediaUrls: combinedMediaUrls,
+      mediaTypes: mediaTypes,
       notes: notes.trim(),
       status: status,
       // Add scheduled date for calendar positioning
@@ -1016,32 +996,45 @@ export default function PostEditorModal({
                             input.type = 'file';
                             input.accept = 'image/*,video/*,image/gif';
                             input.multiple = !hasVideo; // Multiple only if no video
-                            input.onchange = (e) => {
+                            input.onchange = async (e) => {
                               const files = Array.from((e.target as HTMLInputElement).files || []);
-                              files.forEach(file => {
-                                // Create unique URL with timestamp and random ID
-                                const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-                                const url = URL.createObjectURL(file);
-                                const type = file.type.startsWith('video/') ? 'video' : 'image';
+                              
+                              // Upload files immediately to get proper file types
+                              try {
+                                const { uploadFiles } = await import('@/lib/upload');
+                                const result = await uploadFiles(files);
                                 
-                                // Check restrictions before adding
-                                if (type === 'video' && (hasVideo || allMedia.length > 0)) {
-                                  alert('Only one video allowed per post. Remove other media first.');
-                                  return;
-                                }
+                                // Add uploaded files to attached media
+                                result.urls.forEach((url, index) => {
+                                  const file = files[index];
+                                  const type = result.types[index] as 'image' | 'video' | 'audio';
+                                  const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                                  
+                                  // Check restrictions before adding
+                                  if (type === 'video' && (hasVideo || allMedia.length > 0)) {
+                                    alert('Only one video allowed per post. Remove other media first.');
+                                    return;
+                                  }
+                                  
+                                  // Create unique media object with proper identification and session isolation
+                                  setAttachedMedia(prev => [...prev, { 
+                                    url, 
+                                    type, 
+                                    file,
+                                    uniqueId,
+                                    sessionId,
+                                    postId: postId || null,
+                                    brandId: selectedBrand?.id,
+                                    uploadedAt: new Date().toISOString()
+                                  }]);
+                                });
                                 
-                                // Create unique media object with proper identification and session isolation
-                                setAttachedMedia(prev => [...prev, { 
-                                  url, 
-                                  type, 
-                                  file,
-                                  uniqueId,
-                                  sessionId,
-                                  postId: postId || null,
-                                  brandId: selectedBrand?.id,
-                                  uploadedAt: new Date().toISOString()
-                                }]);
-                              });
+                                // Update media types state
+                                setMediaTypes(prev => [...prev, ...result.types]);
+                              } catch (error) {
+                                console.error('Upload failed:', error);
+                                alert('Failed to upload files. Please try again.');
+                              }
                             };
                             input.click();
                           }}
@@ -1073,26 +1066,39 @@ export default function PostEditorModal({
                           input.type = 'file';
                           input.accept = 'image/*,video/*,image/gif';
                           input.multiple = true;
-                          input.onchange = (e) => {
+                          input.onchange = async (e) => {
                             const files = Array.from((e.target as HTMLInputElement).files || []);
-                            files.forEach(file => {
-                              // Create unique URL with timestamp and random ID
-                              const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-                              const url = URL.createObjectURL(file);
-                              const type = file.type.startsWith('video/') ? 'video' : 'image';
+                            
+                            // Upload files immediately to get proper file types
+                            try {
+                              const { uploadFiles } = await import('@/lib/upload');
+                              const result = await uploadFiles(files);
                               
-                              // Create unique media object with proper identification and session isolation
-                              setAttachedMedia(prev => [...prev, { 
-                                url, 
-                                type, 
-                                file,
-                                uniqueId,
-                                sessionId,
-                                postId: postId || null,
-                                brandId: selectedBrand?.id,
-                                uploadedAt: new Date().toISOString()
-                              }]);
-                            });
+                              // Add uploaded files to attached media
+                              result.urls.forEach((url, index) => {
+                                const file = files[index];
+                                const type = result.types[index] as 'image' | 'video' | 'audio';
+                                const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                                
+                                // Create unique media object with proper identification and session isolation
+                                setAttachedMedia(prev => [...prev, { 
+                                  url, 
+                                  type, 
+                                  file,
+                                  uniqueId,
+                                  sessionId,
+                                  postId: postId || null,
+                                  brandId: selectedBrand?.id,
+                                  uploadedAt: new Date().toISOString()
+                                }]);
+                              });
+                              
+                              // Update media types state
+                              setMediaTypes(prev => [...prev, ...result.types]);
+                            } catch (error) {
+                              console.error('Upload failed:', error);
+                              alert('Failed to upload files. Please try again.');
+                            }
                           };
                           input.click();
                         }}

@@ -1,4 +1,4 @@
-export async function uploadFiles(files: File[]): Promise<string[]> {
+export async function uploadFiles(files: File[]): Promise<{urls: string[], types: string[]}> {
   const formData = new FormData();
   
   files.forEach(file => {
@@ -16,7 +16,10 @@ export async function uploadFiles(files: File[]): Promise<string[]> {
   }
 
   const result = await response.json();
-  return result.urls;
+  return {
+    urls: result.urls,
+    types: result.types || []
+  };
 }
 
 export function blobToFile(blobUrl: string, filename: string): Promise<File> {
