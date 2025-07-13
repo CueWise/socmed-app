@@ -234,7 +234,7 @@ export default function RichTextEditor({
           
           {/* Scrollable Dropdown Toolbar */}
           {showToolbar && (
-            <div className="absolute bottom-full right-0 mb-1 bg-white border border-gray-300 rounded-lg shadow-lg z-[9999] p-3 min-w-[280px] max-h-[300px] overflow-y-auto">
+            <div className="fixed bottom-20 right-4 bg-white border border-gray-300 rounded-lg shadow-xl z-[99999] p-3 min-w-[280px] max-h-[300px] overflow-y-auto">
               <div className="space-y-3">
                 {/* Text Formatting */}
                 <div>
