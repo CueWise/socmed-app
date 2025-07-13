@@ -414,6 +414,14 @@ export default function EnhancedCalendar({
                                 src={post.mediaUrls[0]} 
                                 alt="" 
                                 className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Hide broken images and show placeholder
+                                  e.currentTarget.style.display = 'none';
+                                  const placeholder = e.currentTarget.parentElement;
+                                  if (placeholder) {
+                                    placeholder.innerHTML = '<div class="w-full h-full bg-gray-300 flex items-center justify-center"><span class="text-[6px] text-gray-500">IMG</span></div>';
+                                  }
+                                }}
                               />
                             </div>
                           )}

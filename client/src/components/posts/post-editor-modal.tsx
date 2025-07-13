@@ -475,33 +475,42 @@ export default function PostEditorModal({
 
   const createPostMutation = useMutation({
     mutationFn: async (postData: PostData) => {
-      const url = postId ? `/api/posts/${postId}` : '/api/posts';
-      const method = postId ? 'PATCH' : 'POST';
-      
-      const scheduleDateTime = scheduledDate && scheduledTime 
-        ? new Date(`${scheduledDate}T${scheduledTime}:00`)
-        : undefined;
-      
-      const payload = {
-        ...postData,
-        scheduledAt: scheduleDateTime?.toISOString(),
-      };
-      
-      return apiRequest(method, url, payload);
+      console.log('Creating post with data:', postData);
+      return apiRequest(`/api/posts${postId ? `/${postId}` : ""}`, {
+        method: postId ? "PATCH" : "POST",
+        body: JSON.stringify(postData),
+        headers: { "Content-Type": "application/json" },
+      });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('Post creation successful:', data);
+      
       // Invalidate all relevant queries to ensure real-time updates
       queryClient.invalidateQueries({ queryKey: ['/api/posts'] });
       queryClient.invalidateQueries({ queryKey: ['/api/calendar/posts'] });
       queryClient.invalidateQueries({ queryKey: ['/api/analytics'] });
+      
+      // Force refetch to ensure immediate update
+      queryClient.refetchQueries({ queryKey: ['/api/calendar/posts'] });
+      
       toast({
         title: postId ? "Post updated" : "Post created",
         description: postId ? "Your post has been updated successfully." : "Your post has been created successfully.",
       });
+      
+      // Clear form data and close modal
+      setContent("");
+      setSelectedPlatforms(["instagram"]);
+      setHashtags([]);
+      setMediaUrls([]);
+      setAttachedMedia([]);
+      setStatus("draft");
+      setNotes("");
       setHasUnsavedChanges(false);
       onOpenChange(false);
     },
     onError: (error: any) => {
+      console.error("Error creating/updating post:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to save post",
@@ -547,13 +556,10 @@ export default function PostEditorModal({
     }
 
     // Combine existing and new media URLs for submission
-    // For new uploads, create unique identifiers to prevent sharing across posts
+    // For new uploads, use the actual blob URLs for now (temporary solution)
     const combinedMediaUrls = [
       ...existingMedia,
-      ...attachedMedia.map(media => {
-        // Create a unique URL identifier for each new upload with session isolation
-        return `upload_${media.sessionId}_${media.uniqueId}_${media.brandId}_${media.postId || 'new'}_${media.file?.name || 'media'}`;
-      })
+      ...attachedMedia.map(media => media.url) // Use the actual blob URL for display
     ];
 
     // Combine scheduled date and time into a Date object (Philippine timezone)
