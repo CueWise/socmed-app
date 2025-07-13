@@ -111,28 +111,49 @@ export default function EnhancedCalendar({
   const handleDateClick = (date: Date) => {
     const now = Date.now();
     const dayPosts = getPostsForDate(date);
+    const timeSinceLastClick = now - lastClickTime;
+    const isDoubleClick = timeSinceLastClick < 500;
     
-    // Handle mobile: show popout for posts, regular selection for empty dates
+    // Check if date is in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const clickedDate = new Date(date);
+    clickedDate.setHours(0, 0, 0, 0);
+    const isDateInPast = clickedDate < today;
+    
+    // Handle mobile
     if (isMobile) {
       if (dayPosts.length > 0) {
+        // Show popout for posts on mobile
         setMobilePopout({
           visible: true,
           posts: dayPosts,
           date
         });
-        return; // Don't change selection on mobile when showing popout
+        return;
+      } else if (!isDateInPast) {
+        // Show create post popout for empty dates (not in past)
+        setMobilePopout({
+          visible: true,
+          posts: [],
+          date
+        });
+        return;
       }
     } else {
-      // Handle desktop double-click for posts
+      // Handle desktop
       if (dayPosts.length > 0) {
-        const timeSinceLastClick = now - lastClickTime;
-        if (timeSinceLastClick < 500) { // Double-click detected (within 500ms)
-          // Open first post for editing on double-click
+        if (isDoubleClick) {
+          // Double-click on existing posts opens first post for editing
           if (dayPosts[0]) {
             onEditPost?.(dayPosts[0], date);
             return;
           }
         }
+      } else if (isDoubleClick && !isDateInPast) {
+        // Double-click on empty dates (not in past) opens create post
+        onCreatePost?.(date);
+        return;
       }
     }
     
@@ -178,6 +199,11 @@ export default function EnhancedCalendar({
   
   const handlePostEdit = (post: any) => {
     onEditPost?.(post, mobilePopout.date || undefined);
+    closeMobilePopout();
+  };
+  
+  const handleCreateFromPopout = () => {
+    onCreatePost?.(mobilePopout.date || undefined);
     closeMobilePopout();
   };
 
@@ -539,7 +565,7 @@ export default function EnhancedCalendar({
             <DialogDescription>
               {mobilePopout.posts.length > 0 
                 ? "Tap any post below to edit it" 
-                : "No posts scheduled for this date"}
+                : "No posts scheduled for this date. Tap below to create one."}
             </DialogDescription>
           </DialogHeader>
           
@@ -624,10 +650,7 @@ export default function EnhancedCalendar({
             <div className="text-center py-8">
               <p className="text-gray-500 mb-2">No posts scheduled for this date</p>
               <Button 
-                onClick={() => {
-                  closeMobilePopout();
-                  onCreatePost?.(mobilePopout.date || undefined);
-                }}
+                onClick={handleCreateFromPopout}
                 className="min-h-[44px]"
               >
                 <Plus className="h-4 w-4 mr-2" />
