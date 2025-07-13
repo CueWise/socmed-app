@@ -249,10 +249,17 @@ export default function PostEditorModal({
   });
   const [scheduledTime, setScheduledTime] = useState(() => {
     if (initialData?.scheduledAt) {
-      const scheduleDate = new Date(initialData.scheduledAt);
-      const hours = scheduleDate.getHours().toString().padStart(2, '0');
-      const minutes = scheduleDate.getMinutes().toString().padStart(2, '0');
-      return `${hours}:${minutes}`;
+      const dateTimeString = initialData.scheduledAt;
+      if (dateTimeString.includes('T')) {
+        const [, timePart] = dateTimeString.split('T');
+        return timePart.split(':').slice(0, 2).join(':');
+      } else {
+        // Fallback for old format
+        const scheduleDate = new Date(dateTimeString);
+        const hours = scheduleDate.getHours().toString().padStart(2, '0');
+        const minutes = scheduleDate.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+      }
     }
     return "14:00";
   });
@@ -366,12 +373,22 @@ export default function PostEditorModal({
       setNotes(initialData.notes || "");
       
       if (initialData.scheduledAt) {
-        const scheduleDate = new Date(initialData.scheduledAt);
-        setScheduledDate(formatDateForInput(scheduleDate));
-        // Format time as HH:MM for input
-        const hours = scheduleDate.getHours().toString().padStart(2, '0');
-        const minutes = scheduleDate.getMinutes().toString().padStart(2, '0');
-        setScheduledTime(`${hours}:${minutes}`);
+        // scheduledAt is now a text field like "2025-07-31T14:00:00"
+        const dateTimeString = initialData.scheduledAt;
+        if (dateTimeString.includes('T')) {
+          const [datePart, timePart] = dateTimeString.split('T');
+          setScheduledDate(datePart);
+          // Extract time part and format as HH:MM
+          const timeOnly = timePart.split(':').slice(0, 2).join(':');
+          setScheduledTime(timeOnly);
+        } else {
+          // Fallback for old format
+          const scheduleDate = new Date(dateTimeString);
+          setScheduledDate(formatDateForInput(scheduleDate));
+          const hours = scheduleDate.getHours().toString().padStart(2, '0');
+          const minutes = scheduleDate.getMinutes().toString().padStart(2, '0');
+          setScheduledTime(`${hours}:${minutes}`);
+        }
       }
     } else {
       // Reset form for new post
