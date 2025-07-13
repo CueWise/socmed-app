@@ -4,7 +4,7 @@ import { users, brands, posts, approvals, comments, analytics, brandAssets,
          type Comment, type InsertComment, type Analytics, type InsertAnalytics,
          type BrandAsset, type InsertBrandAsset } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, lte, desc, sql } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, or, isNull } from "drizzle-orm";
 
 export interface IStorage {
   // Users
@@ -142,18 +142,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getPostsByDateRange(start: Date, end: Date, brandId?: number): Promise<Post[]> {
+    console.log('Calendar query - Start:', start.toISOString(), 'End:', end.toISOString(), 'BrandId:', brandId);
+    
+    // Include posts with scheduledAt within range OR posts without scheduledAt but created recently
     const conditions = [
-      gte(posts.scheduledAt, start),
-      lte(posts.scheduledAt, end)
+      or(
+        and(
+          gte(posts.scheduledAt, start),
+          lte(posts.scheduledAt, end)
+        ),
+        and(
+          isNull(posts.scheduledAt),
+          gte(posts.createdAt, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) // Last 7 days for drafts without dates
+        )
+      )
     ];
     
     if (brandId) {
       conditions.push(eq(posts.brandId, brandId));
     }
     
-    return await db.select().from(posts)
+    const result = await db.select().from(posts)
       .where(and(...conditions))
-      .orderBy(desc(posts.scheduledAt));
+      .orderBy(desc(posts.scheduledAt), desc(posts.createdAt));
+    
+    console.log('Calendar query result:', result.length, 'posts found');
+    return result;
   }
 
   // Approvals
