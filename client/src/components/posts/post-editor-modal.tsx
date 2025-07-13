@@ -621,14 +621,13 @@ export default function PostEditorModal({
     // This ensures they appear on the correct calendar day
     let scheduledDateTime = null;
     if (scheduledDate && scheduledTime) {
-      // Parse date and time components manually to avoid timezone issues
-      const [year, month, day] = scheduledDate.split('-').map(Number);
-      const [hour, minute] = scheduledTime.split(':').map(Number);
-      scheduledDateTime = new Date(year, month - 1, day, hour, minute, 0);
+      // Create a local datetime string without timezone conversion
+      const localDateTimeString = `${scheduledDate}T${scheduledTime}:00`;
+      scheduledDateTime = localDateTimeString;
     } else if (scheduledDate) {
       // Default time for drafts
-      const [year, month, day] = scheduledDate.split('-').map(Number);
-      scheduledDateTime = new Date(year, month - 1, day, 14, 0, 0);
+      const localDateTimeString = `${scheduledDate}T14:00:00`;
+      scheduledDateTime = localDateTimeString;
     }
 
     const postData: PostData = {

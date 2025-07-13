@@ -101,9 +101,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('Creating post with data:', JSON.stringify(req.body, null, 2));
       
-      // Convert scheduledAt string to Date if present
+      // Handle scheduledAt properly to preserve user's intended time
       if (req.body.scheduledAt && typeof req.body.scheduledAt === 'string') {
-        req.body.scheduledAt = new Date(req.body.scheduledAt);
+        // Parse the local datetime string and treat it as local time
+        // This prevents automatic UTC conversion
+        const localDateTime = req.body.scheduledAt;
+        if (localDateTime.includes('T') && !localDateTime.includes('Z')) {
+          // It's a local datetime string like "2025-07-31T14:00:00"
+          // Create Date object but tell PostgreSQL to treat it as local time
+          req.body.scheduledAt = new Date(localDateTime);
+        } else {
+          // It's already a full ISO string, use as-is
+          req.body.scheduledAt = new Date(req.body.scheduledAt);
+        }
       }
       
       // Filter out blob URLs - they should be converted to real uploads client-side
