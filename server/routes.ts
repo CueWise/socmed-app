@@ -30,14 +30,25 @@ const storage_multer = multer.diskStorage({
 const upload = multer({ 
   storage: storage_multer,
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 100 * 1024 * 1024, // 100MB limit for videos
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    // Support all major social media file formats
+    const allowedTypes = [
+      // Images
+      'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 
+      'image/heic', 'image/heif', 'image/tiff', 'image/bmp', 'image/svg+xml',
+      // Videos
+      'video/mp4', 'video/mov', 'video/avi', 'video/mkv', 'video/webm', 
+      'video/3gpp', 'video/flv', 'video/wmv', 'video/m4v', 'video/quicktime',
+      // Audio
+      'audio/mp3', 'audio/wav', 'audio/aac', 'audio/ogg', 'audio/m4a'
+    ];
+    
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.'));
+      cb(new Error(`Invalid file type: ${file.mimetype}. Supported formats: Images (JPEG, PNG, GIF, WebP, HEIC), Videos (MP4, MOV, WebM, AVI), and Audio files.`));
     }
   }
 });
