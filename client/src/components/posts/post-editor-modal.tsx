@@ -640,7 +640,7 @@ export default function PostEditorModal({
           <div className={cn(
             "fixed bottom-0 bg-white rounded-t-2xl shadow-2xl z-50 transform transition-all duration-300 ease-out",
             "max-h-[90vh] overflow-hidden flex flex-col",
-            showNotes ? "left-0 right-full sm:right-[500px]" : "left-0 right-0", // Fixed positioning, reserve space for notes
+            showNotes ? "left-0 right-full sm:right-[500px] z-[109]" : "left-0 right-0", // Fixed positioning, reserve space for notes
             open ? "translate-y-0" : "translate-y-full"
           )}>
             {/* Header */}
@@ -689,7 +689,13 @@ export default function PostEditorModal({
             </div>
 
             {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-6"
+                 ref={(el) => {
+                   if (el && open && !showNotes) {
+                     // Scroll to top when post editor opens
+                     setTimeout(() => el.scrollTop = 0, 100);
+                   }
+                 }}>
 
         <div className="space-y-6">
           {/* Platform Selection - Clickable Icons */}
@@ -947,6 +953,12 @@ export default function PostEditorModal({
              style={{ 
                paddingBottom: 'env(keyboard-inset-height, 0px)',
                touchAction: 'pan-y'
+             }}
+             ref={(el) => {
+               if (el && showNotes) {
+                 // Scroll to top when notes panel opens
+                 setTimeout(() => el.scrollTop = 0, 100);
+               }
              }}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b bg-white">
@@ -962,7 +974,13 @@ export default function PostEditorModal({
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[300px] pb-4">
+          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[300px] pb-4"
+               ref={(el) => {
+                 if (el && showNotes) {
+                   // Scroll to top when notes panel opens  
+                   setTimeout(() => el.scrollTop = 0, 100);
+                 }
+               }}>
             {/* Note Messages - Slack Style */}
           {noteThreads.map((thread) => (
             <div key={thread.id} className="group hover:bg-gray-100 rounded p-2 transition-colors">
@@ -1124,7 +1142,8 @@ export default function PostEditorModal({
         {/* Add New Message - Mobile keyboard aware footer */}
         <div className="border-t pt-4 bg-white flex-shrink-0 sticky bottom-0"
              style={{ 
-               paddingBottom: 'max(env(keyboard-inset-height, 0px), 16px)',
+               paddingBottom: 'max(env(keyboard-inset-height, 0px) + 60px, 80px)',
+               marginBottom: 'env(keyboard-inset-height, 0px)',
                zIndex: 15
              }}>
           <div className="space-y-2">
