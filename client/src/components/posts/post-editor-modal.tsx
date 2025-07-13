@@ -1012,10 +1012,7 @@ export default function PostEditorModal({
                             </div>
                           </div>
                           
-                          {/* Media Type Badge */}
-                          <div className="absolute top-1 left-1 bg-black bg-opacity-75 text-white text-xs px-1 rounded">
-                            {media.isExisting ? 'DB' : 'NEW'}
-                          </div>
+
                           
                           {/* Remove Button */}
                           <button
@@ -1766,96 +1763,103 @@ export default function PostEditorModal({
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Media Player Popup */}
+      {/* Platform X-Style Media Player */}
       {showMediaPlayer && allMedia.length > 0 && (
-        <div className="fixed inset-0 z-[300] bg-black bg-opacity-90 flex items-center justify-center" onClick={() => setShowMediaPlayer(false)}>
-          <div className="relative max-w-[90vw] max-h-[90vh] bg-white rounded-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-white border-b">
-              <div className="flex items-center space-x-2">
-                <h3 className="font-semibold">Media Viewer</h3>
-                <span className="text-sm text-gray-500">
-                  {currentMediaIndex + 1} of {allMedia.length}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                {allMedia.length > 1 && (
-                  <>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : allMedia.length - 1)}
-                      disabled={allMedia.length <= 1}
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setCurrentMediaIndex(prev => prev < allMedia.length - 1 ? prev + 1 : 0)}
-                      disabled={allMedia.length <= 1}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowMediaPlayer(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
+        <div className="fixed inset-0 z-[300] bg-black flex items-center justify-center" onClick={() => setShowMediaPlayer(false)}>
+          {/* Close Button - Top Right */}
+          <button
+            onClick={() => setShowMediaPlayer(false)}
+            className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black bg-opacity-60 hover:bg-opacity-80 flex items-center justify-center text-white transition-all duration-200"
+          >
+            <X className="h-5 w-5" />
+          </button>
 
-            {/* Media Content */}
-            <div className="bg-black flex items-center justify-center" style={{ minHeight: '400px', maxHeight: '70vh' }}>
-              {allMedia[currentMediaIndex]?.type === 'video' ? (
-                <video
-                  src={allMedia[currentMediaIndex].url}
-                  controls
-                  autoPlay
-                  className="max-w-full max-h-full"
-                  onError={(e) => {
-                    console.error('Video failed to load:', allMedia[currentMediaIndex].url, e);
-                  }}
-                >
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <img
-                  src={allMedia[currentMediaIndex]?.url}
-                  alt={`Media ${currentMediaIndex + 1}`}
-                  className="max-w-full max-h-full object-contain"
-                  onError={(e) => {
-                    console.error('Image failed to load:', allMedia[currentMediaIndex].url, e);
-                  }}
-                />
-              )}
-            </div>
+          {/* Navigation Arrows */}
+          {allMedia.length > 1 && (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : allMedia.length - 1);
+                }}
+                className="absolute left-4 z-50 w-12 h-12 rounded-full bg-black bg-opacity-60 hover:bg-opacity-80 flex items-center justify-center text-white transition-all duration-200"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentMediaIndex(prev => prev < allMedia.length - 1 ? prev + 1 : 0);
+                }}
+                className="absolute right-4 z-50 w-12 h-12 rounded-full bg-black bg-opacity-60 hover:bg-opacity-80 flex items-center justify-center text-white transition-all duration-200"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            </>
+          )}
 
-            {/* Navigation Dots for multiple media */}
-            {allMedia.length > 1 && (
-              <div className="flex items-center justify-center space-x-2 p-4 bg-white border-t">
-                {allMedia.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentMediaIndex(index)}
-                    className={cn(
-                      "w-3 h-3 rounded-full transition-colors",
-                      index === currentMediaIndex ? "bg-blue-500" : "bg-gray-300 hover:bg-gray-400"
-                    )}
-                  />
-                ))}
-              </div>
+          {/* Media Content */}
+          <div className="relative w-full h-full flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            {allMedia[currentMediaIndex]?.type === 'video' ? (
+              <video
+                src={allMedia[currentMediaIndex].url}
+                controls
+                autoPlay
+                className="max-w-[95vw] max-h-[95vh] rounded-lg shadow-2xl"
+                style={{ background: '#000' }}
+                onError={(e) => {
+                  console.error('Video failed to load:', allMedia[currentMediaIndex].url, e);
+                }}
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+              <img
+                src={allMedia[currentMediaIndex]?.url}
+                alt={`Media ${currentMediaIndex + 1}`}
+                className="max-w-[95vw] max-h-[95vh] object-contain rounded-lg shadow-2xl"
+                onError={(e) => {
+                  console.error('Image failed to load:', allMedia[currentMediaIndex].url, e);
+                }}
+              />
             )}
           </div>
 
-          {/* Keyboard Navigation Hint */}
+          {/* Bottom Media Counter & Navigation Dots */}
           {allMedia.length > 1 && (
-            <div className="absolute bottom-4 left-4 text-white text-sm bg-black bg-opacity-50 px-3 py-2 rounded">
-              Use ← → arrow keys to navigate
+            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+              <div className="bg-black bg-opacity-60 backdrop-blur-sm rounded-full px-4 py-2 flex items-center space-x-3">
+                {/* Counter */}
+                <span className="text-white text-sm font-medium">
+                  {currentMediaIndex + 1} / {allMedia.length}
+                </span>
+                
+                {/* Dots Navigation */}
+                <div className="flex items-center space-x-2">
+                  {allMedia.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentMediaIndex(index);
+                      }}
+                      className={cn(
+                        "w-2 h-2 rounded-full transition-all duration-200",
+                        index === currentMediaIndex 
+                          ? "bg-white" 
+                          : "bg-white bg-opacity-40 hover:bg-opacity-60"
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Keyboard Hint - Only show if multiple media */}
+          {allMedia.length > 1 && (
+            <div className="absolute top-4 left-4 z-50 bg-black bg-opacity-60 text-white text-xs px-3 py-2 rounded-full">
+              ← → to navigate • ESC to close
             </div>
           )}
         </div>
