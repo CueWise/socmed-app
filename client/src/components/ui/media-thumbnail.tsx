@@ -52,8 +52,7 @@ export default function MediaThumbnail({
         "bg-gray-300 flex items-center justify-center flex-col gap-1",
         className
       )}>
-        <ImageIcon className="w-4 h-4 text-gray-500" />
-        <span className="text-[6px] text-gray-500 font-medium">
+        <span className="text-[8px] text-gray-500 font-medium">
           {fallbackText}
         </span>
       </div>
@@ -80,7 +79,7 @@ export default function MediaThumbnail({
           </>
         ) : (
           <>
-            <ImageIcon className="w-6 h-6 text-gray-600" />
+            <span className="text-xs text-gray-600 font-medium">IMG</span>
             <span className="absolute bottom-1 right-1 text-[6px] bg-black bg-opacity-50 text-white px-1 rounded">
               IMAGE
             </span>

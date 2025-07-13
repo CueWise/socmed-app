@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered, MoreHorizontal, Edit, Trash2, Link, Smile, Menu, Play, Calendar, Clock, MessageSquare, MoreVertical, Code, AlignLeft, AlignCenter, AlignRight, Type, Eye, Monitor, Smartphone, Heart, MessageCircle, Bookmark, ThumbsUp, Share, Repeat2, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered, MoreHorizontal, Edit, Trash2, Link, Smile, Menu, Play, Calendar, Clock, MessageSquare, MoreVertical, Code, AlignLeft, AlignCenter, AlignRight, Type, Eye, Monitor, Smartphone, Heart, MessageCircle, Bookmark, ThumbsUp, Share, Repeat2, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -231,15 +231,15 @@ export default function PostEditorModal({
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(
     initialData?.platforms || ["instagram"]
   );
+  // Helper function to format date without timezone issues
+  const formatDateForInput = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [scheduledDate, setScheduledDate] = useState(() => {
-    // Helper function to format date without timezone issues
-    const formatDateForInput = (date: Date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    };
-    
     if (initialData?.scheduledAt) {
       return formatDateForInput(new Date(initialData.scheduledAt));
     } else if (defaultDate) {
@@ -317,18 +317,6 @@ export default function PostEditorModal({
   const queryClient = useQueryClient();
   const { selectedBrand } = useBrandStore();
 
-  // Helper function to format date without timezone issues
-  const formatDateForInput = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-
-  
-
-  
   // Enhanced emoji categories
   const emojiCategories = {
     faces: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '🥹', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '🥸', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭'],
@@ -1766,13 +1754,38 @@ export default function PostEditorModal({
       {/* Platform X-Style Media Player */}
       {showMediaPlayer && allMedia.length > 0 && (
         <div className="fixed inset-0 z-[300] bg-black flex items-center justify-center" onClick={() => setShowMediaPlayer(false)}>
-          {/* Close Button - Top Right */}
-          <button
-            onClick={() => setShowMediaPlayer(false)}
-            className="absolute top-4 right-4 z-50 w-10 h-10 rounded-full bg-black bg-opacity-60 hover:bg-opacity-80 flex items-center justify-center text-white transition-all duration-200"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          {/* Top Right Controls */}
+          <div className="absolute top-4 right-4 z-50 flex space-x-2">
+            {/* Download Button */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const currentMedia = allMedia[currentMediaIndex];
+                if (currentMedia?.url) {
+                  // Create a temporary anchor element to trigger download
+                  const link = document.createElement('a');
+                  link.href = currentMedia.url;
+                  link.download = `media-${Date.now()}.${currentMedia.type === 'video' ? 'mp4' : currentMedia.type === 'audio' ? 'mp3' : 'jpg'}`;
+                  link.target = '_blank';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }
+              }}
+              className="w-10 h-10 rounded-full bg-black bg-opacity-60 hover:bg-opacity-80 flex items-center justify-center text-white transition-all duration-200"
+              title="Download media"
+            >
+              <Download className="h-5 w-5" />
+            </button>
+            
+            {/* Close Button */}
+            <button
+              onClick={() => setShowMediaPlayer(false)}
+              className="w-10 h-10 rounded-full bg-black bg-opacity-60 hover:bg-opacity-80 flex items-center justify-center text-white transition-all duration-200"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
 
           {/* Navigation Arrows */}
           {allMedia.length > 1 && (
