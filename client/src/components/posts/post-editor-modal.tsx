@@ -263,6 +263,7 @@ export default function PostEditorModal({
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [showMediaConfirm, setShowMediaConfirm] = useState(false);
   const [mediaToRemove, setMediaToRemove] = useState<{index: number, isExisting: boolean} | null>(null);
+  const [detachedMedia, setDetachedMedia] = useState<string[]>([]);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkText, setLinkText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
@@ -321,6 +322,8 @@ export default function PostEditorModal({
       setMediaUrls([]);
       setStatus("draft");
       setNotes("");
+      setAttachedMedia([]);
+      setDetachedMedia([]);
       
       if (defaultDate) {
         setScheduledDate(defaultDate.toISOString().split('T')[0]);
@@ -345,8 +348,8 @@ export default function PostEditorModal({
     }
   }, [content, selectedPlatforms, hashtags, status, notes, initialData]);
 
-  // Get existing media from database
-  const existingMedia = initialData?.mediaUrls || [];
+  // Get existing media from database (excluding detached ones)
+  const existingMedia = (initialData?.mediaUrls || []).filter(url => !detachedMedia.includes(url));
   
   // Get all media (existing + newly attached)
   const allMedia = [
@@ -368,21 +371,29 @@ export default function PostEditorModal({
 
   // Handle media removal confirmation
   const handleRemoveMedia = (index: number, isExisting: boolean) => {
-    setMediaToRemove({ index, isExisting });
-    setShowMediaConfirm(true);
+    if (!isExisting) {
+      // For newly attached media, remove immediately without confirmation
+      const adjustedIndex = index - existingMedia.length;
+      setAttachedMedia(prev => prev.filter((_, i) => i !== adjustedIndex));
+    } else {
+      // For existing media, show confirmation with two options
+      setMediaToRemove({ index, isExisting });
+      setShowMediaConfirm(true);
+    }
   };
 
-  const confirmRemoveMedia = () => {
+  const confirmRemoveMedia = (permanent: boolean) => {
     if (!mediaToRemove) return;
     
-    if (mediaToRemove.isExisting) {
-      // Remove from existing media (database field)
+    if (permanent) {
+      // Remove from database permanently
       const newMediaUrls = existingMedia.filter((_, i) => i !== mediaToRemove.index);
       setMediaUrls(newMediaUrls);
     } else {
-      // Remove from newly attached media
-      const adjustedIndex = mediaToRemove.index - existingMedia.length;
-      setAttachedMedia(prev => prev.filter((_, i) => i !== adjustedIndex));
+      // Just detach from this draft (hide from preview but keep in database)
+      // We'll track detached media separately
+      const detachedUrl = existingMedia[mediaToRemove.index];
+      setDetachedMedia(prev => [...prev, detachedUrl]);
     }
     
     setShowMediaConfirm(false);
@@ -1072,11 +1083,18 @@ export default function PostEditorModal({
           <div className="bg-white p-6 rounded-lg shadow-2xl max-w-md mx-4">
             <h3 className="text-lg font-semibold mb-4">Remove Media</h3>
             <p className="text-gray-600 mb-6">
-              {mediaToRemove?.isExisting 
-                ? "This will permanently remove the media from your post. This action cannot be undone."
-                : "Remove this newly attached media file?"
-              }
+              Choose how you want to remove this media:
             </p>
+            <div className="space-y-3 mb-6">
+              <div className="p-3 border rounded-lg">
+                <h4 className="font-medium text-sm mb-1">Detach from Draft Only</h4>
+                <p className="text-xs text-gray-500">Hide from this draft but keep the media in your post database</p>
+              </div>
+              <div className="p-3 border rounded-lg border-red-200 bg-red-50">
+                <h4 className="font-medium text-sm mb-1 text-red-800">Remove Permanently</h4>
+                <p className="text-xs text-red-600">Delete the media from your post completely. This cannot be undone.</p>
+              </div>
+            </div>
             <div className="flex gap-3 justify-end">
               <Button
                 variant="outline"
@@ -1088,10 +1106,17 @@ export default function PostEditorModal({
                 Cancel
               </Button>
               <Button
-                variant="destructive"
-                onClick={confirmRemoveMedia}
+                variant="outline"
+                onClick={() => confirmRemoveMedia(false)}
+                className="border-blue-200 text-blue-700 hover:bg-blue-50"
               >
-                {mediaToRemove?.isExisting ? "Remove Permanently" : "Remove"}
+                Detach Only
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => confirmRemoveMedia(true)}
+              >
+                Remove Permanently
               </Button>
             </div>
           </div>
