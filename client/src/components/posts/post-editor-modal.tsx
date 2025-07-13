@@ -276,6 +276,10 @@ export default function PostEditorModal({
   const queryClient = useQueryClient();
   const { selectedBrand } = useBrandStore();
   
+  // Debug: Log brand info
+  console.log("PostEditorModal - selectedBrand:", selectedBrand);
+  console.log("PostEditorModal - postId:", postId);
+  
   // Enhanced emoji categories
   const emojiCategories = {
     faces: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '🥹', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '🥸', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭'],
@@ -474,7 +478,9 @@ export default function PostEditorModal({
       return;
     }
 
+    console.log("handleSubmit - postId:", postId, "selectedBrand:", selectedBrand);
     if (!postId && !selectedBrand) {
+      console.log("Brand validation failed - no brand selected");
       toast({
         title: "Brand required",
         description: "Please select a brand to create a post",
