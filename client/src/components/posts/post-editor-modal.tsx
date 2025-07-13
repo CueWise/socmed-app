@@ -368,7 +368,7 @@ export default function PostEditorModal({
               </div>
             ) : (
               /* Post Edit View */
-              <div className="p-4 md:p-6 space-y-4 md:space-y-6 max-w-2xl mx-auto">
+              <div className="p-4 space-y-4 max-w-md mx-auto">
                 
                 {/* Platform Selection */}
                 <div>
@@ -414,7 +414,27 @@ export default function PostEditorModal({
                     className="mt-2 min-h-[120px] resize-none"
                     maxLength={2200}
                   />
+                  
+                  {/* Content Actions */}
                   <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {/* Upload functionality */}}
+                        className="p-2 h-8 w-8"
+                      >
+                        <Upload className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowEmojiPicker(true)}
+                        className="p-2 h-8 w-8"
+                      >
+                        <Smile className="h-4 w-4" />
+                      </Button>
+                    </div>
                     <p className="text-xs text-gray-500">
                       {content.length}/2200 characters
                     </p>
@@ -456,7 +476,7 @@ export default function PostEditorModal({
                 </div>
 
                 {/* Scheduling */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <div>
                     <Label htmlFor="scheduled-date" className="text-sm font-medium">Schedule Date</Label>
                     <Input
@@ -495,15 +515,16 @@ export default function PostEditorModal({
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex justify-end space-x-3 pt-6">
-                  <Button variant="outline" onClick={handleClose}>
-                    Cancel
-                  </Button>
+                <div className="flex flex-col space-y-3 pt-6">
                   <Button
                     onClick={handleSubmit}
                     disabled={createPostMutation.isPending || !content.trim() || selectedPlatforms.length === 0}
+                    className="w-full"
                   >
                     {createPostMutation.isPending ? "Saving..." : postId ? "Update Post" : "Create Post"}
+                  </Button>
+                  <Button variant="outline" onClick={handleClose} className="w-full">
+                    Cancel
                   </Button>
                 </div>
               </div>
