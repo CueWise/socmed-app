@@ -6,6 +6,20 @@ CueWise is a web-based social media management platform with AI-powered content 
 
 ## Recent Changes (July 2025)
 
+✓ **Multi-Media File Upload System Fixed** - Complete support for all social media formats
+  - Fixed critical bug where video files were saved with .jpg extensions
+  - Updated multer configuration to properly handle MP4, MOV, WebM, AVI video formats
+  - Added support for audio files (MP3, WAV, AAC, OGG) and extended image formats
+  - Increased file size limit to 100MB for video content
+  - Enhanced media thumbnail component with video preview and play icons
+  - Fixed filename logic to preserve correct file extensions based on MIME types
+
+✓ **Calendar Date Range Issues Resolved** - Fixed posts not appearing on 31st days
+  - Corrected calendar month-end date calculation to include full last day (23:59:59)
+  - Fixed date format inconsistency between old and new post formats
+  - Updated server-side date filtering to handle both "2025-07-24 08:00:00" and "2025-07-31T14:00:00" formats
+  - All posts scheduled for 31st days now display correctly in calendar
+
 ✓ **Critical Timezone Fix Applied** - Fixed date scheduling bug affecting calendar posts
   - Replaced hardcoded UTC+8 timezone with user's local timezone
   - Fixed manual date parsing to prevent timezone conversion issues
