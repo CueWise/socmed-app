@@ -258,6 +258,7 @@ export default function PostEditorModal({
   const [emojiCategory, setEmojiCategory] = useState(0);
   const [showPreviewPanel, setShowPreviewPanel] = useState(false);
   const [attachedMedia, setAttachedMedia] = useState<{url: string, type: 'image' | 'video', file?: File}[]>([]);
+  const [emojiTarget, setEmojiTarget] = useState<'content' | 'note' | 'reply'>('content');
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkText, setLinkText] = useState("");
@@ -549,7 +550,10 @@ export default function PostEditorModal({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => setShowEmojiPicker(true)}
+                          onClick={() => {
+                            setEmojiTarget('note');
+                            setShowEmojiPicker(true);
+                          }}
                           className="p-2 h-8 w-8"
                         >
                           <Smile className="h-4 w-4" />
@@ -640,7 +644,10 @@ export default function PostEditorModal({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setShowEmojiPicker(true)}
+                        onClick={() => {
+                          setEmojiTarget('content');
+                          setShowEmojiPicker(true);
+                        }}
                         className="p-2 h-8 w-8"
                       >
                         <Smile className="h-4 w-4" />
@@ -651,19 +658,30 @@ export default function PostEditorModal({
                     </p>
                   </div>
                   
+                  {/* Debug: Always show media example for testing */}
+                  <div className="mt-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-sm font-medium text-gray-700">Test Preview Panel</span>
+                      <button
+                        onClick={() => setShowPreviewPanel(true)}
+                        className="text-xs px-2 py-1 h-6 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                      >
+                        Open Preview
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Media Thumbnails */}
                   {attachedMedia.length > 0 && (
                     <div className="mt-3">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-sm font-medium text-gray-700">Attached Media ({attachedMedia.length})</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
+                        <button
                           onClick={() => setShowPreviewPanel(true)}
-                          className="text-xs px-2 py-1 h-6"
+                          className="text-xs px-2 py-1 h-6 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
                         >
                           Preview
-                        </Button>
+                        </button>
                       </div>
                       <div className="flex gap-2 overflow-x-auto">
                         {attachedMedia.map((media, index) => (
@@ -903,7 +921,13 @@ export default function PostEditorModal({
                   <button
                     key={index}
                     onClick={() => {
-                      setContent(prev => prev + emoji);
+                      if (emojiTarget === 'content') {
+                        setContent(prev => prev + emoji);
+                      } else if (emojiTarget === 'note') {
+                        setNewNoteText(prev => prev + emoji);
+                      } else if (emojiTarget === 'reply') {
+                        setReplyText(prev => prev + emoji);
+                      }
                       setShowEmojiPicker(false);
                     }}
                     className="p-3 text-2xl hover:bg-gray-100 rounded transition-colors"
