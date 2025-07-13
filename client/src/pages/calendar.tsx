@@ -22,6 +22,14 @@ export default function Calendar() {
   const isMobile = useIsMobile();
 
   const handleCreatePost = (date?: Date) => {
+    setEditingPost(null);
+    setSelectedDate(date || null);
+    setShowPostEditor(true);
+  };
+
+  const handleEditPost = (postId: number, date?: Date) => {
+    setEditingPost({ id: postId });
+    setSelectedDate(date || null);
     setShowPostEditor(true);
   };
 
@@ -61,6 +69,7 @@ export default function Calendar() {
         selectedDate={selectedDate}
         onDateSelect={handleDateSelect}
         onCreatePost={handleCreatePost}
+        onEditPost={handleEditPost}
         showCreateButton={true}
         title="Content Calendar"
       />

@@ -16,12 +16,21 @@ import { useBrand } from "@/hooks/use-brand";
 export default function Dashboard() {
   const [showPostEditor, setShowPostEditor] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [editingPost, setEditingPost] = useState<any>(null);
   const isMobile = useIsMobile();
   const { selectedBrand } = useBrand();
   const { data: approvals } = useApprovals();
   const { data: analytics } = useAnalytics();
 
   const handleCreatePost = (date?: Date) => {
+    setEditingPost(null);
+    setSelectedDate(date || null);
+    setShowPostEditor(true);
+  };
+
+  const handleEditPost = (postId: number, date?: Date) => {
+    setEditingPost({ id: postId });
+    setSelectedDate(date || null);
     setShowPostEditor(true);
   };
 
@@ -175,6 +184,7 @@ export default function Dashboard() {
             selectedDate={selectedDate}
             onDateSelect={handleDateSelect}
             onCreatePost={handleCreatePost}
+            onEditPost={handleEditPost}
             showCreateButton={true}
           />
         </div>
@@ -221,6 +231,8 @@ export default function Dashboard() {
         open={showPostEditor} 
         onOpenChange={setShowPostEditor}
         defaultDate={selectedDate || undefined}
+        postId={editingPost?.id}
+        initialData={editingPost}
       />
     </div>
   );
