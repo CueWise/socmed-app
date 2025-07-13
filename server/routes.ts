@@ -23,7 +23,37 @@ const storage_multer = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+    
+    // Get the correct file extension based on MIME type
+    let extension = path.extname(file.originalname);
+    if (!extension) {
+      // Fallback to MIME type mapping if no extension
+      const mimeToExt = {
+        'image/jpeg': '.jpg',
+        'image/png': '.png',
+        'image/gif': '.gif',
+        'image/webp': '.webp',
+        'image/heic': '.heic',
+        'image/heif': '.heif',
+        'image/svg+xml': '.svg',
+        'video/mp4': '.mp4',
+        'video/mov': '.mov',
+        'video/quicktime': '.mov',
+        'video/avi': '.avi',
+        'video/mkv': '.mkv',
+        'video/webm': '.webm',
+        'video/3gpp': '.3gp',
+        'video/x-msvideo': '.avi',
+        'audio/mp3': '.mp3',
+        'audio/wav': '.wav',
+        'audio/aac': '.aac',
+        'audio/ogg': '.ogg',
+        'audio/m4a': '.m4a'
+      };
+      extension = mimeToExt[file.mimetype] || '.bin';
+    }
+    
+    cb(null, file.fieldname + '-' + uniqueSuffix + extension);
   }
 });
 
