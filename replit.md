@@ -6,6 +6,17 @@ CueWise is a web-based social media management platform with AI-powered content 
 
 ## Recent Changes (July 2025)
 
+✓ **Critical Timezone Fix Applied** - Fixed date scheduling bug affecting calendar posts
+  - Replaced hardcoded UTC+8 timezone with user's local timezone
+  - Fixed manual date parsing to prevent timezone conversion issues
+  - Corrected scheduled date display in post editor modal
+  - Posts now save with correct scheduled times matching user input
+
+✓ **React Infinite Loop Bug Fixed** - Resolved app startup failures
+  - Fixed infinite loop in PostEditorModal component's useEffect
+  - Improved blob URL cleanup logic to prevent memory leaks
+  - App now starts consistently without React warnings
+
 ✓ **Theme System Removal Complete** - Removed complex theme customization to fix text display issues
   - Simplified to single, consistent light theme design
   - Removed theme provider, customizer, and picker components

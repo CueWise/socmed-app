@@ -247,11 +247,15 @@ export default function PostEditorModal({
       return formatDateForInput(new Date());
     }
   });
-  const [scheduledTime, setScheduledTime] = useState(
-    initialData?.scheduledAt 
-      ? new Date(initialData.scheduledAt).toTimeString().split(' ')[0].slice(0, 5)
-      : "14:00"
-  );
+  const [scheduledTime, setScheduledTime] = useState(() => {
+    if (initialData?.scheduledAt) {
+      const scheduleDate = new Date(initialData.scheduledAt);
+      const hours = scheduleDate.getHours().toString().padStart(2, '0');
+      const minutes = scheduleDate.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+    return "14:00";
+  });
   const [selectedPreviewPlatform, setSelectedPreviewPlatform] = useState<string>('instagram');
   const [hashtags, setHashtags] = useState<string[]>(initialData?.hashtags || []);
   const [mediaUrls, setMediaUrls] = useState<string[]>(initialData?.mediaUrls || []);
@@ -364,7 +368,10 @@ export default function PostEditorModal({
       if (initialData.scheduledAt) {
         const scheduleDate = new Date(initialData.scheduledAt);
         setScheduledDate(formatDateForInput(scheduleDate));
-        setScheduledTime(scheduleDate.toTimeString().split(' ')[0].slice(0, 5));
+        // Format time as HH:MM for input
+        const hours = scheduleDate.getHours().toString().padStart(2, '0');
+        const minutes = scheduleDate.getMinutes().toString().padStart(2, '0');
+        setScheduledTime(`${hours}:${minutes}`);
       }
     } else {
       // Reset form for new post
@@ -612,9 +619,17 @@ export default function PostEditorModal({
 
     // For calendar posts, always set a scheduled date, even for drafts
     // This ensures they appear on the correct calendar day
-    const scheduledDateTime = scheduledDate && scheduledTime 
-      ? new Date(`${scheduledDate}T${scheduledTime}:00+08:00`) // Philippine timezone (UTC+8)
-      : (scheduledDate ? new Date(`${scheduledDate}T14:00:00+08:00`) : null); // Default time for drafts
+    let scheduledDateTime = null;
+    if (scheduledDate && scheduledTime) {
+      // Parse date and time components manually to avoid timezone issues
+      const [year, month, day] = scheduledDate.split('-').map(Number);
+      const [hour, minute] = scheduledTime.split(':').map(Number);
+      scheduledDateTime = new Date(year, month - 1, day, hour, minute, 0);
+    } else if (scheduledDate) {
+      // Default time for drafts
+      const [year, month, day] = scheduledDate.split('-').map(Number);
+      scheduledDateTime = new Date(year, month - 1, day, 14, 0, 0);
+    }
 
     const postData: PostData = {
       content: content.trim(),
