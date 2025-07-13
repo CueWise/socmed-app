@@ -1225,7 +1225,8 @@ export default function PostEditorModal({
                     <Smile className="h-4 w-4" />
                   </Button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-full right-0 mb-2 bg-white border-2 border-gray-200 rounded-xl shadow-2xl z-[130] w-80 max-w-[90vw] animate-in slide-in-from-bottom-2 duration-300">
+                    <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black bg-opacity-50" onClick={() => setShowEmojiPicker(false)}>
+                      <div className="bg-white border-2 border-gray-200 rounded-xl shadow-2xl w-80 max-w-[90vw] animate-in slide-in-from-bottom-2 duration-300" onClick={(e) => e.stopPropagation()}>
                       {/* Category Tabs */}
                       <div className="flex border-b border-gray-200 bg-gray-50 rounded-t-xl">
                         {emojiCategories.map((category, index) => (
@@ -1290,6 +1291,7 @@ export default function PostEditorModal({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </button>
+                      </div>
                       </div>
                     </div>
                   )}
