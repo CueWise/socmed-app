@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered, MoreHorizontal, Edit, Trash2, Link, Smile, Menu, Play, Calendar, Clock, MessageSquare, MoreVertical, Code, AlignLeft, AlignCenter, AlignRight, Type, Eye, Monitor, Smartphone, Heart, MessageCircle, Bookmark, ThumbsUp, Share, Repeat2 } from "lucide-react";
+import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered, MoreHorizontal, Edit, Trash2, Link, Smile, Menu, Play, Calendar, Clock, MessageSquare, MoreVertical, Code, AlignLeft, AlignCenter, AlignRight, Type, Eye, Monitor, Smartphone, Heart, MessageCircle, Bookmark, ThumbsUp, Share, Repeat2, ChevronLeft, ChevronRight } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -309,6 +309,9 @@ export default function PostEditorModal({
   const [linkText, setLinkText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [hasSelectedText, setHasSelectedText] = useState(false);
+  const [showMediaPlayer, setShowMediaPlayer] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [mediaPlayerSource, setMediaPlayerSource] = useState<'edit' | 'preview'>('edit');
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -360,6 +363,8 @@ export default function PostEditorModal({
     }
   }, [open, selectedPlatforms]);
 
+
+
   // Update form when initialData changes
   useEffect(() => {
     // Always clear attached media when modal opens/changes to prevent cross-contamination
@@ -371,6 +376,7 @@ export default function PostEditorModal({
       setSelectedPlatforms(initialData.platforms || ["instagram"]);
       setHashtags(initialData.hashtags || []);
       setMediaUrls(initialData.mediaUrls || []);
+      setMediaTypes(initialData.mediaTypes || []);
       setStatus(initialData.status || "draft");
       setNotes(initialData.notes || "");
       
@@ -398,6 +404,7 @@ export default function PostEditorModal({
       setSelectedPlatforms(["instagram"]);
       setHashtags([]);
       setMediaUrls([]);
+      setMediaTypes([]);
       setStatus("draft");
       setNotes("");
       
@@ -461,6 +468,26 @@ export default function PostEditorModal({
     if (hasVideo) return false; // No additional media if video exists
     return true; // Can add multiple images
   };
+
+  // Keyboard navigation for media player
+  useEffect(() => {
+    if (!showMediaPlayer) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowMediaPlayer(false);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : allMedia.length - 1);
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        setCurrentMediaIndex(prev => prev < allMedia.length - 1 ? prev + 1 : 0);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showMediaPlayer, allMedia.length]);
 
   // Handle media removal confirmation
   const handleRemoveMedia = (index: number, isExisting: boolean) => {
@@ -554,6 +581,7 @@ export default function PostEditorModal({
       setSelectedPlatforms(["instagram"]);
       setHashtags([]);
       setMediaUrls([]);
+      setMediaTypes([]);
       setAttachedMedia([]);
       setStatus("draft");
       setNotes("");
@@ -932,45 +960,56 @@ export default function PostEditorModal({
                     )}>
                       {allMedia.map((media, index) => (
                         <div key={index} className="relative flex-shrink-0">
-                          {media.type === 'image' ? (
-                            <img 
-                              src={media.url} 
-                              alt={`Media ${index + 1}`}
-                              className={cn(
-                                "object-cover rounded border shadow-sm",
+                          <button
+                            onClick={() => {
+                              setCurrentMediaIndex(index);
+                              setMediaPlayerSource('edit');
+                              setShowMediaPlayer(true);
+                            }}
+                            className="block"
+                          >
+                            {media.type === 'image' ? (
+                              <img 
+                                src={media.url} 
+                                alt={`Media ${index + 1}`}
+                                className={cn(
+                                  "object-cover rounded border shadow-sm hover:opacity-90 transition-opacity",
+                                  allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
+                                )}
+                                onError={(e) => {
+                                  console.error('Image failed to load:', media.url, e);
+                                  // Fallback display for broken images
+                                  e.currentTarget.style.display = 'none';
+                                  e.currentTarget.parentElement?.nextElementSibling?.classList.remove('hidden');
+                                }}
+                                onLoad={() => {
+                                  console.log('Image loaded successfully:', media.url);
+                                }}
+                              />
+                            ) : (
+                              <div className={cn(
+                                "bg-gray-800 rounded border shadow-sm flex items-center justify-center hover:bg-gray-700 transition-colors",
                                 allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
-                              )}
-                              onError={(e) => {
-                                console.error('Image failed to load:', media.url, e);
-                                // Fallback display for broken images
-                                e.currentTarget.style.display = 'none';
-                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                              }}
-                              onLoad={() => {
-                                console.log('Image loaded successfully:', media.url);
-                              }}
-                            />
-                          ) : (
-                            <div className={cn(
-                              "bg-gray-800 rounded border shadow-sm flex items-center justify-center",
-                              allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
-                            )}>
-                              <Play className={cn(
-                                "text-white",
-                                allMedia.length === 1 ? "h-12 w-12" : "h-8 w-8"
-                              )} />
-                            </div>
-                          )}
+                              )}>
+                                <Play className={cn(
+                                  "text-white",
+                                  allMedia.length === 1 ? "h-12 w-12" : "h-8 w-8"
+                                )} />
+                              </div>
+                            )}
+                          </button>
                           
                           {/* Fallback display for broken image */}
                           <div className={cn(
                             "hidden bg-gray-200 rounded border shadow-sm flex items-center justify-center",
                             allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
                           )}>
-                            <ImageIcon className={cn(
-                              "text-gray-500",
-                              allMedia.length === 1 ? "h-12 w-12" : "h-8 w-8"
-                            )} />
+                            <div className={cn(
+                              "text-gray-500 text-center",
+                              allMedia.length === 1 ? "text-sm" : "text-xs"
+                            )}>
+                              Failed to load
+                            </div>
                           </div>
                           
                           {/* Media Type Badge */}
@@ -980,8 +1019,11 @@ export default function PostEditorModal({
                           
                           {/* Remove Button */}
                           <button
-                            onClick={() => handleRemoveMedia(index, media.isExisting)}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 shadow-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveMedia(index, media.isExisting);
+                            }}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 shadow-sm z-10"
                           >
                             <X className="h-4 w-4" />
                           </button>
@@ -1588,13 +1630,22 @@ export default function PostEditorModal({
                             {/* Media */}
                             {allMedia.length > 0 && (
                               <div className="mt-3 rounded-2xl overflow-hidden border">
-                                {allMedia[0].type === 'image' ? (
-                                  <img src={allMedia[0].url} alt="Post content" className="w-full h-auto" />
-                                ) : (
-                                  <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
-                                    <Play className="h-12 w-12 text-white" />
-                                  </div>
-                                )}
+                                <button
+                                  onClick={() => {
+                                    setCurrentMediaIndex(0);
+                                    setMediaPlayerSource('preview');
+                                    setShowMediaPlayer(true);
+                                  }}
+                                  className="block w-full"
+                                >
+                                  {allMedia[0].type === 'image' ? (
+                                    <img src={allMedia[0].url} alt="Post content" className="w-full h-auto hover:opacity-90 transition-opacity" />
+                                  ) : (
+                                    <div className="w-full h-48 bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition-colors">
+                                      <Play className="h-12 w-12 text-white" />
+                                    </div>
+                                  )}
+                                </button>
                               </div>
                             )}
                             
@@ -1627,13 +1678,22 @@ export default function PostEditorModal({
                         {/* Video Area */}
                         <div className="relative aspect-[9/16] bg-gray-900">
                           {allMedia.length > 0 ? (
-                            allMedia[0].type === 'video' ? (
-                              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                                <Play className="h-16 w-16 text-white" />
-                              </div>
-                            ) : (
-                              <img src={allMedia[0].url} alt="Post content" className="w-full h-full object-cover" />
-                            )
+                            <button
+                              onClick={() => {
+                                setCurrentMediaIndex(0);
+                                setMediaPlayerSource('preview');
+                                setShowMediaPlayer(true);
+                              }}
+                              className="block w-full h-full"
+                            >
+                              {allMedia[0].type === 'video' ? (
+                                <div className="w-full h-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition-colors">
+                                  <Play className="h-16 w-16 text-white" />
+                                </div>
+                              ) : (
+                                <img src={allMedia[0].url} alt="Post content" className="w-full h-full object-cover hover:opacity-90 transition-opacity" />
+                              )}
+                            </button>
                           ) : (
                             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
                               <div className="text-center text-white">
@@ -1705,6 +1765,101 @@ export default function PostEditorModal({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Media Player Popup */}
+      {showMediaPlayer && allMedia.length > 0 && (
+        <div className="fixed inset-0 z-[300] bg-black bg-opacity-90 flex items-center justify-center" onClick={() => setShowMediaPlayer(false)}>
+          <div className="relative max-w-[90vw] max-h-[90vh] bg-white rounded-lg overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 bg-white border-b">
+              <div className="flex items-center space-x-2">
+                <h3 className="font-semibold">Media Viewer</h3>
+                <span className="text-sm text-gray-500">
+                  {currentMediaIndex + 1} of {allMedia.length}
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                {allMedia.length > 1 && (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : allMedia.length - 1)}
+                      disabled={allMedia.length <= 1}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentMediaIndex(prev => prev < allMedia.length - 1 ? prev + 1 : 0)}
+                      disabled={allMedia.length <= 1}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowMediaPlayer(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Media Content */}
+            <div className="bg-black flex items-center justify-center" style={{ minHeight: '400px', maxHeight: '70vh' }}>
+              {allMedia[currentMediaIndex]?.type === 'video' ? (
+                <video
+                  src={allMedia[currentMediaIndex].url}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-full"
+                  onError={(e) => {
+                    console.error('Video failed to load:', allMedia[currentMediaIndex].url, e);
+                  }}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <img
+                  src={allMedia[currentMediaIndex]?.url}
+                  alt={`Media ${currentMediaIndex + 1}`}
+                  className="max-w-full max-h-full object-contain"
+                  onError={(e) => {
+                    console.error('Image failed to load:', allMedia[currentMediaIndex].url, e);
+                  }}
+                />
+              )}
+            </div>
+
+            {/* Navigation Dots for multiple media */}
+            {allMedia.length > 1 && (
+              <div className="flex items-center justify-center space-x-2 p-4 bg-white border-t">
+                {allMedia.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentMediaIndex(index)}
+                    className={cn(
+                      "w-3 h-3 rounded-full transition-colors",
+                      index === currentMediaIndex ? "bg-blue-500" : "bg-gray-300 hover:bg-gray-400"
+                    )}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Keyboard Navigation Hint */}
+          {allMedia.length > 1 && (
+            <div className="absolute bottom-4 left-4 text-white text-sm bg-black bg-opacity-50 px-3 py-2 rounded">
+              Use ← → arrow keys to navigate
+            </div>
+          )}
+        </div>
+      )}
     </div>,
     document.body
   );
