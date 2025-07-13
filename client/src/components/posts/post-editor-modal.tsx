@@ -638,9 +638,9 @@ export default function PostEditorModal({
           
           {/* Sliding Panel */}
           <div className={cn(
-            "fixed bottom-0 bg-white rounded-t-2xl shadow-2xl z-50 transform transition-all duration-300 ease-out",
+            "fixed bottom-0 bg-white rounded-t-2xl shadow-2xl transform transition-all duration-300 ease-out",
             "max-h-[90vh] overflow-hidden flex flex-col",
-            showNotes ? "left-0 right-full sm:right-[500px] z-[105]" : "left-0 right-0", // Fixed positioning, reserve space for notes, lower z-index when notes open
+            showNotes ? "hidden" : "left-0 right-0 z-50", // Hide completely when notes are open
             open ? "translate-y-0" : "translate-y-full"
           )}>
             {/* Header */}
@@ -949,7 +949,7 @@ export default function PostEditorModal({
       
       {/* Notes Slide-in Panel - Fixed position, no adjusting */}
       {showNotes && open && (
-        <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[500px] max-w-[90vw] bg-white z-[115] flex flex-col shadow-2xl border-l transform transition-transform duration-300 ease-in-out translate-x-0"
+        <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[500px] max-w-[90vw] bg-white z-[100] flex flex-col shadow-2xl border-l transform transition-transform duration-300 ease-in-out translate-x-0"
              style={{ 
                paddingBottom: 'env(keyboard-inset-height, 0px)',
                touchAction: 'pan-y'
@@ -974,7 +974,7 @@ export default function PostEditorModal({
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[300px] pb-4"
+          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[300px] pb-[200px]"
                ref={(el) => {
                  if (el && showNotes) {
                    // Scroll to top when notes panel opens  
@@ -1140,12 +1140,12 @@ export default function PostEditorModal({
         </div>
         
         {/* Add New Message - Mobile keyboard aware footer */}
-        <div className="border-t pt-4 bg-white flex-shrink-0 sticky bottom-0"
+        <div className="border-t pt-4 bg-white flex-shrink-0 fixed bottom-0 w-full sm:w-[500px] max-w-[90vw]"
              style={{ 
-               paddingBottom: 'max(env(keyboard-inset-height, 0px) + 120px, 140px)',
-               marginBottom: 'max(env(keyboard-inset-height, 0px), 0px)',
-               transform: 'translateY(-env(keyboard-inset-height, 0px))',
-               zIndex: 15
+               bottom: 'max(env(keyboard-inset-height, 0px), 0px)',
+               paddingBottom: '20px',
+               right: '0px',
+               zIndex: 120
              }}>
           <div className="space-y-2">
             <RichTextEditor
