@@ -1,8 +1,8 @@
-# SocialFlow - Social Media Management Platform
+CueWise - Social Media Management Platform
 
 ## Overview
 
-SocialFlow is a mobile-first social media management platform with AI-powered content creation and analytics. The application enables users to create, schedule, and manage social media posts across multiple platforms (Instagram, Facebook, TikTok, Twitter) with collaborative approval workflows and comprehensive analytics.
+CueWise is a web-based social media management platform with AI-powered content creation and analytics. The application enables users to create, schedule, and manage social media posts across multiple platforms (Instagram, Facebook, TikTok, Twitter) with collaborative approval workflows and comprehensive analytics.
 
 ## Recent Changes (July 2025)
 
