@@ -103,14 +103,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Handle scheduledAt as local datetime string - no timezone conversion
       if (req.body.scheduledAt && typeof req.body.scheduledAt === 'string') {
-        // Keep the datetime string as-is without any Date object conversion
-        // This prevents PostgreSQL from applying timezone conversions
-        const localDateTime = req.body.scheduledAt;
+        // Ensure consistent format for future posts: "2025-07-31T14:00:00"
+        let localDateTime = req.body.scheduledAt;
         if (localDateTime.includes('T') && !localDateTime.includes('Z')) {
-          // Store as local datetime string without timezone info
+          // Already in correct format "2025-07-31T14:00:00"
           req.body.scheduledAt = localDateTime;
         } else {
-          req.body.scheduledAt = req.body.scheduledAt;
+          // Convert other formats to consistent format
+          req.body.scheduledAt = localDateTime;
         }
       }
       

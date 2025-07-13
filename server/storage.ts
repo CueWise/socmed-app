@@ -150,30 +150,47 @@ export class DatabaseStorage implements IStorage {
     
     console.log('Converted date strings - Start:', startDateString, 'End:', endDateString);
     
-    // Include posts with scheduledAt within range OR posts without scheduledAt but created recently
-    const conditions = [
-      or(
-        and(
-          gte(posts.scheduledAt, startDateString),
-          lte(posts.scheduledAt, endDateString + 'T23:59:59')
-        ),
-        and(
-          isNull(posts.scheduledAt),
-          gte(posts.createdAt, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) // Last 7 days for drafts without dates
-        )
-      )
-    ];
+    // Get all posts and filter in JavaScript to handle both date formats
+    let query = db.select().from(posts);
     
+    const conditions = [];
     if (brandId) {
       conditions.push(eq(posts.brandId, brandId));
     }
     
-    const result = await db.select().from(posts)
-      .where(and(...conditions))
-      .orderBy(desc(posts.scheduledAt), desc(posts.createdAt));
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
     
-    console.log('Calendar query result:', result.length, 'posts found');
-    return result;
+    const allPosts = await query.orderBy(desc(posts.scheduledAt), desc(posts.createdAt));
+    
+    // Filter posts based on scheduledAt date range, handling both formats
+    const filteredPosts = allPosts.filter(post => {
+      if (!post.scheduledAt) {
+        // Include drafts without dates if created recently
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        return post.createdAt >= weekAgo;
+      }
+      
+      // Extract date part from scheduledAt regardless of format
+      let postDateStr = '';
+      if (post.scheduledAt.includes('T')) {
+        // Format: "2025-07-31T14:00:00"
+        postDateStr = post.scheduledAt.split('T')[0];
+      } else if (post.scheduledAt.includes(' ')) {
+        // Format: "2025-07-24 08:00:00"
+        postDateStr = post.scheduledAt.split(' ')[0];
+      } else {
+        // Format: "2025-07-24"
+        postDateStr = post.scheduledAt;
+      }
+      
+      // Check if post date is within range
+      return postDateStr >= startDateString && postDateStr <= endDateString;
+    });
+    
+    console.log('Calendar query result:', filteredPosts.length, 'posts found');
+    return filteredPosts;
   }
 
   // Approvals
