@@ -500,8 +500,13 @@ export default function PostEditorModal({
       queryClient.invalidateQueries({ queryKey: ['/api/calendar/posts'] });
       queryClient.invalidateQueries({ queryKey: ['/api/analytics'] });
       
-      // Force refetch to ensure immediate update
-      queryClient.refetchQueries({ queryKey: ['/api/calendar/posts'] });
+      // Clear all calendar-related queries to force complete refresh
+      queryClient.removeQueries({ queryKey: ['/api/calendar/posts'] });
+      
+      // Force immediate refetch with a small delay to ensure backend is updated
+      setTimeout(() => {
+        queryClient.refetchQueries({ queryKey: ['/api/calendar/posts'] });
+      }, 100);
       
       toast({
         title: postId ? "Post updated" : "Post created",
@@ -572,10 +577,11 @@ export default function PostEditorModal({
       ...attachedMedia.map(media => media.url) // Use the actual blob URL for display
     ];
 
-    // Combine scheduled date and time into a Date object (Philippine timezone)
-    const scheduledDateTime = status === 'scheduled' && scheduledDate && scheduledTime 
+    // For calendar posts, always set a scheduled date, even for drafts
+    // This ensures they appear on the correct calendar day
+    const scheduledDateTime = scheduledDate && scheduledTime 
       ? new Date(`${scheduledDate}T${scheduledTime}:00+08:00`) // Philippine timezone (UTC+8)
-      : null;
+      : (scheduledDate ? new Date(`${scheduledDate}T14:00:00+08:00`) : null); // Default time for drafts
 
     const postData: PostData = {
       content: content.trim(),
@@ -584,7 +590,7 @@ export default function PostEditorModal({
       mediaUrls: combinedMediaUrls,
       notes: notes.trim(),
       status: status,
-      // Add scheduled date if status is 'scheduled'
+      // Add scheduled date for calendar positioning
       ...(scheduledDateTime && {
         scheduledAt: scheduledDateTime,
       }),
