@@ -640,7 +640,7 @@ export default function PostEditorModal({
           <div className={cn(
             "fixed bottom-0 bg-white rounded-t-2xl shadow-2xl z-50 transform transition-all duration-300 ease-out",
             "max-h-[90vh] overflow-hidden flex flex-col",
-            showNotes ? "left-0 right-96" : "left-0 right-0", // Fixed positioning, reserve space for notes
+            showNotes ? "left-0 right-[500px]" : "left-0 right-0", // Fixed positioning, reserve space for notes
             open ? "translate-y-0" : "translate-y-full"
           )}>
             {/* Header */}
@@ -943,7 +943,11 @@ export default function PostEditorModal({
       
       {/* Notes Slide-in Panel - Fixed position, no adjusting */}
       {showNotes && open && (
-        <div className="fixed top-0 right-0 bottom-0 w-96 bg-white z-[110] flex flex-col shadow-2xl border-l transform transition-transform duration-300 ease-in-out translate-x-0">
+        <div className="fixed top-0 right-0 bottom-0 w-[500px] bg-white z-[110] flex flex-col shadow-2xl border-l transform transition-transform duration-300 ease-in-out translate-x-0"
+             style={{ 
+               paddingBottom: 'env(keyboard-inset-height, 0px)',
+               touchAction: 'pan-y'
+             }}>
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b bg-white">
             <h2 className="text-lg font-semibold">Notes & Comments</h2>
@@ -958,7 +962,11 @@ export default function PostEditorModal({
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[400px]">
+          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[400px]"
+               style={{ 
+                 marginBottom: 'env(keyboard-inset-height, 0px)',
+                 paddingBottom: 'max(env(keyboard-inset-height, 0px), 20px)'
+               }}>
             {/* Note Messages - Slack Style */}
           {noteThreads.map((thread) => (
             <div key={thread.id} className="group hover:bg-gray-100 rounded p-2 transition-colors">
@@ -1315,7 +1323,7 @@ export default function PostEditorModal({
                 
                 {/* Link Dialog */}
                 {showLinkDialog && (
-                  <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-4 w-80 z-20">
+                  <div className="absolute bottom-full left-0 mb-2 bg-white border rounded-lg shadow-lg p-4 w-80 z-[125]">
                     <div className="space-y-3">
                       <div>
                         <label className="text-sm font-medium">Link Text</label>
