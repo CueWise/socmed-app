@@ -49,6 +49,53 @@ interface PostData {
   notes?: string;
 }
 
+// Simple emoji picker component
+const EmojiPicker = ({ onSelect, onClose }: { onSelect: (emoji: string) => void, onClose: () => void }) => {
+  const emojis = [
+    '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
+    '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
+    '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩',
+    '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
+    '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬',
+    '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗',
+    '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯',
+    '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐',
+    '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈',
+    '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾'
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[100000] bg-black bg-opacity-50" onClick={onClose}>
+      <div className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl max-h-60 overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="p-3 border-b">
+          <div className="flex justify-between items-center">
+            <h3 className="font-medium">Choose Emoji</h3>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <div className="p-3 max-h-48 overflow-y-auto">
+          <div className="grid grid-cols-8 gap-2">
+            {emojis.map((emoji, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  onSelect(emoji);
+                  onClose();
+                }}
+                className="p-2 text-xl hover:bg-gray-100 rounded"
+              >
+                {emoji}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function PostEditorModal({ 
   open, 
   onOpenChange, 
@@ -354,7 +401,36 @@ export default function PostEditorModal({
                       autoFocus
                       className="min-h-[100px]"
                     />
-                    <div className="flex justify-start">
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = 'image/*,video/*';
+                            input.onchange = (e) => {
+                              const file = (e.target as HTMLInputElement).files?.[0];
+                              if (file) {
+                                console.log('File selected for Notes:', file);
+                              }
+                            };
+                            input.click();
+                          }}
+                          className="p-2 h-8 w-8"
+                        >
+                          <Upload className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowEmojiPicker(true)}
+                          className="p-2 h-8 w-8"
+                        >
+                          <Smile className="h-4 w-4" />
+                        </Button>
+                      </div>
                       <Button
                         onClick={handleAddNote}
                         disabled={!newNoteText.trim()}
@@ -389,14 +465,13 @@ export default function PostEditorModal({
                             }
                           }}
                           className={cn(
-                            "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
+                            "flex items-center justify-center p-3 rounded-lg border-2 transition-all",
                             isSelected 
-                              ? "border-blue-500 bg-blue-50 text-blue-700" 
-                              : "border-gray-200 hover:border-gray-300 text-gray-600"
+                              ? "border-blue-500 bg-blue-50" 
+                              : "border-gray-200 hover:border-gray-300"
                           )}
                         >
-                          <Icon className={cn("h-5 w-5", isSelected ? platform.color : "text-gray-400")} />
-                          <span className="text-sm font-medium">{platform.name}</span>
+                          <Icon className={cn("h-6 w-6", isSelected ? platform.color : "text-gray-400")} />
                         </button>
                       );
                     })}
@@ -421,7 +496,18 @@ export default function PostEditorModal({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => {/* Upload functionality */}}
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*,video/*';
+                          input.onchange = (e) => {
+                            const file = (e.target as HTMLInputElement).files?.[0];
+                            if (file) {
+                              console.log('File selected for Post:', file);
+                            }
+                          };
+                          input.click();
+                        }}
                         className="p-2 h-8 w-8"
                       >
                         <Upload className="h-4 w-4" />
