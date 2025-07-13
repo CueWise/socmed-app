@@ -19,7 +19,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const brandId = req.query.brandId ? parseInt(req.query.brandId as string) : undefined;
       const status = req.query.status as string | undefined;
       const posts = await storage.getPosts(brandId, status);
-      res.json(posts);
+      
+      // Clean up media URLs - remove any invalid blob URLs
+      const cleanedPosts = posts.map(post => ({
+        ...post,
+        mediaUrls: (post.mediaUrls || []).filter(url => 
+          url && !url.startsWith('blob:') && !url.includes('upload_session_')
+        )
+      }));
+      
+      res.json(cleanedPosts);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch posts" });
     }
@@ -47,7 +56,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.body.scheduledAt = new Date(req.body.scheduledAt);
       }
       
-      const validatedData = insertPostSchema.parse(req.body);
+      // Clean media URLs - remove blob URLs and upload session IDs temporarily
+      const cleanedBody = {
+        ...req.body,
+        mediaUrls: (req.body.mediaUrls || []).filter((url: string) => 
+          url && !url.startsWith('blob:') && !url.includes('upload_session_')
+        )
+      };
+      
+      const validatedData = insertPostSchema.parse(cleanedBody);
       console.log('Validated data:', JSON.stringify(validatedData, null, 2));
       const post = await storage.createPost(validatedData);
       res.status(201).json(post);
@@ -95,7 +112,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const brandId = req.query.brandId ? parseInt(req.query.brandId as string) : undefined;
       
       const posts = await storage.getPostsByDateRange(startDate, endDate, brandId);
-      res.json(posts);
+      
+      // Clean up media URLs - remove any invalid blob URLs or upload session URLs
+      const cleanedPosts = posts.map(post => ({
+        ...post,
+        mediaUrls: (post.mediaUrls || []).filter(url => 
+          url && !url.startsWith('blob:') && !url.includes('upload_session_')
+        )
+      }));
+      
+      res.json(cleanedPosts);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch calendar posts" });
     }
