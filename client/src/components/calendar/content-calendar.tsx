@@ -191,7 +191,7 @@ export default function ContentCalendar() {
                 className={cn(
                   "calendar-day p-2 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer relative touch-active transition-colors",
                   isToday && "bg-primary/10 dark:bg-primary/20 border-primary",
-                  selectedDate?.toDateString() === date.toDateString() && "ring-2 ring-primary ring-opacity-50",
+                  selectedDate?.toDateString() === date.toDateString() && "bg-blue-100 dark:bg-blue-900/30 border-blue-500 ring-2 ring-blue-500/50",
                   isMobile && "min-h-[60px] touch-manipulation"
                 )}
               >
