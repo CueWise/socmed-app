@@ -66,7 +66,7 @@ export default function EnhancedCalendar({
   
   // Get posts for the current month only for the selected brand
   const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
   const { data: posts = [] } = useCalendarPosts(monthStart, monthEnd, selectedBrand?.id);
 
   const generateCalendarDays = () => {
