@@ -470,7 +470,10 @@ export default function PostEditorModal({
       return apiRequest(method, url, payload);
     },
     onSuccess: () => {
+      // Invalidate all relevant queries to ensure real-time updates
       queryClient.invalidateQueries({ queryKey: ['/api/posts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/calendar/posts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/analytics'] });
       toast({
         title: postId ? "Post updated" : "Post created",
         description: postId ? "Your post has been updated successfully." : "Your post has been created successfully.",
@@ -851,6 +854,15 @@ export default function PostEditorModal({
                                 "object-cover rounded border shadow-sm",
                                 allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
                               )}
+                              onError={(e) => {
+                                console.error('Image failed to load:', media.url, e);
+                                // Fallback display for broken images
+                                e.currentTarget.style.display = 'none';
+                                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                              }}
+                              onLoad={() => {
+                                console.log('Image loaded successfully:', media.url);
+                              }}
                             />
                           ) : (
                             <div className={cn(
@@ -863,6 +875,17 @@ export default function PostEditorModal({
                               )} />
                             </div>
                           )}
+                          
+                          {/* Fallback display for broken image */}
+                          <div className={cn(
+                            "hidden bg-gray-200 rounded border shadow-sm flex items-center justify-center",
+                            allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
+                          )}>
+                            <ImageIcon className={cn(
+                              "text-gray-500",
+                              allMedia.length === 1 ? "h-12 w-12" : "h-8 w-8"
+                            )} />
+                          </div>
                           
                           {/* Media Type Badge */}
                           <div className="absolute top-1 left-1 bg-black bg-opacity-75 text-white text-xs px-1 rounded">
