@@ -85,6 +85,14 @@ const upload = multer({
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Helper function to detect file type from MIME type
+  function getFileType(mimetype: string): string {
+    if (mimetype.startsWith('image/')) return 'image';
+    if (mimetype.startsWith('video/')) return 'video';
+    if (mimetype.startsWith('audio/')) return 'audio';
+    return 'unknown';
+  }
+
   // Media upload endpoint
   app.post("/api/upload", upload.array('files', 10), async (req, res) => {
     try {
@@ -92,8 +100,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "No files uploaded" });
       }
 
-      const fileUrls = req.files.map(file => `/uploads/${file.filename}`);
-      res.json({ urls: fileUrls });
+      const fileInfo = req.files.map(file => ({
+        url: `/uploads/${file.filename}`,
+        type: getFileType(file.mimetype),
+        mimetype: file.mimetype,
+        originalName: file.originalname
+      }));
+
+      res.json({ 
+        urls: fileInfo.map(f => f.url),
+        types: fileInfo.map(f => f.type),
+        fileInfo: fileInfo
+      });
     } catch (error) {
       console.error('Upload error:', error);
       res.status(500).json({ error: "Failed to upload files" });
@@ -160,7 +178,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ...req.body,
         mediaUrls: (req.body.mediaUrls || []).filter((url: string) => 
           url && !url.startsWith('blob:') && !url.includes('upload_session_')
-        )
+        ),
+        mediaTypes: req.body.mediaTypes || []
       };
       
       const validatedData = insertPostSchema.parse(processedBody);
