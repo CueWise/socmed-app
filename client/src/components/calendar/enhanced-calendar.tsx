@@ -410,9 +410,23 @@ export default function EnhancedCalendar({
                           {/* Media thumbnail */}
                           {post.mediaUrls && post.mediaUrls.length > 0 && (
                             <div className="w-4 h-4 rounded bg-gray-200 border border-gray-300 overflow-hidden">
-                              <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                                <span className="text-[6px] text-gray-500 font-medium">IMG</span>
-                              </div>
+                              <img 
+                                src={post.mediaUrls[0]} 
+                                alt="" 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  // Show placeholder text if image fails to load
+                                  const target = e.currentTarget;
+                                  target.style.display = 'none';
+                                  const placeholder = target.parentElement;
+                                  if (placeholder && !placeholder.querySelector('.placeholder-text')) {
+                                    const span = document.createElement('div');
+                                    span.className = 'placeholder-text w-full h-full bg-gray-300 flex items-center justify-center';
+                                    span.innerHTML = '<span class="text-[6px] text-gray-500 font-medium">IMG</span>';
+                                    placeholder.appendChild(span);
+                                  }
+                                }}
+                              />
                             </div>
                           )}
                           

@@ -20,12 +20,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const status = req.query.status as string | undefined;
       const posts = await storage.getPosts(brandId, status);
       
-      // Clean up media URLs - remove any invalid blob URLs
+      // Keep all media URLs but replace broken ones with placeholders
       const cleanedPosts = posts.map(post => ({
         ...post,
-        mediaUrls: (post.mediaUrls || []).filter(url => 
-          url && !url.startsWith('blob:') && !url.includes('upload_session_')
-        )
+        mediaUrls: (post.mediaUrls || []).map((url: string, index: number) => {
+          if (!url || url.includes('upload_session_')) {
+            return `https://placeholder.images/400x300/cccccc/666666?text=Image+${index + 1}`;
+          }
+          return url;
+        })
       }));
       
       res.json(cleanedPosts);
@@ -56,15 +59,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.body.scheduledAt = new Date(req.body.scheduledAt);
       }
       
-      // Clean media URLs - remove blob URLs and upload session IDs temporarily
-      const cleanedBody = {
+      // Convert blob URLs to placeholder URLs for now - keep the media reference
+      const processedBody = {
         ...req.body,
-        mediaUrls: (req.body.mediaUrls || []).filter((url: string) => 
-          url && !url.startsWith('blob:') && !url.includes('upload_session_')
-        )
+        mediaUrls: (req.body.mediaUrls || []).map((url: string, index: number) => {
+          if (url && (url.startsWith('blob:') || url.includes('upload_session_'))) {
+            // Generate a placeholder URL that indicates media was uploaded
+            return `https://placeholder.images/400x300/cccccc/666666?text=Image+${index + 1}`;
+          }
+          return url;
+        }).filter(Boolean)
       };
       
-      const validatedData = insertPostSchema.parse(cleanedBody);
+      const validatedData = insertPostSchema.parse(processedBody);
       console.log('Validated data:', JSON.stringify(validatedData, null, 2));
       const post = await storage.createPost(validatedData);
       res.status(201).json(post);
@@ -113,12 +120,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const posts = await storage.getPostsByDateRange(startDate, endDate, brandId);
       
-      // Clean up media URLs - remove any invalid blob URLs or upload session URLs
+      // Keep all media URLs but replace broken ones with placeholders  
       const cleanedPosts = posts.map(post => ({
         ...post,
-        mediaUrls: (post.mediaUrls || []).filter(url => 
-          url && !url.startsWith('blob:') && !url.includes('upload_session_')
-        )
+        mediaUrls: (post.mediaUrls || []).map((url: string, index: number) => {
+          if (!url || url.includes('upload_session_')) {
+            return `https://placeholder.images/400x300/cccccc/666666?text=Image+${index + 1}`;
+          }
+          return url;
+        })
       }));
       
       res.json(cleanedPosts);
