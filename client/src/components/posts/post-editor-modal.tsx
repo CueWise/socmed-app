@@ -383,15 +383,18 @@ export default function PostEditorModal({
 
   // Cleanup blob URLs when modal closes to prevent memory leaks and cross-contamination
   useEffect(() => {
-    if (!open && attachedMedia.length > 0) {
-      // Revoke all blob URLs created in this session
-      attachedMedia.forEach(media => {
-        if (media.url.startsWith('blob:')) {
-          URL.revokeObjectURL(media.url);
-        }
-      });
+    if (!open) {
       // Clear the attached media to prevent sharing
-      setAttachedMedia([]);
+      setAttachedMedia(prevMedia => {
+        // Revoke all blob URLs created in this session
+        prevMedia.forEach(media => {
+          if (media.url.startsWith('blob:')) {
+            URL.revokeObjectURL(media.url);
+          }
+        });
+        return [];
+      });
+      setDetachedMedia([]);
     }
   }, [open]); // Only depend on open state to avoid infinite loop
 
