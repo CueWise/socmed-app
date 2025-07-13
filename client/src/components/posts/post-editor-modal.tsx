@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered, MoreHorizontal, Edit, Trash2, Link, Smile, Menu } from "lucide-react";
+import { X, Sparkles, Hash, TrendingUp, Camera, Upload, StickyNote, AlertTriangle, Plus, Paperclip, Send, Reply, FileText, Image as ImageIcon, Video, FileSpreadsheet, Bold, Italic, List, ListOrdered, MoreHorizontal, Edit, Trash2, Link, Smile, Menu, Play, Calendar, Clock, MessageSquare, MoreVertical, Code, AlignLeft, AlignCenter, AlignRight, Type, Eye, Monitor, Smartphone, Heart, MessageCircle, Bookmark, ThumbsUp, Share, Repeat2 } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -256,6 +256,8 @@ export default function PostEditorModal({
   const [editingText, setEditingText] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [emojiCategory, setEmojiCategory] = useState(0);
+  const [showPreviewPanel, setShowPreviewPanel] = useState(false);
+  const [attachedMedia, setAttachedMedia] = useState<{url: string, type: 'image' | 'video', file?: File}[]>([]);
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkText, setLinkText] = useState("");
@@ -264,6 +266,18 @@ export default function PostEditorModal({
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Enhanced emoji categories
+  const emojiCategories = {
+    faces: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '🥹', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '🥸', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭'],
+    gestures: ['👍', '👎', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✊', '👊', '🤛', '🤜', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '🫵', '👋', '🤚', '🖐️', '✋', '🖖', '💪', '🦾', '🦿', '🦵', '🦶'],
+    hearts: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '♥️', '💯', '💢', '💥', '💫', '💦', '💨', '🔥', '⭐', '🌟', '✨', '⚡', '☄️'],
+    objects: ['⌚', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '💽', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰', '🕰️'],
+    nature: ['🌱', '🌿', '☘️', '🍀', '🎋', '🪴', '🎍', '🌾', '🌲', '🌳', '🌴', '🌵', '🌷', '🌸', '🌹', '🥀', '🌺', '🌻', '🌼', '🌙', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌞', '⭐', '🌟', '💫', '✨'],
+    food: ['🍎', '🍏', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕', '🧄', '🧅', '🥔', '🍠', '🥐', '🥖', '🍞', '🥨', '🥯'],
+    gifs: ['🎭', '🎪', '🎨', '🎬', '🎤', '🎧', '🎼', '🎵', '🎶', '🎯', '🎳', '🎮', '🎰', '🧩', '🎲', '♠️', '♥️', '♦️', '♣️', '🃏', '🎴', '🀄'],
+    stickers: ['⭐', '✨', '💥', '💫', '💨', '💢', '💯', '🔥', '💎', '🌟', '⚡', '☄️', '🌈', '☀️', '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌙', '🪐']
+  };
 
   // Update form when initialData changes
   useEffect(() => {
@@ -319,14 +333,7 @@ export default function PostEditorModal({
     { id: 'twitter', name: 'Twitter', icon: FaTwitter, color: 'text-blue-400' },
   ];
 
-  const emojiCategories = [
-    ["😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇"],
-    ["👍", "👎", "👌", "✌️", "🤞", "🤟", "🤘", "🤙", "👈", "👉"],
-    ["❤️", "🧡", "💛", "💚", "💙", "💜", "🖤", "🤍", "🤎", "💔"],
-    ["🍕", "🍔", "🍟", "🌭", "🥪", "🌮", "🍝", "🍜", "🍲", "🍱"],
-    ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸"],
-    ["🚗", "🚕", "🚙", "🚌", "🚎", "🏎️", "🚓", "🚑", "🚒", "🚐"],
-  ];
+
 
   const createPostMutation = useMutation({
     mutationFn: async (postData: PostData) => {
@@ -614,12 +621,15 @@ export default function PostEditorModal({
                         onClick={() => {
                           const input = document.createElement('input');
                           input.type = 'file';
-                          input.accept = 'image/*,video/*';
+                          input.accept = 'image/*,video/*,image/gif';
+                          input.multiple = true;
                           input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (file) {
-                              console.log('File selected for Post:', file);
-                            }
+                            const files = Array.from((e.target as HTMLInputElement).files || []);
+                            files.forEach(file => {
+                              const url = URL.createObjectURL(file);
+                              const type = file.type.startsWith('video/') ? 'video' : 'image';
+                              setAttachedMedia(prev => [...prev, { url, type, file }]);
+                            });
                           };
                           input.click();
                         }}
@@ -640,6 +650,46 @@ export default function PostEditorModal({
                       {content.length}/2200 characters
                     </p>
                   </div>
+                  
+                  {/* Media Thumbnails */}
+                  {attachedMedia.length > 0 && (
+                    <div className="mt-3">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-sm font-medium text-gray-700">Attached Media ({attachedMedia.length})</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowPreviewPanel(true)}
+                          className="text-xs px-2 py-1 h-6"
+                        >
+                          Preview
+                        </Button>
+                      </div>
+                      <div className="flex gap-2 overflow-x-auto">
+                        {attachedMedia.map((media, index) => (
+                          <div key={index} className="relative flex-shrink-0">
+                            {media.type === 'image' ? (
+                              <img 
+                                src={media.url} 
+                                alt={`Attachment ${index + 1}`}
+                                className="w-16 h-16 object-cover rounded border"
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center">
+                                <Play className="h-6 w-6 text-gray-500" />
+                              </div>
+                            )}
+                            <button
+                              onClick={() => setAttachedMedia(prev => prev.filter((_, i) => i !== index))}
+                              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Hashtags */}
@@ -829,19 +879,19 @@ export default function PostEditorModal({
             </div>
             
             {/* Category Tabs */}
-            <div className="flex border-b bg-gray-50">
-              {emojiCategories.map((category, index) => (
+            <div className="flex border-b bg-gray-50 overflow-x-auto">
+              {Object.entries(emojiCategories).map(([key, category], index) => (
                 <button
-                  key={index}
+                  key={key}
                   onClick={() => setEmojiCategory(index)}
                   className={cn(
-                    "flex-1 p-3 text-center transition-colors",
+                    "flex-1 px-4 py-3 text-center transition-colors whitespace-nowrap text-sm font-medium",
                     emojiCategory === index 
-                      ? "bg-white border-b-2 border-blue-500" 
-                      : "hover:bg-gray-100"
+                      ? "bg-white border-b-2 border-blue-500 text-blue-600" 
+                      : "hover:bg-gray-100 text-gray-600"
                   )}
                 >
-                  {category[0]}
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
                 </button>
               ))}
             </div>
@@ -849,7 +899,7 @@ export default function PostEditorModal({
             {/* Emoji Grid */}
             <div className="flex-1 overflow-y-auto p-4">
               <div className="grid grid-cols-8 gap-2">
-                {emojiCategories[emojiCategory].map((emoji, index) => (
+                {Object.values(emojiCategories)[emojiCategory]?.map((emoji, index) => (
                   <button
                     key={index}
                     onClick={() => {
@@ -860,7 +910,7 @@ export default function PostEditorModal({
                   >
                     {emoji}
                   </button>
-                ))}
+                )) || []}
               </div>
             </div>
           </div>
@@ -874,6 +924,263 @@ export default function PostEditorModal({
         selectedPlatforms={selectedPlatforms}
         onSelectionChange={setSelectedPlatforms}
       />
+
+      {/* Platform Preview Panel */}
+      {showPreviewPanel && (
+        <div className="fixed inset-0 z-[150] bg-black bg-opacity-50" onClick={() => setShowPreviewPanel(false)}>
+          <div className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+            
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+              <h3 className="text-lg font-semibold">Post Preview</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowPreviewPanel(false)}
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            {/* Platform Tabs */}
+            <div className="flex border-b bg-gray-50">
+              {selectedPlatforms.map((platformId) => {
+                const platform = platforms.find(p => p.id === platformId);
+                if (!platform) return null;
+                const Icon = platform.icon;
+                return (
+                  <button
+                    key={platformId}
+                    className="flex-1 p-3 flex items-center justify-center gap-2 hover:bg-gray-100 border-b-2 border-blue-500"
+                  >
+                    <Icon className={cn("h-4 w-4", platform.color)} />
+                    <span className="text-sm font-medium">{platform.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            
+            {/* Preview Content */}
+            <div className="flex-1 overflow-y-auto p-4">
+              {selectedPlatforms.map((platformId) => {
+                const platform = platforms.find(p => p.id === platformId);
+                if (!platform) return null;
+                
+                return (
+                  <div key={platformId} className="mb-6">
+                    {/* Instagram Preview */}
+                    {platformId === 'instagram' && (
+                      <div className="bg-white border rounded-lg overflow-hidden shadow-sm max-w-sm mx-auto">
+                        {/* Header */}
+                        <div className="flex items-center p-3">
+                          <div className="w-8 h-8 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-full p-0.5">
+                            <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+                              <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+                            </div>
+                          </div>
+                          <div className="ml-3">
+                            <p className="font-semibold text-sm">your_brand</p>
+                            <p className="text-xs text-gray-500">Sponsored</p>
+                          </div>
+                        </div>
+                        
+                        {/* Media */}
+                        {attachedMedia.length > 0 && (
+                          <div className="aspect-square bg-gray-100">
+                            {attachedMedia[0].type === 'image' ? (
+                              <img src={attachedMedia[0].url} alt="Post content" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                                <Play className="h-12 w-12 text-white" />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Content */}
+                        <div className="p-3">
+                          <div className="flex items-center mb-2">
+                            <Heart className="h-6 w-6 mr-3" />
+                            <MessageCircle className="h-6 w-6 mr-3" />
+                            <Send className="h-6 w-6 mr-auto" />
+                            <Bookmark className="h-6 w-6" />
+                          </div>
+                          <p className="text-sm font-semibold mb-1">1,234 likes</p>
+                          <p className="text-sm">
+                            <span className="font-semibold">your_brand </span>
+                            {content} {hashtags.map(tag => `#${tag}`).join(' ')}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Facebook Preview */}
+                    {platformId === 'facebook' && (
+                      <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
+                        {/* Header */}
+                        <div className="flex items-center p-4">
+                          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                            <span className="text-white font-bold text-sm">YB</span>
+                          </div>
+                          <div className="ml-3">
+                            <p className="font-semibold text-sm">Your Brand</p>
+                            <p className="text-xs text-gray-500">5 min · 🌍</p>
+                          </div>
+                        </div>
+                        
+                        {/* Content */}
+                        <div className="px-4 pb-3">
+                          <p className="text-sm">{content} {hashtags.map(tag => `#${tag}`).join(' ')}</p>
+                        </div>
+                        
+                        {/* Media */}
+                        {attachedMedia.length > 0 && (
+                          <div className="bg-gray-100">
+                            {attachedMedia[0].type === 'image' ? (
+                              <img src={attachedMedia[0].url} alt="Post content" className="w-full h-auto" />
+                            ) : (
+                              <div className="w-full h-64 bg-gray-800 flex items-center justify-center">
+                                <Play className="h-16 w-16 text-white" />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Actions */}
+                        <div className="border-t">
+                          <div className="flex">
+                            <button className="flex-1 py-2 text-center text-gray-600 hover:bg-gray-50 flex items-center justify-center">
+                              <ThumbsUp className="h-4 w-4 mr-1" /> Like
+                            </button>
+                            <button className="flex-1 py-2 text-center text-gray-600 hover:bg-gray-50 flex items-center justify-center">
+                              <MessageCircle className="h-4 w-4 mr-1" /> Comment
+                            </button>
+                            <button className="flex-1 py-2 text-center text-gray-600 hover:bg-gray-50 flex items-center justify-center">
+                              <Share className="h-4 w-4 mr-1" /> Share
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Twitter Preview */}
+                    {platformId === 'twitter' && (
+                      <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
+                        {/* Header */}
+                        <div className="flex items-start p-3">
+                          <div className="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center mr-3">
+                            <span className="text-white font-bold text-sm">YB</span>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center">
+                              <p className="font-bold text-sm">Your Brand</p>
+                              <span className="text-blue-500 ml-1">✓</span>
+                              <p className="text-gray-500 text-sm ml-2">@yourbrand · 2h</p>
+                            </div>
+                            <p className="text-sm mt-1">{content}</p>
+                            {hashtags.length > 0 && (
+                              <p className="text-blue-500 text-sm mt-1">
+                                {hashtags.map(tag => `#${tag}`).join(' ')}
+                              </p>
+                            )}
+                            
+                            {/* Media */}
+                            {attachedMedia.length > 0 && (
+                              <div className="mt-3 rounded-2xl overflow-hidden border">
+                                {attachedMedia[0].type === 'image' ? (
+                                  <img src={attachedMedia[0].url} alt="Post content" className="w-full h-auto" />
+                                ) : (
+                                  <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
+                                    <Play className="h-12 w-12 text-white" />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            
+                            {/* Actions */}
+                            <div className="flex items-center justify-between mt-3 max-w-md">
+                              <button className="flex items-center text-gray-500 hover:text-blue-500">
+                                <MessageCircle className="h-4 w-4 mr-1" />
+                                <span className="text-sm">24</span>
+                              </button>
+                              <button className="flex items-center text-gray-500 hover:text-green-500">
+                                <Repeat2 className="h-4 w-4 mr-1" />
+                                <span className="text-sm">12</span>
+                              </button>
+                              <button className="flex items-center text-gray-500 hover:text-red-500">
+                                <Heart className="h-4 w-4 mr-1" />
+                                <span className="text-sm">156</span>
+                              </button>
+                              <button className="text-gray-500 hover:text-blue-500">
+                                <Share className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* TikTok Preview */}
+                    {platformId === 'tiktok' && (
+                      <div className="bg-black rounded-lg overflow-hidden shadow-sm max-w-sm mx-auto">
+                        {/* Video Area */}
+                        <div className="relative aspect-[9/16] bg-gray-900">
+                          {attachedMedia.length > 0 ? (
+                            attachedMedia[0].type === 'video' ? (
+                              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                                <Play className="h-16 w-16 text-white" />
+                              </div>
+                            ) : (
+                              <img src={attachedMedia[0].url} alt="Post content" className="w-full h-full object-cover" />
+                            )
+                          ) : (
+                            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                              <div className="text-center text-white">
+                                <div className="w-16 h-16 border-4 border-white rounded-full mx-auto mb-4"></div>
+                                <p className="text-sm">Tap to add media</p>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Overlay content */}
+                          <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                            <div className="flex items-end">
+                              <div className="flex-1">
+                                <p className="font-semibold text-sm mb-1">@yourbrand</p>
+                                <p className="text-sm">{content}</p>
+                                {hashtags.length > 0 && (
+                                  <p className="text-sm mt-1">
+                                    {hashtags.map(tag => `#${tag}`).join(' ')}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex flex-col items-center space-y-4 ml-4">
+                                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                                  <Heart className="h-6 w-6 text-red-500" />
+                                </div>
+                                <span className="text-xs">1.2K</span>
+                                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                                  <MessageCircle className="h-6 w-6 text-black" />
+                                </div>
+                                <span className="text-xs">89</span>
+                                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
+                                  <Share className="h-6 w-6 text-black" />
+                                </div>
+                                <span className="text-xs">12</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Unsaved Changes Dialog */}
       <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
