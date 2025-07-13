@@ -30,6 +30,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import RichTextEditor from "@/components/ui/rich-text-editor";
+import { useBrandStore } from "@/hooks/use-brand";
 
 interface PostEditorModalProps {
   open: boolean;
@@ -47,6 +48,8 @@ interface PostData {
   hashtags?: string[];
   status: string;
   notes?: string;
+  brandId?: number;
+  createdBy?: number;
 }
 
 // Enhanced emoji picker with categories
@@ -271,6 +274,7 @@ export default function PostEditorModal({
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { selectedBrand } = useBrandStore();
   
   // Enhanced emoji categories
   const emojiCategories = {
@@ -470,6 +474,15 @@ export default function PostEditorModal({
       return;
     }
 
+    if (!postId && !selectedBrand) {
+      toast({
+        title: "Brand required",
+        description: "Please select a brand to create a post",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Combine existing and new media URLs for submission
     const combinedMediaUrls = [
       ...existingMedia,
@@ -483,6 +496,13 @@ export default function PostEditorModal({
       mediaUrls: combinedMediaUrls,
       notes: notes.trim(),
       status: status,
+      // Required fields for posts
+      ...(selectedBrand && {
+        brandId: selectedBrand.id,
+      }),
+      ...(!postId && {
+        createdBy: 1, // TODO: Replace with actual user ID when auth is implemented
+      }),
     };
 
     createPostMutation.mutate(postData);
