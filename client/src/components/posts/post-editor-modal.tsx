@@ -1211,7 +1211,7 @@ export default function PostEditorModal({
                     }
                   }}
                 >
-                  <Paperclip className="h-5 w-5" />
+                  <Paperclip className="h-4 w-4" />
                 </Button>
                 
                 <div className="relative z-10">
@@ -1222,10 +1222,10 @@ export default function PostEditorModal({
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                     className="text-gray-700 hover:text-gray-900 p-3 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200 h-12 w-12"
                   >
-                    <Smile className="h-5 w-5" />
+                    <Smile className="h-4 w-4" />
                   </Button>
                   {showEmojiPicker && (
-                    <div className="absolute bottom-full left-0 mb-2 bg-white border-2 border-gray-200 rounded-xl shadow-2xl z-20 w-80 animate-in slide-in-from-bottom-2 duration-300">
+                    <div className="absolute bottom-full right-0 mb-2 bg-white border-2 border-gray-200 rounded-xl shadow-2xl z-[130] w-80 max-w-[90vw] animate-in slide-in-from-bottom-2 duration-300">
                       {/* Category Tabs */}
                       <div className="flex border-b border-gray-200 bg-gray-50 rounded-t-xl">
                         {emojiCategories.map((category, index) => (
@@ -1249,12 +1249,17 @@ export default function PostEditorModal({
                         <div className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
                           {emojiCategories[emojiCategory].name}
                         </div>
-                        <div className="grid grid-cols-8 gap-2 max-h-48 overflow-y-auto">
+                        <div className="flex gap-2 max-h-48 overflow-x-auto overflow-y-hidden pb-2 scrollbar-none" 
+                             style={{ 
+                               scrollbarWidth: 'none', 
+                               msOverflowStyle: 'none',
+                               WebkitOverflowScrolling: 'touch'
+                             }}>
                           {emojiCategories[emojiCategory].emojis.map((emoji, index) => (
                             <button
                               key={index}
                               onClick={() => addEmoji(emoji)}
-                              className="hover:bg-blue-50 hover:scale-110 rounded-lg p-2 text-lg flex items-center justify-center min-h-[2.5rem] min-w-[2.5rem] transition-all duration-150 hover:shadow-sm"
+                              className="hover:bg-blue-50 hover:scale-110 rounded-lg p-2 text-lg flex items-center justify-center min-h-[2.5rem] min-w-[2.5rem] flex-shrink-0 transition-all duration-150 hover:shadow-sm"
                             >
                               {emoji}
                             </button>
