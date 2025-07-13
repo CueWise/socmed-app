@@ -806,11 +806,8 @@ export default function PostEditorModal({
                   
                   {allMedia.length > 0 ? (
                     <div className={cn(
-                      "p-2 bg-gray-50 rounded border",
-                      allMedia.length === 1 ? "flex justify-center" : "grid gap-2",
-                      allMedia.length === 2 ? "grid-cols-2" : "",
-                      allMedia.length === 3 ? "grid-cols-3" : "",
-                      allMedia.length >= 4 ? "grid-cols-4" : ""
+                      "p-2 bg-gray-50 rounded border flex flex-wrap gap-2",
+                      allMedia.length === 1 ? "justify-center" : ""
                     )}>
                       {allMedia.map((media, index) => (
                         <div key={index} className="relative flex-shrink-0">
@@ -849,24 +846,81 @@ export default function PostEditorModal({
                           </button>
                         </div>
                       ))}
+                      
+                      {/* Upload Button - Show if no video and images < 10, or no media at all */}
+                      {canAddMedia() && (
+                        <button
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.accept = 'image/*,video/*,image/gif';
+                            input.multiple = !hasVideo; // Multiple only if no video
+                            input.onchange = (e) => {
+                              const files = Array.from((e.target as HTMLInputElement).files || []);
+                              files.forEach(file => {
+                                const url = URL.createObjectURL(file);
+                                const type = file.type.startsWith('video/') ? 'video' : 'image';
+                                
+                                // Check restrictions before adding
+                                if (type === 'video' && (hasVideo || allMedia.length > 0)) {
+                                  alert('Only one video allowed per post. Remove other media first.');
+                                  return;
+                                }
+                                
+                                setAttachedMedia(prev => [...prev, { url, type, file }]);
+                              });
+                            };
+                            input.click();
+                          }}
+                          className={cn(
+                            "rounded border-2 border-dashed border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 flex items-center justify-center transition-colors",
+                            allMedia.length === 0 ? "w-32 h-32" : "w-20 h-20"
+                          )}
+                        >
+                          <div className="text-center">
+                            <Upload className={cn(
+                              "mx-auto text-gray-400 mb-1",
+                              allMedia.length === 0 ? "h-8 w-8" : "h-5 w-5"
+                            )} />
+                            <span className={cn(
+                              "text-gray-500 font-medium",
+                              allMedia.length === 0 ? "text-sm" : "text-xs"
+                            )}>
+                              {allMedia.length === 0 ? "Upload" : "+"}
+                            </span>
+                          </div>
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <div className="p-4 bg-gray-50 rounded border text-center text-gray-500 text-sm">
-                      No media attached. Use the upload button above to add images or videos.
-                      {hasVideo && <div className="text-xs mt-1 text-amber-600">Video posts can only have one media file.</div>}
+                      <button
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*,video/*,image/gif';
+                          input.multiple = true;
+                          input.onchange = (e) => {
+                            const files = Array.from((e.target as HTMLInputElement).files || []);
+                            files.forEach(file => {
+                              const url = URL.createObjectURL(file);
+                              const type = file.type.startsWith('video/') ? 'video' : 'image';
+                              setAttachedMedia(prev => [...prev, { url, type, file }]);
+                            });
+                          };
+                          input.click();
+                        }}
+                        className="w-full p-8 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded bg-white hover:bg-gray-50 transition-colors"
+                      >
+                        <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                        <div className="text-gray-600 font-medium">Click to upload media</div>
+                        <div className="text-xs text-gray-500 mt-1">Images, videos, or GIFs</div>
+                      </button>
                     </div>
                   )}
                 </div>
 
-                {/* Debug: Test Preview Panel Button */}
-                <div className="mt-4">
-                  <button
-                    onClick={() => setShowPreviewPanel(true)}
-                    className="w-full text-sm px-3 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
-                  >
-                    Test Preview Panel
-                  </button>
-                </div>
+
 
                 {/* Scheduling */}
                 <div className="grid grid-cols-1 gap-4">
@@ -999,42 +1053,7 @@ export default function PostEditorModal({
               {isOptimizing ? "Optimizing..." : "Optimize Content"}
             </Button>
             
-            <Button
-              variant="outline"
-              className="w-full justify-start"
-              onClick={() => {
-                if (!canAddMedia()) {
-                  alert('Cannot add more media. Remove the video first to add other content.');
-                  return;
-                }
-                
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'image/*,video/*,image/gif';
-                input.multiple = !hasVideo; // Multiple only if no video
-                input.onchange = (e) => {
-                  const files = Array.from((e.target as HTMLInputElement).files || []);
-                  files.forEach(file => {
-                    const url = URL.createObjectURL(file);
-                    const type = file.type.startsWith('video/') ? 'video' : 'image';
-                    
-                    // Check restrictions before adding
-                    if (type === 'video' && (hasVideo || allMedia.length > 0)) {
-                      alert('Only one video allowed per post. Remove other media first.');
-                      return;
-                    }
-                    
-                    setAttachedMedia(prev => [...prev, { url, type, file }]);
-                  });
-                };
-                input.click();
-                setShowMainMenu(false);
-              }}
-              disabled={!canAddMedia()}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Media
-            </Button>
+
           </div>
         </div>
       </div>
