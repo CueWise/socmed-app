@@ -246,7 +246,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleBold().run()}
                       className={`p-2 ${editor.isActive('bold') ? 'bg-blue-100' : ''}`}
                     >
-                      <Bold className="h-4 w-4" />
+                      <Bold className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -254,7 +254,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleItalic().run()}
                       className={`p-2 ${editor.isActive('italic') ? 'bg-blue-100' : ''}`}
                     >
-                      <Italic className="h-4 w-4" />
+                      <Italic className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -262,7 +262,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleUnderline().run()}
                       className={`p-2 ${editor.isActive('underline') ? 'bg-blue-100' : ''}`}
                     >
-                      <UnderlineIcon className="h-4 w-4" />
+                      <UnderlineIcon className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -270,7 +270,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleStrike().run()}
                       className={`p-2 ${editor.isActive('strike') ? 'bg-blue-100' : ''}`}
                     >
-                      <Strikethrough className="h-4 w-4" />
+                      <Strikethrough className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
@@ -285,7 +285,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
                       className={`p-2 ${editor.isActive('heading', { level: 1 }) ? 'bg-blue-100' : ''}`}
                     >
-                      <Heading1 className="h-4 w-4" />
+                      <Heading1 className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -293,7 +293,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
                       className={`p-2 ${editor.isActive('heading', { level: 2 }) ? 'bg-blue-100' : ''}`}
                     >
-                      <Heading2 className="h-4 w-4" />
+                      <Heading2 className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -301,7 +301,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
                       className={`p-2 ${editor.isActive('heading', { level: 3 }) ? 'bg-blue-100' : ''}`}
                     >
-                      <Heading3 className="h-4 w-4" />
+                      <Heading3 className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
@@ -316,7 +316,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleBulletList().run()}
                       className={`p-2 ${editor.isActive('bulletList') ? 'bg-blue-100' : ''}`}
                     >
-                      <List className="h-4 w-4" />
+                      <List className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -324,7 +324,7 @@ export default function RichTextEditor({
                       onClick={() => editor.chain().focus().toggleOrderedList().run()}
                       className={`p-2 ${editor.isActive('orderedList') ? 'bg-blue-100' : ''}`}
                     >
-                      <ListOrdered className="h-4 w-4" />
+                      <ListOrdered className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
