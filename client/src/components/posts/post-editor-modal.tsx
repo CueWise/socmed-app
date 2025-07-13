@@ -640,7 +640,7 @@ export default function PostEditorModal({
           <div className={cn(
             "fixed bottom-0 bg-white rounded-t-2xl shadow-2xl transform transition-all duration-300 ease-out",
             "max-h-[90vh] overflow-hidden flex flex-col",
-            showNotes ? "hidden" : "left-0 right-0 z-50", // Hide completely when notes are open
+            showNotes ? "hidden" : "left-0 right-0 z-50", // Hide main panel when notes are open
             open ? "translate-y-0" : "translate-y-full"
           )}>
             {/* Header */}
@@ -961,13 +961,13 @@ export default function PostEditorModal({
                }
              }}>
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b bg-white">
+          <div className="flex items-center justify-between p-4 border-b bg-white relative z-[110]">
             <h2 className="text-lg font-semibold">Notes & Comments</h2>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowNotes(false)}
-              className="h-8 w-8 p-0"
+              className="h-8 w-8 p-0 relative z-[111]"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -1225,10 +1225,27 @@ export default function PostEditorModal({
                     <Smile className="h-4 w-4" />
                   </Button>
                   {showEmojiPicker && (
-                    <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black bg-opacity-50" onClick={() => setShowEmojiPicker(false)}>
-                      <div className="bg-white border-2 border-gray-200 rounded-xl shadow-2xl w-80 max-w-[90vw] animate-in slide-in-from-bottom-2 duration-300" onClick={(e) => e.stopPropagation()}>
-                      {/* Category Tabs */}
-                      <div className="flex border-b border-gray-200 bg-gray-50 rounded-t-xl">
+                    <div className="fixed inset-0 z-[130] bg-black bg-opacity-50" onClick={() => setShowEmojiPicker(false)}>
+                      <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl transform transition-transform duration-300 ease-out translate-y-0 h-[40vh] max-h-[500px]" 
+                           onClick={(e) => e.stopPropagation()}
+                           style={{ 
+                             touchAction: 'pan-y'
+                           }}>
+                        {/* Header with close button */}
+                        <div className="flex items-center justify-between p-4 border-b bg-white rounded-t-2xl">
+                          <h3 className="text-lg font-semibold">Emojis</h3>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowEmojiPicker(false)}
+                            className="h-8 w-8 p-0"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        
+                        {/* Category Tabs */}
+                        <div className="flex border-b border-gray-200 bg-gray-50">
                         {emojiCategories.map((category, index) => (
                           <button
                             key={index}
@@ -1391,21 +1408,13 @@ export default function PostEditorModal({
                 )}
               </div>
               
-              <div className="flex gap-3 pt-3 justify-center px-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setShowNotes(false)}
-                  className="flex-1 max-w-[120px] h-12 text-base"
-                >
-                  Close
-                </Button>
+              <div className="flex justify-start px-6 pt-3">
                 <Button
                   onClick={handleAddNote}
                   disabled={!newNoteText.trim()}
-                  className="bg-primary hover:bg-primary/90 flex-1 max-w-[120px] h-12 text-base"
+                  className="bg-primary hover:bg-primary/90 h-12 w-12 p-0"
                 >
-                  <Send className="h-5 w-5 mr-2" />
-                  Send
+                  <Send className="h-5 w-5" />
                 </Button>
               </div>
             </div>
