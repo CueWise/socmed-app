@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, X, Edit2 } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { useCalendarPosts } from "@/hooks/use-posts";
 import { useBrand } from "@/hooks/use-brand";
@@ -15,10 +16,17 @@ interface TooltipData {
   position: { x: number; y: number };
 }
 
+interface MobilePopoutData {
+  visible: boolean;
+  posts: any[];
+  date: Date | null;
+}
+
 interface EnhancedCalendarProps {
   onDateSelect?: (date: Date | null) => void;
   selectedDate?: Date | null;
   onCreatePost?: (date?: Date) => void;
+  onEditPost?: (postId: number, date?: Date) => void;
   showCreateButton?: boolean;
   title?: string;
   className?: string;
@@ -28,6 +36,7 @@ export default function EnhancedCalendar({
   onDateSelect,
   selectedDate: externalSelectedDate,
   onCreatePost,
+  onEditPost,
   showCreateButton = false,
   title = "Content Calendar",
   className
@@ -40,6 +49,12 @@ export default function EnhancedCalendar({
     date: null,
     position: { x: 0, y: 0 }
   });
+  const [mobilePopout, setMobilePopout] = useState<MobilePopoutData>({
+    visible: false,
+    posts: [],
+    date: null
+  });
+  const [lastClickTime, setLastClickTime] = useState<number>(0);
   
   const { selectedBrand } = useBrand();
   const isMobile = useIsMobile();
@@ -94,6 +109,35 @@ export default function EnhancedCalendar({
   };
 
   const handleDateClick = (date: Date) => {
+    const now = Date.now();
+    const dayPosts = getPostsForDate(date);
+    
+    // Handle mobile: show popout for posts, regular selection for empty dates
+    if (isMobile) {
+      if (dayPosts.length > 0) {
+        setMobilePopout({
+          visible: true,
+          posts: dayPosts,
+          date
+        });
+        return; // Don't change selection on mobile when showing popout
+      }
+    } else {
+      // Handle desktop double-click for posts
+      if (dayPosts.length > 0) {
+        const timeSinceLastClick = now - lastClickTime;
+        if (timeSinceLastClick < 500) { // Double-click detected (within 500ms)
+          // Open first post for editing on double-click
+          if (dayPosts[0]?.id) {
+            onEditPost?.(dayPosts[0].id, date);
+            return;
+          }
+        }
+      }
+    }
+    
+    setLastClickTime(now);
+    
     const newSelectedDate = selectedDate?.toDateString() === date.toDateString() ? null : date;
     
     if (externalSelectedDate === undefined) {
@@ -104,6 +148,9 @@ export default function EnhancedCalendar({
   };
 
   const handleDateHover = (event: React.MouseEvent, date: Date) => {
+    // Only show hover tooltip on desktop
+    if (isMobile) return;
+    
     const dayPosts = getPostsForDate(date);
     const rect = event.currentTarget.getBoundingClientRect();
     
@@ -119,7 +166,19 @@ export default function EnhancedCalendar({
   };
 
   const handleMouseLeave = () => {
-    setTooltip(prev => ({ ...prev, visible: false }));
+    // Only hide tooltip on desktop
+    if (!isMobile) {
+      setTooltip(prev => ({ ...prev, visible: false }));
+    }
+  };
+  
+  const closeMobilePopout = () => {
+    setMobilePopout({ visible: false, posts: [], date: null });
+  };
+  
+  const handlePostEdit = (postId: number) => {
+    onEditPost?.(postId, mobilePopout.date || undefined);
+    closeMobilePopout();
   };
 
   // Platform icons mapping
@@ -362,8 +421,8 @@ export default function EnhancedCalendar({
         </CardContent>
       </Card>
 
-      {/* Enhanced Tooltip */}
-      {tooltip.visible && (
+      {/* Desktop Tooltip */}
+      {tooltip.visible && !isMobile && (
         <div
           ref={tooltipRef}
           className="fixed z-50 bg-white border border-gray-200 rounded-lg shadow-xl p-4 min-w-[300px] max-w-[400px]"
@@ -383,6 +442,9 @@ export default function EnhancedCalendar({
                 day: 'numeric' 
               })}
             </h4>
+            {tooltip.posts.length > 0 && (
+              <p className="text-xs text-gray-500 mt-1">Double-click to edit first post</p>
+            )}
           </div>
           
           {tooltip.posts.length > 0 ? (
@@ -459,6 +521,117 @@ export default function EnhancedCalendar({
           )}
         </div>
       )}
+
+      {/* Mobile Popout Dialog */}
+      <Dialog open={mobilePopout.visible} onOpenChange={closeMobilePopout}>
+        <DialogContent className="max-w-[90vw] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>
+                {mobilePopout.date?.toLocaleDateString('en-US', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}
+              </span>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {mobilePopout.posts.length > 0 ? (
+            <div className="space-y-4">
+              {mobilePopout.posts.map((post, index) => (
+                <div 
+                  key={index} 
+                  className="border border-gray-200 rounded-lg p-4 cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => handlePostEdit(post.id)}
+                >
+                  {/* Platforms */}
+                  <div className="flex items-center space-x-3 mb-3">
+                    {post.platforms?.map((platform: string, idx: number) => {
+                      const IconComponent = platformIcons[platform as keyof typeof platformIcons];
+                      return IconComponent ? (
+                        <div key={idx} className="flex items-center space-x-2">
+                          <IconComponent 
+                            className={cn(
+                              "w-5 h-5",
+                              platformColors[platform as keyof typeof platformColors]
+                            )} 
+                          />
+                          <span className="text-sm text-gray-700 capitalize font-medium">{platform}</span>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+                  
+                  {/* Content preview */}
+                  <p className="text-gray-800 mb-3 leading-relaxed">
+                    {post.content}
+                  </p>
+                  
+                  {/* Media thumbnails */}
+                  {post.mediaUrls && post.mediaUrls.length > 0 && (
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      {post.mediaUrls.slice(0, 6).map((url: string, idx: number) => (
+                        <img 
+                          key={idx}
+                          src={url} 
+                          alt="" 
+                          className="w-full h-20 object-cover rounded border border-gray-200"
+                        />
+                      ))}
+                      {post.mediaUrls.length > 6 && (
+                        <div className="w-full h-20 bg-gray-100 rounded border border-gray-200 flex items-center justify-center">
+                          <span className="text-sm text-gray-600 font-medium">+{post.mediaUrls.length - 6}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  
+                  {/* Status and time */}
+                  <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                    <span className={cn(
+                      "text-sm px-3 py-1 rounded-full font-medium",
+                      post.status === 'published' && "bg-green-100 text-green-800",
+                      post.status === 'scheduled' && "bg-blue-100 text-blue-800",
+                      post.status === 'draft' && "bg-gray-100 text-gray-800"
+                    )}>
+                      {post.status}
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-gray-500">
+                        {new Date(post.scheduledAt).toLocaleTimeString('en-US', { 
+                          hour: '2-digit', 
+                          minute: '2-digit' 
+                        })}
+                      </span>
+                      <Edit2 className="h-4 w-4 text-gray-400" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              <div className="text-center py-2">
+                <p className="text-sm text-gray-500">Tap any post above to edit</p>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-2">No posts scheduled for this date</p>
+              <Button 
+                onClick={() => {
+                  closeMobilePopout();
+                  onCreatePost?.(mobilePopout.date || undefined);
+                }}
+                className="min-h-[44px]"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Create Post
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
