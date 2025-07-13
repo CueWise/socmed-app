@@ -11,10 +11,12 @@ import MobileWidgets from "@/components/mobile/mobile-widgets";
 import { useApprovals } from "@/hooks/use-approvals";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useBrand } from "@/hooks/use-brand";
 
 export default function Dashboard() {
   const [showPostEditor, setShowPostEditor] = useState(false);
   const isMobile = useIsMobile();
+  const { selectedBrand } = useBrand();
   const { data: approvals } = useApprovals();
   const { data: analytics } = useAnalytics();
 

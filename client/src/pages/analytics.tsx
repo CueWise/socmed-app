@@ -11,11 +11,13 @@ import {
 } from "@/components/ui/select";
 import StatsCard from "@/components/analytics/stats-card";
 import { useAnalytics } from "@/hooks/use-analytics";
+import { useBrand } from "@/hooks/use-brand";
 
 export default function Analytics() {
   const [dateRange, setDateRange] = useState("7d");
   const [platform, setPlatform] = useState("all");
   
+  const { selectedBrand } = useBrand();
   const { data: analytics } = useAnalytics();
 
   const exportData = (format: 'csv' | 'pdf') => {

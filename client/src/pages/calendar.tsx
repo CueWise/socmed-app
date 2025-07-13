@@ -11,7 +11,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import PostEditorModal from "@/components/posts/post-editor-modal";
-import { usePosts } from "@/hooks/use-posts";
+import { useCalendarPosts } from "@/hooks/use-posts";
+import { useBrand } from "@/hooks/use-brand";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +28,13 @@ export default function Calendar() {
     position: { x: number; y: number };
   }>({ visible: false, post: null, position: { x: 0, y: 0 } });
   
-  const { data: posts } = usePosts();
+  const { selectedBrand } = useBrand();
+  
+  // Get posts for the entire current month to show on calendar
+  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const { data: posts = [] } = useCalendarPosts(monthStart, monthEnd, selectedBrand?.id);
+  
   const isMobile = useIsMobile();
   const calendarRef = useRef<HTMLDivElement>(null);
 
