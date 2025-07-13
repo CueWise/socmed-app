@@ -262,7 +262,14 @@ export default function PostEditorModal({
   const [emojiCategory, setEmojiCategory] = useState(0);
   const [showPreviewPanel, setShowPreviewPanel] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
-  const [attachedMedia, setAttachedMedia] = useState<{url: string, type: 'image' | 'video', file?: File}[]>([]);
+  const [attachedMedia, setAttachedMedia] = useState<{
+    url: string, 
+    type: 'image' | 'video', 
+    file?: File,
+    uniqueId?: string,
+    brandId?: number,
+    uploadedAt?: string
+  }[]>([]);
   const [emojiTarget, setEmojiTarget] = useState<'content' | 'note' | 'reply'>('content');
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
   const [showMediaConfirm, setShowMediaConfirm] = useState(false);
@@ -496,9 +503,13 @@ export default function PostEditorModal({
     }
 
     // Combine existing and new media URLs for submission
+    // For new uploads, create unique identifiers to prevent sharing across posts
     const combinedMediaUrls = [
       ...existingMedia,
-      ...attachedMedia.map(media => media.url)
+      ...attachedMedia.map(media => {
+        // Create a unique URL identifier for each new upload
+        return `upload_${media.uniqueId}_${media.brandId}_${media.file?.name || 'media'}`;
+      })
     ];
 
     // Combine scheduled date and time into a Date object (Philippine timezone)
@@ -858,6 +869,8 @@ export default function PostEditorModal({
                             input.onchange = (e) => {
                               const files = Array.from((e.target as HTMLInputElement).files || []);
                               files.forEach(file => {
+                                // Create unique URL with timestamp and random ID
+                                const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                                 const url = URL.createObjectURL(file);
                                 const type = file.type.startsWith('video/') ? 'video' : 'image';
                                 
@@ -867,7 +880,15 @@ export default function PostEditorModal({
                                   return;
                                 }
                                 
-                                setAttachedMedia(prev => [...prev, { url, type, file }]);
+                                // Create unique media object with proper identification
+                                setAttachedMedia(prev => [...prev, { 
+                                  url, 
+                                  type, 
+                                  file,
+                                  uniqueId,
+                                  brandId: selectedBrand?.id,
+                                  uploadedAt: new Date().toISOString()
+                                }]);
                               });
                             };
                             input.click();
@@ -903,9 +924,20 @@ export default function PostEditorModal({
                           input.onchange = (e) => {
                             const files = Array.from((e.target as HTMLInputElement).files || []);
                             files.forEach(file => {
+                              // Create unique URL with timestamp and random ID
+                              const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                               const url = URL.createObjectURL(file);
                               const type = file.type.startsWith('video/') ? 'video' : 'image';
-                              setAttachedMedia(prev => [...prev, { url, type, file }]);
+                              
+                              // Create unique media object with proper identification
+                              setAttachedMedia(prev => [...prev, { 
+                                url, 
+                                type, 
+                                file,
+                                uniqueId,
+                                brandId: selectedBrand?.id,
+                                uploadedAt: new Date().toISOString()
+                              }]);
                             });
                           };
                           input.click();
@@ -1238,7 +1270,7 @@ export default function PostEditorModal({
                             </div>
                           </div>
                           <div className="ml-3">
-                            <p className="font-semibold text-sm">your_brand</p>
+                            <p className="font-semibold text-sm">{selectedBrand?.name || 'Your Brand'}</p>
                             <p className="text-xs text-gray-500">Sponsored</p>
                           </div>
                         </div>
@@ -1295,7 +1327,7 @@ export default function PostEditorModal({
                           </div>
                           <p className="text-sm font-semibold mb-1">1,234 likes</p>
                           <p className="text-sm">
-                            <span className="font-semibold">your_brand </span>
+                            <span className="font-semibold">{selectedBrand?.name || 'Your Brand'} </span>
                             {content} {hashtags.map(tag => `#${tag}`).join(' ')}
                           </p>
                         </div>
@@ -1311,7 +1343,7 @@ export default function PostEditorModal({
                             <span className="text-white font-bold text-sm">YB</span>
                           </div>
                           <div className="ml-3">
-                            <p className="font-semibold text-sm">Your Brand</p>
+                            <p className="font-semibold text-sm">{selectedBrand?.name || 'Your Brand'}</p>
                             <p className="text-xs text-gray-500">5 min · 🌍</p>
                           </div>
                         </div>
