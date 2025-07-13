@@ -476,11 +476,21 @@ export default function PostEditorModal({
   const createPostMutation = useMutation({
     mutationFn: async (postData: PostData) => {
       console.log('Creating post with data:', postData);
-      return apiRequest(`/api/posts${postId ? `/${postId}` : ""}`, {
-        method: postId ? "PATCH" : "POST",
-        body: JSON.stringify(postData),
+      const url = `/api/posts${postId ? `/${postId}` : ""}`;
+      const method = postId ? "PATCH" : "POST";
+      
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(postData),
+        credentials: "include",
       });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to ${postId ? 'update' : 'create'} post`);
+      }
+      
+      return response.json();
     },
     onSuccess: (data) => {
       console.log('Post creation successful:', data);
