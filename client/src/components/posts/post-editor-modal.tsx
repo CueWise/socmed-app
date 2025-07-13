@@ -640,7 +640,7 @@ export default function PostEditorModal({
           <div className={cn(
             "fixed bottom-0 bg-white rounded-t-2xl shadow-2xl z-50 transform transition-all duration-300 ease-out",
             "max-h-[90vh] overflow-hidden flex flex-col",
-            showNotes ? "left-0 right-[500px]" : "left-0 right-0", // Fixed positioning, reserve space for notes
+            showNotes ? "left-0 right-full sm:right-[500px]" : "left-0 right-0", // Fixed positioning, reserve space for notes
             open ? "translate-y-0" : "translate-y-full"
           )}>
             {/* Header */}
@@ -943,7 +943,7 @@ export default function PostEditorModal({
       
       {/* Notes Slide-in Panel - Fixed position, no adjusting */}
       {showNotes && open && (
-        <div className="fixed top-0 right-0 bottom-0 w-[500px] bg-white z-[110] flex flex-col shadow-2xl border-l transform transition-transform duration-300 ease-in-out translate-x-0"
+        <div className="fixed top-0 right-0 bottom-0 w-full sm:w-[500px] max-w-[90vw] bg-white z-[110] flex flex-col shadow-2xl border-l transform transition-transform duration-300 ease-in-out translate-x-0"
              style={{ 
                paddingBottom: 'env(keyboard-inset-height, 0px)',
                touchAction: 'pan-y'
@@ -962,11 +962,7 @@ export default function PostEditorModal({
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[400px]"
-               style={{ 
-                 marginBottom: 'env(keyboard-inset-height, 0px)',
-                 paddingBottom: 'max(env(keyboard-inset-height, 0px), 20px)'
-               }}>
+          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[300px] pb-4">
             {/* Note Messages - Slack Style */}
           {noteThreads.map((thread) => (
             <div key={thread.id} className="group hover:bg-gray-100 rounded p-2 transition-colors">
@@ -1125,8 +1121,12 @@ export default function PostEditorModal({
           )}
         </div>
         
-        {/* Add New Message */}
-        <div className="border-t pt-4 bg-white flex-shrink-0">
+        {/* Add New Message - Mobile keyboard aware footer */}
+        <div className="border-t pt-4 bg-white flex-shrink-0 sticky bottom-0"
+             style={{ 
+               paddingBottom: 'max(env(keyboard-inset-height, 0px), 16px)',
+               zIndex: 15
+             }}>
           <div className="space-y-2">
             <RichTextEditor
               key={editorKey}
@@ -1364,17 +1364,18 @@ export default function PostEditorModal({
                 )}
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 pt-2">
                 <Button
                   variant="outline"
                   onClick={() => setShowNotes(false)}
+                  className="flex-1 sm:flex-none"
                 >
                   Close
                 </Button>
                 <Button
                   onClick={handleAddNote}
                   disabled={!newNoteText.trim()}
-                  className="bg-primary hover:bg-primary/90 px-4 py-2 z-10 relative"
+                  className="bg-primary hover:bg-primary/90 px-4 py-2 z-10 relative flex-1 sm:flex-none"
                   size="sm"
                 >
                   <Send className="h-4 w-4" />
