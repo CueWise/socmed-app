@@ -223,6 +223,9 @@ export default function PostEditorModal({
   postId,
   initialData
 }: PostEditorModalProps) {
+  // Create a unique session ID for this post editing session to isolate media
+  const [sessionId] = useState(() => `session_${Date.now()}_${postId || 'new'}_${Math.random().toString(36).substr(2, 9)}`);
+  
   const [content, setContent] = useState(initialData?.content || "");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(
     initialData?.platforms || ["instagram"]
@@ -267,6 +270,8 @@ export default function PostEditorModal({
     type: 'image' | 'video', 
     file?: File,
     uniqueId?: string,
+    sessionId?: string,
+    postId?: number | null,
     brandId?: number,
     uploadedAt?: string
   }[]>([]);
@@ -324,6 +329,10 @@ export default function PostEditorModal({
 
   // Update form when initialData changes
   useEffect(() => {
+    // Always clear attached media when modal opens/changes to prevent cross-contamination
+    setAttachedMedia([]);
+    setDetachedMedia([]);
+    
     if (initialData) {
       setContent(initialData.content || "");
       setSelectedPlatforms(initialData.platforms || ["instagram"]);
@@ -345,14 +354,26 @@ export default function PostEditorModal({
       setMediaUrls([]);
       setStatus("draft");
       setNotes("");
-      setAttachedMedia([]);
-      setDetachedMedia([]);
       
       if (defaultDate) {
         setScheduledDate(defaultDate.toISOString().split('T')[0]);
       }
     }
-  }, [initialData, defaultDate, open]);
+  }, [initialData, defaultDate, open, postId]);
+
+  // Cleanup blob URLs when modal closes to prevent memory leaks and cross-contamination
+  useEffect(() => {
+    if (!open && attachedMedia.length > 0) {
+      // Revoke all blob URLs created in this session
+      attachedMedia.forEach(media => {
+        if (media.url.startsWith('blob:')) {
+          URL.revokeObjectURL(media.url);
+        }
+      });
+      // Clear the attached media to prevent sharing
+      setAttachedMedia([]);
+    }
+  }, [open]); // Only depend on open state to avoid infinite loop
 
   // Track unsaved changes
   useEffect(() => {
@@ -507,8 +528,8 @@ export default function PostEditorModal({
     const combinedMediaUrls = [
       ...existingMedia,
       ...attachedMedia.map(media => {
-        // Create a unique URL identifier for each new upload
-        return `upload_${media.uniqueId}_${media.brandId}_${media.file?.name || 'media'}`;
+        // Create a unique URL identifier for each new upload with session isolation
+        return `upload_${media.sessionId}_${media.uniqueId}_${media.brandId}_${media.postId || 'new'}_${media.file?.name || 'media'}`;
       })
     ];
 
@@ -880,12 +901,14 @@ export default function PostEditorModal({
                                   return;
                                 }
                                 
-                                // Create unique media object with proper identification
+                                // Create unique media object with proper identification and session isolation
                                 setAttachedMedia(prev => [...prev, { 
                                   url, 
                                   type, 
                                   file,
                                   uniqueId,
+                                  sessionId,
+                                  postId: postId || null,
                                   brandId: selectedBrand?.id,
                                   uploadedAt: new Date().toISOString()
                                 }]);
@@ -929,12 +952,14 @@ export default function PostEditorModal({
                               const url = URL.createObjectURL(file);
                               const type = file.type.startsWith('video/') ? 'video' : 'image';
                               
-                              // Create unique media object with proper identification
+                              // Create unique media object with proper identification and session isolation
                               setAttachedMedia(prev => [...prev, { 
                                 url, 
                                 type, 
                                 file,
                                 uniqueId,
+                                sessionId,
+                                postId: postId || null,
                                 brandId: selectedBrand?.id,
                                 uploadedAt: new Date().toISOString()
                               }]);
