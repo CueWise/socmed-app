@@ -276,8 +276,7 @@ export default function PostEditorModal({
   const queryClient = useQueryClient();
   const { selectedBrand } = useBrandStore();
 
-  // Debug: Add console log to see the brand state
-  console.log("Selected brand in modal:", selectedBrand);
+
   
 
   
@@ -494,6 +493,11 @@ export default function PostEditorModal({
       ...attachedMedia.map(media => media.url)
     ];
 
+    // Combine scheduled date and time into a Date object
+    const scheduledDateTime = status === 'scheduled' && scheduledDate && scheduledTime 
+      ? new Date(`${scheduledDate}T${scheduledTime}:00`)
+      : null;
+
     const postData: PostData = {
       content: content.trim(),
       platforms: selectedPlatforms,
@@ -501,6 +505,10 @@ export default function PostEditorModal({
       mediaUrls: combinedMediaUrls,
       notes: notes.trim(),
       status: status,
+      // Add scheduled date if status is 'scheduled'
+      ...(scheduledDateTime && {
+        scheduledAt: scheduledDateTime,
+      }),
       // Required fields for posts
       ...(selectedBrand && {
         brandId: selectedBrand.id,
