@@ -423,11 +423,7 @@ export default function PostEditorModal({
         scheduledAt: scheduleDateTime?.toISOString(),
       };
       
-      return apiRequest(url, {
-        method,
-        body: JSON.stringify(payload),
-        headers: { 'Content-Type': 'application/json' },
-      });
+      return apiRequest(method, url, payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/posts'] });
