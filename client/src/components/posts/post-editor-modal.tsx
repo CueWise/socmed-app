@@ -418,15 +418,8 @@ export default function PostEditorModal({
         ? new Date(`${scheduledDate}T${scheduledTime}:00`)
         : undefined;
       
-      // Combine existing and new media URLs
-      const combinedMediaUrls = [
-        ...existingMedia,
-        ...attachedMedia.map(media => media.url)
-      ];
-
       const payload = {
         ...postData,
-        mediaUrls: combinedMediaUrls,
         scheduledAt: scheduleDateTime?.toISOString(),
       };
       
@@ -481,11 +474,17 @@ export default function PostEditorModal({
       return;
     }
 
+    // Combine existing and new media URLs for submission
+    const combinedMediaUrls = [
+      ...existingMedia,
+      ...attachedMedia.map(media => media.url)
+    ];
+
     const postData: PostData = {
       content: content.trim(),
       platforms: selectedPlatforms,
       hashtags,
-      mediaUrls,
+      mediaUrls: combinedMediaUrls,
       notes: notes.trim(),
       status: status,
     };
