@@ -230,11 +230,23 @@ export default function PostEditorModal({
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(
     initialData?.platforms || ["instagram"]
   );
-  const [scheduledDate, setScheduledDate] = useState(
-    initialData?.scheduledAt 
-      ? new Date(initialData.scheduledAt).toISOString().split('T')[0]
-      : defaultDate?.toISOString().split('T')[0] || new Date().toISOString().split('T')[0]
-  );
+  const [scheduledDate, setScheduledDate] = useState(() => {
+    // Helper function to format date without timezone issues
+    const formatDateForInput = (date: Date) => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    if (initialData?.scheduledAt) {
+      return formatDateForInput(new Date(initialData.scheduledAt));
+    } else if (defaultDate) {
+      return formatDateForInput(defaultDate);
+    } else {
+      return formatDateForInput(new Date());
+    }
+  });
   const [scheduledTime, setScheduledTime] = useState(
     initialData?.scheduledAt 
       ? new Date(initialData.scheduledAt).toTimeString().split(' ')[0].slice(0, 5)
@@ -288,6 +300,14 @@ export default function PostEditorModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { selectedBrand } = useBrandStore();
+
+  // Helper function to format date without timezone issues
+  const formatDateForInput = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
 
   
@@ -343,7 +363,7 @@ export default function PostEditorModal({
       
       if (initialData.scheduledAt) {
         const scheduleDate = new Date(initialData.scheduledAt);
-        setScheduledDate(scheduleDate.toISOString().split('T')[0]);
+        setScheduledDate(formatDateForInput(scheduleDate));
         setScheduledTime(scheduleDate.toTimeString().split(' ')[0].slice(0, 5));
       }
     } else {
@@ -356,7 +376,7 @@ export default function PostEditorModal({
       setNotes("");
       
       if (defaultDate) {
-        setScheduledDate(defaultDate.toISOString().split('T')[0]);
+        setScheduledDate(formatDateForInput(defaultDate));
       }
     }
   }, [initialData, defaultDate, open, postId]);
