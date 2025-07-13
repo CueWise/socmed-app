@@ -626,17 +626,21 @@ export default function PostEditorModal({
       {/* Main Edit Form - Slides up from bottom */}
       {open && (
         <>
-          {/* Backdrop */}
+          {/* Backdrop - Prevent main page interaction */}
           <div 
-            className="fixed inset-0 bg-black/50 z-50"
+            className="fixed inset-0 bg-black/50 z-40"
             onClick={() => handleClose()}
+            style={{ 
+              touchAction: 'none',
+              overscrollBehavior: 'contain'
+            }}
           />
           
           {/* Sliding Panel */}
           <div className={cn(
-            "fixed bottom-0 right-0 bg-white rounded-t-2xl shadow-2xl z-50 transform transition-transform duration-300 ease-out",
+            "fixed bottom-0 bg-white rounded-t-2xl shadow-2xl z-50 transform transition-all duration-300 ease-out",
             "max-h-[90vh] overflow-hidden flex flex-col",
-            showNotes ? "left-[30%]" : "left-0", // Show partially when notes are open
+            showNotes ? "left-0 right-96" : "left-0 right-0", // Fixed positioning, reserve space for notes
             open ? "translate-y-0" : "translate-y-full"
           )}>
             {/* Header */}
@@ -937,9 +941,9 @@ export default function PostEditorModal({
         </>
       )}
       
-      {/* Notes Slide-in Panel - Slides from right, positioned next to edit form */}
-      {showNotes && (
-        <div className="fixed top-0 right-0 bottom-0 w-96 bg-white z-[110] transform transition-transform duration-300 ease-in-out translate-x-0 flex flex-col shadow-2xl border-l min-h-full">
+      {/* Notes Slide-in Panel - Fixed position, no adjusting */}
+      {showNotes && open && (
+        <div className="fixed top-0 right-0 bottom-0 w-96 bg-white z-[110] flex flex-col shadow-2xl border-l transform transition-transform duration-300 ease-in-out translate-x-0">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b bg-white">
             <h2 className="text-lg font-semibold">Notes & Comments</h2>
@@ -1374,7 +1378,7 @@ export default function PostEditorModal({
         </div>
       )}
 
-    {/* Platform Selection Modal */}
+      {/* Platform Selection Modal */}
     <Dialog open={showPlatformModal} onOpenChange={setShowPlatformModal}>
       <DialogContent className="max-w-md">
         <DialogHeader>
