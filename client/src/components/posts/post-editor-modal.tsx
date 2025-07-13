@@ -257,6 +257,7 @@ export default function PostEditorModal({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [emojiCategory, setEmojiCategory] = useState(0);
   const [showPreviewPanel, setShowPreviewPanel] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [attachedMedia, setAttachedMedia] = useState<{url: string, type: 'image' | 'video', file?: File}[]>([]);
   const [emojiTarget, setEmojiTarget] = useState<'content' | 'note' | 'reply'>('content');
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
@@ -279,6 +280,21 @@ export default function PostEditorModal({
     gifs: ['🎭', '🎪', '🎨', '🎬', '🎤', '🎧', '🎼', '🎵', '🎶', '🎯', '🎳', '🎮', '🎰', '🧩', '🎲', '♠️', '♥️', '♦️', '♣️', '🃏', '🎴', '🀄'],
     stickers: ['⭐', '✨', '💥', '💫', '💨', '💢', '💯', '🔥', '💎', '🌟', '⚡', '☄️', '🌈', '☀️', '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌙', '🪐']
   };
+
+  // Check if desktop and show preview by default
+  useEffect(() => {
+    const checkIsDesktop = () => {
+      const isDesktop = window.innerWidth >= 1024; // lg breakpoint
+      setIsDesktop(isDesktop);
+      if (isDesktop) {
+        setShowPreviewPanel(true); // Show preview by default on desktop
+      }
+    };
+    
+    checkIsDesktop();
+    window.addEventListener('resize', checkIsDesktop);
+    return () => window.removeEventListener('resize', checkIsDesktop);
+  }, []);
 
   // Update form when initialData changes
   useEffect(() => {
@@ -441,7 +457,8 @@ export default function PostEditorModal({
         
         {/* Left Content Area */}
         <div className={cn(
-          "flex-1 bg-white transition-all duration-300 ease-in-out",
+          "bg-white transition-all duration-300 ease-in-out",
+          isDesktop && showPreviewPanel ? "flex-1 lg:w-1/2" : "flex-1",
           showMainMenu ? "md:mr-80 mr-0" : "mr-0"
         )}>
           
@@ -451,6 +468,17 @@ export default function PostEditorModal({
               {postId ? "Edit Post" : "Create Post"}
             </h1>
             <div className="flex items-center space-x-2">
+              {!isDesktop && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPreviewPanel(!showPreviewPanel)}
+                  className="flex items-center space-x-1 md:space-x-2"
+                >
+                  <Eye className="h-4 w-4" />
+                  <span className="hidden sm:inline">Preview</span>
+                </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"
@@ -658,56 +686,7 @@ export default function PostEditorModal({
                     </p>
                   </div>
                   
-                  {/* Debug: Always show media example for testing */}
-                  <div className="mt-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-sm font-medium text-gray-700">Test Preview Panel</span>
-                      <button
-                        onClick={() => setShowPreviewPanel(true)}
-                        className="text-xs px-2 py-1 h-6 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
-                      >
-                        Open Preview
-                      </button>
-                    </div>
-                  </div>
 
-                  {/* Media Thumbnails */}
-                  {attachedMedia.length > 0 && (
-                    <div className="mt-3">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium text-gray-700">Attached Media ({attachedMedia.length})</span>
-                        <button
-                          onClick={() => setShowPreviewPanel(true)}
-                          className="text-xs px-2 py-1 h-6 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
-                        >
-                          Preview
-                        </button>
-                      </div>
-                      <div className="flex gap-2 overflow-x-auto">
-                        {attachedMedia.map((media, index) => (
-                          <div key={index} className="relative flex-shrink-0">
-                            {media.type === 'image' ? (
-                              <img 
-                                src={media.url} 
-                                alt={`Attachment ${index + 1}`}
-                                className="w-16 h-16 object-cover rounded border"
-                              />
-                            ) : (
-                              <div className="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center">
-                                <Play className="h-6 w-6 text-gray-500" />
-                              </div>
-                            )}
-                            <button
-                              onClick={() => setAttachedMedia(prev => prev.filter((_, i) => i !== index))}
-                              className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
-                            >
-                              <X className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
 
                 {/* Hashtags */}
@@ -742,6 +721,54 @@ export default function PostEditorModal({
                       }}
                     />
                   </div>
+                </div>
+
+                {/* Media Thumbnails - positioned below hashtags */}
+                {attachedMedia.length > 0 && (
+                  <div className="mt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-sm font-medium text-gray-700">Attached Media ({attachedMedia.length})</span>
+                      <button
+                        onClick={() => setShowPreviewPanel(true)}
+                        className="text-xs px-2 py-1 h-6 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                      >
+                        Preview
+                      </button>
+                    </div>
+                    <div className="flex gap-2 overflow-x-auto">
+                      {attachedMedia.map((media, index) => (
+                        <div key={index} className="relative flex-shrink-0">
+                          {media.type === 'image' ? (
+                            <img 
+                              src={media.url} 
+                              alt={`Attachment ${index + 1}`}
+                              className="w-16 h-16 object-cover rounded border"
+                            />
+                          ) : (
+                            <div className="w-16 h-16 bg-gray-100 rounded border flex items-center justify-center">
+                              <Play className="h-6 w-6 text-gray-500" />
+                            </div>
+                          )}
+                          <button
+                            onClick={() => setAttachedMedia(prev => prev.filter((_, i) => i !== index))}
+                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Debug: Test Preview Panel Button */}
+                <div className="mt-4">
+                  <button
+                    onClick={() => setShowPreviewPanel(true)}
+                    className="w-full text-sm px-3 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
+                  >
+                    Test Preview Panel
+                  </button>
                 </div>
 
                 {/* Scheduling */}
