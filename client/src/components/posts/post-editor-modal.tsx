@@ -270,12 +270,12 @@ export default function PostEditorModal({
         {/* Left Content Area */}
         <div className={cn(
           "flex-1 bg-white transition-all duration-300 ease-in-out",
-          showMainMenu ? "mr-80" : "mr-0"
+          showMainMenu ? "md:mr-80 mr-0" : "mr-0"
         )}>
           
           {/* Header */}
-          <div className="h-16 border-b bg-white flex items-center justify-between px-6">
-            <h1 className="text-xl font-semibold">
+          <div className="h-16 border-b bg-white flex items-center justify-between px-4 md:px-6">
+            <h1 className="text-lg md:text-xl font-semibold">
               {postId ? "Edit Post" : "Create Post"}
             </h1>
             <div className="flex items-center space-x-2">
@@ -283,10 +283,10 @@ export default function PostEditorModal({
                 variant="outline"
                 size="sm"
                 onClick={() => setShowMainMenu(!showMainMenu)}
-                className="flex items-center space-x-2"
+                className="flex items-center space-x-1 md:space-x-2"
               >
                 <Menu className="h-4 w-4" />
-                <span>Menu</span>
+                <span className="hidden sm:inline">Menu</span>
               </Button>
               <Button
                 variant="ghost"
@@ -368,7 +368,7 @@ export default function PostEditorModal({
               </div>
             ) : (
               /* Post Edit View */
-              <div className="p-6 space-y-6">
+              <div className="p-4 md:p-6 space-y-4 md:space-y-6 max-w-2xl mx-auto">
                 
                 {/* Platform Selection */}
                 <div>
@@ -513,7 +513,7 @@ export default function PostEditorModal({
 
         {/* Right Side Menu */}
         <div className={cn(
-          "fixed top-0 right-0 h-full w-80 bg-white border-l shadow-lg transform transition-transform duration-300 ease-in-out z-10",
+          "fixed top-0 right-0 h-full w-full md:w-80 bg-white border-l shadow-lg transform transition-transform duration-300 ease-in-out z-10",
           showMainMenu ? "translate-x-0" : "translate-x-full"
         )}>
           {/* Menu Header */}
