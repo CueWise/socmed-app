@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, Plus, Filter, X } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import PostEditorModal from "@/components/posts/post-editor-modal";
 import { usePosts } from "@/hooks/use-posts";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 
 export default function Calendar() {
@@ -27,6 +28,8 @@ export default function Calendar() {
   }>({ visible: false, post: null, position: { x: 0, y: 0 } });
   
   const { data: posts } = usePosts();
+  const isMobile = useIsMobile();
+  const calendarRef = useRef<HTMLDivElement>(null);
 
   // Generate calendar days
   const generateCalendarDays = () => {
@@ -70,6 +73,62 @@ export default function Calendar() {
     setCurrentDate(newDate);
   };
 
+  // Add swipe gesture support for mobile (copied from ContentCalendar)
+  useEffect(() => {
+    if (!isMobile || !calendarRef.current) return;
+
+    let startX: number;
+    let startY: number;
+    let isSwipe = false;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      isSwipe = false;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!startX || !startY) return;
+
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const diffX = startX - currentX;
+      const diffY = startY - currentY;
+
+      // Detect horizontal swipe (more horizontal than vertical movement)
+      if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+        isSwipe = true;
+        e.preventDefault(); // Prevent scrolling
+        
+        // Swipe left to go to next month
+        if (diffX > 0) {
+          navigateMonth('next');
+        }
+        // Swipe right to go to previous month
+        else {
+          navigateMonth('prev');
+        }
+      }
+    };
+
+    const handleTouchEnd = () => {
+      startX = 0;
+      startY = 0;
+      isSwipe = false;
+    };
+
+    const element = calendarRef.current;
+    element.addEventListener('touchstart', handleTouchStart, { passive: false });
+    element.addEventListener('touchmove', handleTouchMove, { passive: false });
+    element.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      element.removeEventListener('touchstart', handleTouchStart);
+      element.removeEventListener('touchmove', handleTouchMove);
+      element.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isMobile, navigateMonth]);
+
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -98,6 +157,7 @@ export default function Calendar() {
 
   // Handle calendar day click with tooltip
   const handleDayClick = (event: React.MouseEvent, date: Date) => {
+    setSelectedDate(date); // Set selected date for blue highlighting
     const postsForDate = getPostsForDate(date);
     if (postsForDate.length > 0) {
       // Center the tooltip in the middle of the screen
@@ -196,8 +256,11 @@ export default function Calendar() {
             ))}
           </div>
           
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1">
+          {/* Calendar Grid with Touch Gesture Support */}
+          <div 
+            ref={calendarRef}
+            className="grid grid-cols-7 gap-1 select-none touch-manipulation"
+          >
             {calendarDays.map((date, index) => {
               if (!date) {
                 return <div key={index} className="calendar-day" />;
@@ -211,9 +274,9 @@ export default function Calendar() {
                 <div
                   key={index}
                   className={cn(
-                    "calendar-day p-2 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer relative transition-colors",
+                    "calendar-day p-2 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer relative transition-colors touch-manipulation",
                     isToday && "bg-primary/10 dark:bg-primary/20 border-primary",
-                    isSelected && "bg-primary/20 dark:bg-primary/30"
+                    isSelected && "bg-blue-100 dark:bg-blue-900/30 border-blue-500 ring-2 ring-blue-500/50"
                   )}
                   onClick={(e) => handleDayClick(e, date)}
                 >
