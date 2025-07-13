@@ -41,6 +41,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/posts", async (req, res) => {
     try {
       console.log('Creating post with data:', JSON.stringify(req.body, null, 2));
+      
+      // Convert scheduledAt string to Date if present
+      if (req.body.scheduledAt && typeof req.body.scheduledAt === 'string') {
+        req.body.scheduledAt = new Date(req.body.scheduledAt);
+      }
+      
       const validatedData = insertPostSchema.parse(req.body);
       console.log('Validated data:', JSON.stringify(validatedData, null, 2));
       const post = await storage.createPost(validatedData);
