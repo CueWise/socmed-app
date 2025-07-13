@@ -40,11 +40,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/posts", async (req, res) => {
     try {
+      console.log('Creating post with data:', JSON.stringify(req.body, null, 2));
       const validatedData = insertPostSchema.parse(req.body);
+      console.log('Validated data:', JSON.stringify(validatedData, null, 2));
       const post = await storage.createPost(validatedData);
       res.status(201).json(post);
     } catch (error) {
-      res.status(400).json({ error: "Invalid post data" });
+      console.error('Post creation validation error:', error);
+      if (error instanceof Error) {
+        res.status(400).json({ error: "Invalid post data", details: error.message });
+      } else {
+        res.status(400).json({ error: "Invalid post data" });
+      }
     }
   });
 
