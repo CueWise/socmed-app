@@ -12,6 +12,7 @@ import {
 import PostCard from "@/components/posts/post-card";
 import PostEditorModal from "@/components/posts/post-editor-modal";
 import { usePosts } from "@/hooks/use-posts";
+import { useBrand } from "@/hooks/use-brand";
 
 export default function Drafts() {
   const [showPostEditor, setShowPostEditor] = useState(false);
@@ -19,7 +20,8 @@ export default function Drafts() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [platformFilter, setPlatformFilter] = useState("all");
   
-  const { data: allPosts } = usePosts();
+  const { selectedBrand } = useBrand();
+  const { data: allPosts } = usePosts(selectedBrand?.id);
 
   // Filter posts to show drafts and pending approval
   const draftPosts = allPosts?.filter(post => 
