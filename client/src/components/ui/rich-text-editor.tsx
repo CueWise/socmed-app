@@ -31,7 +31,8 @@ import {
   Eye,
   EyeOff,
   Type,
-  MoreHorizontal
+  MoreHorizontal,
+  X
 } from 'lucide-react'
 
 interface RichTextEditorProps {
@@ -62,17 +63,17 @@ export default function RichTextEditor({
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
-        // Disable all formatting by default - user can enable via ellipsis menu
-        bold: false,
-        italic: false,
-        heading: false,
-        codeBlock: false,
-        strike: false,
-        bulletList: false,
-        orderedList: false,
-        code: false
+        // Enable all formatting
+        bold: true,
+        italic: true,
+        heading: true,
+        codeBlock: true,
+        strike: true,
+        bulletList: true,
+        orderedList: true,
+        code: true
       }),
-      // Only add extensions when user wants rich text
+      // Add all extensions
       ...(showToolbar ? [
         Heading.configure({
           levels: [1, 2, 3]
@@ -235,6 +236,17 @@ export default function RichTextEditor({
           {/* Scrollable Dropdown Toolbar */}
           {showToolbar && (
             <div className="fixed bottom-20 right-4 bg-white border border-gray-300 rounded-lg shadow-xl z-[99999] p-3 min-w-[280px] max-h-[300px] overflow-y-auto">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-medium text-sm">Formatting</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowToolbar(false)}
+                  className="p-1 h-6 w-6"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
               <div className="space-y-3">
                 {/* Text Formatting */}
                 <div>

@@ -49,24 +49,40 @@ interface PostData {
   notes?: string;
 }
 
-// Simple emoji picker component
+// Enhanced emoji picker with categories
 const EmojiPicker = ({ onSelect, onClose }: { onSelect: (emoji: string) => void, onClose: () => void }) => {
-  const emojis = [
-    '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇',
-    '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚',
-    '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩',
-    '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣',
-    '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬',
-    '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗',
-    '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯',
-    '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐',
-    '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈',
-    '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾'
-  ];
+  const [selectedCategory, setSelectedCategory] = useState('faces');
+  
+  const emojiCategories = {
+    faces: {
+      name: 'Faces',
+      emojis: ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '🥹', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '🥸', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😮‍💨', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🫣', '🤗', '🫡', '🤔', '🫢', '🤭', '🤫', '🤥', '😶', '😶‍🌫️', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '😵‍💫', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕']
+    },
+    gestures: {
+      name: 'Gestures',
+      emojis: ['👍', '👎', '👏', '🙌', '👐', '🤲', '🤝', '🙏', '✊', '👊', '🤛', '🤜', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '🫵', '👋', '🤚', '🖐️', '✋', '🖖', '🫱', '🫲', '🫳', '🫴', '👌', '🤌', '🤏', '✌️', '🤞', '🫰', '🤟', '🤘', '🤙', '👈', '👉', '👆', '🖕', '👇', '☝️', '🫵', '👋', '🤚', '🖐️', '✋', '🖖']
+    },
+    hearts: {
+      name: 'Hearts',
+      emojis: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '♥️', '💯', '💢', '💥', '💫', '💦', '💨', '🕳️', '💬', '👁️‍🗨️', '🗨️', '🗯️', '💭', '💤']
+    },
+    objects: {
+      name: 'Objects',
+      emojis: ['⌚', '📱', '📲', '💻', '⌨️', '🖥️', '🖨️', '🖱️', '🖲️', '🕹️', '🗜️', '💽', '💾', '💿', '📀', '📼', '📷', '📸', '📹', '🎥', '📽️', '🎞️', '📞', '☎️', '📟', '📠', '📺', '📻', '🎙️', '🎚️', '🎛️', '🧭', '⏱️', '⏲️', '⏰', '🕰️', '⌛', '⏳', '📡', '🔋', '🪫', '🔌', '💡', '🔦', '🕯️', '🪔', '🧯', '🛢️', '💸', '💵', '💴', '💶', '💷', '🪙', '💰', '💳', '💎', '⚖️', '🪜', '🧰', '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🪓', '🪚', '🔩', '⚙️', '🪤', '🧱', '⛓️', '🧲', '🔫', '💣', '🧨', '🪓', '🔪', '🗡️', '⚔️', '🛡️', '🚬', '⚰️', '🪦', '⚱️', '🏺', '🔮', '📿', '🧿', '🪬', '💈', '⚗️', '🔭', '🔬', '🕳️', '🩹', '🩺', '💊', '💉', '🩸', '🧬', '🦠', '🧫', '🧪', '🌡️', '🧹', '🪠', '🧽', '🧴', '🛎️', '🔑', '🗝️', '🚪', '🪑', '🛋️', '🛏️', '🛌', '🧸', '🪆', '🖼️', '🪞', '🪟', '🛍️', '🛒', '🎁', '🎈', '🎏', '🎀', '🪄', '🪅', '🎊', '🎉', '🎎', '🏮', '🎐', '🧧', '✉️', '📩', '📨', '📧', '💌', '📥', '📤', '📦', '🏷️', '🪧', '📪', '📫', '📬', '📭', '📮', '📯', '📜', '📃', '📄', '📑', '🧾', '📊', '📈', '📉', '🗒️', '🗓️', '📆', '📅', '🗑️', '📇', '🗃️', '🗳️', '🗄️', '📋', '📁', '📂', '🗂️', '🗞️', '📰', '📓', '📔', '📒', '📕', '📗', '📘', '📙', '📚', '📖', '🔖', '🧷', '🔗', '📎', '🖇️', '📐', '📏', '🧮', '📌', '📍', '✂️', '🖊️', '🖋️', '✒️', '🖌️', '🖍️', '📝', '✏️', '🔍', '🔎', '🔏', '🔐', '🔒', '🔓']
+    },
+    nature: {
+      name: 'Nature',
+      emojis: ['🌱', '🌿', '☘️', '🍀', '🎋', '🪴', '🎍', '🌾', '🌲', '🌳', '🌴', '🌵', '🌷', '🌸', '🌹', '🥀', '🌺', '🌻', '🌼', '🌙', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌙', '🌛', '🌜', '🌚', '🌝', '🌞', '⭐', '🌟', '💫', '✨', '☄️', '☀️', '🌤️', '⛅', '🌥️', '☁️', '🌦️', '🌧️', '⛈️', '🌩️', '🌨️', '❄️', '☃️', '⛄', '🌬️', '💨', '🌪️', '🌫️', '🌊', '💧', '💦', '🫧']
+    },
+    food: {
+      name: 'Food',
+      emojis: ['🍎', '🍏', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶️', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🫘', '🥐', '🥖', '🍞', '🥨', '🥯', '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🌭', '🍔', '🍟', '🍕', '🫓', '🥙', '🌮', '🌯', '🫔', '🥗', '🥘', '🫕', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🧂', '🍩', '🍪', '🌰', '🥜', '🍯', '🥛', '🍼', '🫖', '☕', '🍵', '🧃', '🥤', '🧋', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🫗', '🥤', '🧊', '🥢', '🍽️', '🍴', '🥄', '🔪', '🫙']
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-[100000] bg-black bg-opacity-50" onClick={onClose}>
-      <div className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl max-h-60 overflow-hidden" onClick={e => e.stopPropagation()}>
+      <div className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl max-h-80 overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="p-3 border-b">
           <div className="flex justify-between items-center">
             <h3 className="font-medium">Choose Emoji</h3>
@@ -75,21 +91,110 @@ const EmojiPicker = ({ onSelect, onClose }: { onSelect: (emoji: string) => void,
             </Button>
           </div>
         </div>
+        
+        {/* Category tabs */}
+        <div className="flex border-b overflow-x-auto">
+          {Object.entries(emojiCategories).map(([key, category]) => (
+            <button
+              key={key}
+              onClick={() => setSelectedCategory(key)}
+              className={cn(
+                "px-3 py-2 text-xs font-medium whitespace-nowrap border-b-2 transition-colors",
+                selectedCategory === key
+                  ? "border-blue-500 text-blue-600 bg-blue-50"
+                  : "border-transparent text-gray-600 hover:text-gray-800"
+              )}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+        
+        {/* Emoji grid */}
         <div className="p-3 max-h-48 overflow-y-auto">
-          <div className="grid grid-cols-8 gap-2">
-            {emojis.map((emoji, index) => (
+          <div className="grid grid-cols-8 gap-1">
+            {emojiCategories[selectedCategory as keyof typeof emojiCategories].emojis.map((emoji, index) => (
               <button
                 key={index}
                 onClick={() => {
                   onSelect(emoji);
                   onClose();
                 }}
-                className="p-2 text-xl hover:bg-gray-100 rounded"
+                className="p-2 text-lg hover:bg-gray-100 rounded transition-colors"
               >
                 {emoji}
               </button>
             ))}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Platform selection modal
+const PlatformSelectionModal = ({ 
+  open, 
+  onClose, 
+  selectedPlatforms, 
+  onSelectionChange 
+}: { 
+  open: boolean; 
+  onClose: () => void; 
+  selectedPlatforms: string[];
+  onSelectionChange: (platforms: string[]) => void;
+}) => {
+  const platforms = [
+    { id: 'instagram', name: 'Instagram', icon: FaInstagram, color: 'text-pink-500' },
+    { id: 'facebook', name: 'Facebook', icon: FaFacebook, color: 'text-blue-600' },
+    { id: 'tiktok', name: 'TikTok', icon: FaTiktok, color: 'text-black' },
+    { id: 'twitter', name: 'Twitter', icon: FaTwitter, color: 'text-blue-400' }
+  ];
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100000] bg-black bg-opacity-50" onClick={onClose}>
+      <div className="fixed bottom-4 left-4 right-4 bg-white rounded-lg shadow-xl overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="p-4 border-b">
+          <div className="flex justify-between items-center">
+            <h3 className="font-medium">Select Platforms</h3>
+            <Button variant="ghost" size="sm" onClick={onClose}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        
+        <div className="p-4 space-y-3">
+          {platforms.map((platform) => {
+            const Icon = platform.icon;
+            const isSelected = selectedPlatforms.includes(platform.id);
+            
+            return (
+              <label key={platform.id} className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isSelected}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      onSelectionChange([...selectedPlatforms, platform.id]);
+                    } else {
+                      onSelectionChange(selectedPlatforms.filter(p => p !== platform.id));
+                    }
+                  }}
+                  className="rounded"
+                />
+                <Icon className={cn("h-6 w-6", platform.color)} />
+                <span className="font-medium">{platform.name}</span>
+              </label>
+            );
+          })}
+        </div>
+        
+        <div className="p-4 border-t">
+          <Button onClick={onClose} className="w-full">
+            Done
+          </Button>
         </div>
       </div>
     </div>
@@ -448,33 +553,31 @@ export default function PostEditorModal({
                 
                 {/* Platform Selection */}
                 <div>
-                  <Label className="text-sm font-medium mb-3 block">Platforms</Label>
+                  <div className="flex items-center justify-between mb-3">
+                    <Label className="text-sm font-medium">Platforms</Label>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowPlatformModal(true)}
+                      className="text-xs"
+                    >
+                      Select Platforms
+                    </Button>
+                  </div>
                   <div className="flex items-center gap-2">
-                    {platforms.map((platform) => {
-                      const Icon = platform.icon;
-                      const isSelected = selectedPlatforms.includes(platform.id);
-                      
-                      return (
-                        <button
-                          key={platform.id}
-                          onClick={() => {
-                            if (isSelected) {
-                              setSelectedPlatforms(selectedPlatforms.filter(p => p !== platform.id));
-                            } else {
-                              setSelectedPlatforms([...selectedPlatforms, platform.id]);
-                            }
-                          }}
-                          className={cn(
-                            "flex items-center justify-center p-3 rounded-lg border-2 transition-all",
-                            isSelected 
-                              ? "border-blue-500 bg-blue-50" 
-                              : "border-gray-200 hover:border-gray-300"
-                          )}
-                        >
-                          <Icon className={cn("h-6 w-6", isSelected ? platform.color : "text-gray-400")} />
-                        </button>
-                      );
-                    })}
+                    {platforms
+                      .filter(platform => selectedPlatforms.includes(platform.id))
+                      .map((platform) => {
+                        const Icon = platform.icon;
+                        return (
+                          <div key={platform.id} className="flex items-center">
+                            <Icon className={cn("h-6 w-6", platform.color)} />
+                          </div>
+                        );
+                      })}
+                    {selectedPlatforms.length === 0 && (
+                      <p className="text-sm text-gray-500">No platforms selected</p>
+                    )}
                   </div>
                 </div>
 
@@ -751,6 +854,14 @@ export default function PostEditorModal({
           </div>
         </div>
       )}
+
+      {/* Platform Selection Modal */}
+      <PlatformSelectionModal
+        open={showPlatformModal}
+        onClose={() => setShowPlatformModal(false)}
+        selectedPlatforms={selectedPlatforms}
+        onSelectionChange={setSelectedPlatforms}
+      />
 
       {/* Unsaved Changes Dialog */}
       <AlertDialog open={showUnsavedDialog} onOpenChange={setShowUnsavedDialog}>
