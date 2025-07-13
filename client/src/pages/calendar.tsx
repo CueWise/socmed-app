@@ -100,13 +100,13 @@ export default function Calendar() {
   const handleDayClick = (event: React.MouseEvent, date: Date) => {
     const postsForDate = getPostsForDate(date);
     if (postsForDate.length > 0) {
-      const rect = event.currentTarget.getBoundingClientRect();
+      // Center the tooltip in the middle of the screen
       setTooltip({
         visible: true,
         post: postsForDate[0], // Show first post for now
         position: {
-          x: rect.left + rect.width / 2,
-          y: rect.top - 10
+          x: window.innerWidth / 2,
+          y: window.innerHeight / 2
         }
       });
     }
@@ -376,10 +376,10 @@ export default function Calendar() {
           />
           {/* Tooltip */}
           <div 
-            className="fixed z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 max-w-sm"
+            className="fixed z-50 bg-white rounded-lg shadow-xl border border-gray-200 p-4 max-w-sm transform -translate-x-1/2 -translate-y-1/2"
             style={{
-              left: tooltip.position.x - 150, // Center horizontally
-              top: tooltip.position.y - 200, // Position above click point
+              left: tooltip.position.x,
+              top: tooltip.position.y,
             }}
           >
             {/* Close button */}
