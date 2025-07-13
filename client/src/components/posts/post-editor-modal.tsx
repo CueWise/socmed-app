@@ -237,6 +237,7 @@ export default function PostEditorModal({
       ? new Date(initialData.scheduledAt).toTimeString().split(' ')[0].slice(0, 5)
       : "14:00"
   );
+  const [selectedPreviewPlatform, setSelectedPreviewPlatform] = useState<string>('instagram');
   const [hashtags, setHashtags] = useState<string[]>(initialData?.hashtags || []);
   const [mediaUrls, setMediaUrls] = useState<string[]>(initialData?.mediaUrls || []);
   const [status, setStatus] = useState(initialData?.status || "draft");
@@ -306,6 +307,13 @@ export default function PostEditorModal({
     window.addEventListener('resize', checkIsDesktop);
     return () => window.removeEventListener('resize', checkIsDesktop);
   }, []);
+
+  // Initialize selected preview platform when modal opens
+  useEffect(() => {
+    if (open && selectedPlatforms.length > 0) {
+      setSelectedPreviewPlatform(selectedPlatforms[0]);
+    }
+  }, [open, selectedPlatforms]);
 
   // Update form when initialData changes
   useEffect(() => {
@@ -493,9 +501,9 @@ export default function PostEditorModal({
       ...attachedMedia.map(media => media.url)
     ];
 
-    // Combine scheduled date and time into a Date object
+    // Combine scheduled date and time into a Date object (Philippine timezone)
     const scheduledDateTime = status === 'scheduled' && scheduledDate && scheduledTime 
-      ? new Date(`${scheduledDate}T${scheduledTime}:00`)
+      ? new Date(`${scheduledDate}T${scheduledTime}:00+08:00`) // Philippine timezone (UTC+8)
       : null;
 
     const postData: PostData = {
@@ -724,68 +732,20 @@ export default function PostEditorModal({
                   </div>
                 </div>
 
-                {/* Content */}
+                {/* Caption */}
                 <div>
-                  <Label htmlFor="content" className="text-sm font-medium">Content</Label>
+                  <Label htmlFor="content" className="text-sm font-medium">Caption</Label>
                   <Textarea
                     id="content"
-                    placeholder="What's happening?"
+                    placeholder="Write your caption..."
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     className="mt-2 min-h-[120px] resize-none"
                     maxLength={2200}
                   />
                   
-                  {/* Content Actions */}
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          if (!canAddMedia()) {
-                            alert('Cannot add more media. Remove the video first to add other content.');
-                            return;
-                          }
-                          
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*,video/*,image/gif';
-                          input.multiple = !hasVideo; // Multiple only if no video
-                          input.onchange = (e) => {
-                            const files = Array.from((e.target as HTMLInputElement).files || []);
-                            files.forEach(file => {
-                              const url = URL.createObjectURL(file);
-                              const type = file.type.startsWith('video/') ? 'video' : 'image';
-                              
-                              // Check restrictions before adding
-                              if (type === 'video' && (hasVideo || allMedia.length > 0)) {
-                                alert('Only one video allowed per post. Remove other media first.');
-                                return;
-                              }
-                              
-                              setAttachedMedia(prev => [...prev, { url, type, file }]);
-                            });
-                          };
-                          input.click();
-                        }}
-                        className="p-2 h-8 w-8"
-                        disabled={!canAddMedia()}
-                      >
-                        <Upload className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setEmojiTarget('content');
-                          setShowEmojiPicker(true);
-                        }}
-                        className="p-2 h-8 w-8"
-                      >
-                        <Smile className="h-4 w-4" />
-                      </Button>
-                    </div>
+                  {/* Caption Character Count */}
+                  <div className="flex justify-end mt-2">
                     <p className="text-xs text-gray-500">
                       {content.length}/2200 characters
                     </p>
@@ -918,10 +878,11 @@ export default function PostEditorModal({
                       value={scheduledDate}
                       onChange={(e) => setScheduledDate(e.target.value)}
                       className="mt-2"
+                      min={new Date().toISOString().split('T')[0]}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="scheduled-time" className="text-sm font-medium">Schedule Time</Label>
+                    <Label htmlFor="scheduled-time" className="text-sm font-medium">Schedule Time (Philippine Time)</Label>
                     <Input
                       id="scheduled-time"
                       type="time"
@@ -1036,6 +997,43 @@ export default function PostEditorModal({
             >
               <TrendingUp className="h-4 w-4 mr-2" />
               {isOptimizing ? "Optimizing..." : "Optimize Content"}
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full justify-start"
+              onClick={() => {
+                if (!canAddMedia()) {
+                  alert('Cannot add more media. Remove the video first to add other content.');
+                  return;
+                }
+                
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*,video/*,image/gif';
+                input.multiple = !hasVideo; // Multiple only if no video
+                input.onchange = (e) => {
+                  const files = Array.from((e.target as HTMLInputElement).files || []);
+                  files.forEach(file => {
+                    const url = URL.createObjectURL(file);
+                    const type = file.type.startsWith('video/') ? 'video' : 'image';
+                    
+                    // Check restrictions before adding
+                    if (type === 'video' && (hasVideo || allMedia.length > 0)) {
+                      alert('Only one video allowed per post. Remove other media first.');
+                      return;
+                    }
+                    
+                    setAttachedMedia(prev => [...prev, { url, type, file }]);
+                  });
+                };
+                input.click();
+                setShowMainMenu(false);
+              }}
+              disabled={!canAddMedia()}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Media
             </Button>
           </div>
         </div>
@@ -1183,10 +1181,17 @@ export default function PostEditorModal({
                 const platform = platforms.find(p => p.id === platformId);
                 if (!platform) return null;
                 const Icon = platform.icon;
+                const isActive = selectedPreviewPlatform === platformId;
                 return (
                   <button
                     key={platformId}
-                    className="flex-1 p-3 flex items-center justify-center gap-2 hover:bg-gray-100 border-b-2 border-blue-500"
+                    onClick={() => setSelectedPreviewPlatform(platformId)}
+                    className={cn(
+                      "flex-1 p-3 flex items-center justify-center gap-2 hover:bg-gray-100 border-b-2 transition-colors",
+                      isActive 
+                        ? "border-blue-500 bg-white text-blue-600" 
+                        : "border-transparent text-gray-600"
+                    )}
                   >
                     <Icon className={cn("h-4 w-4", platform.color)} />
                     <span className="text-sm font-medium">{platform.name}</span>
@@ -1197,14 +1202,14 @@ export default function PostEditorModal({
             
             {/* Preview Content */}
             <div className="flex-1 overflow-y-auto p-4">
-              {selectedPlatforms.map((platformId) => {
-                const platform = platforms.find(p => p.id === platformId);
+              {(() => {
+                const platform = platforms.find(p => p.id === selectedPreviewPlatform);
                 if (!platform) return null;
                 
                 return (
-                  <div key={platformId} className="mb-6">
+                  <div className="mb-6">
                     {/* Instagram Preview */}
-                    {platformId === 'instagram' && (
+                    {selectedPreviewPlatform === 'instagram' && (
                       <div className="bg-white border rounded-lg overflow-hidden shadow-sm max-w-sm mx-auto">
                         {/* Header */}
                         <div className="flex items-center p-3">
@@ -1279,7 +1284,7 @@ export default function PostEditorModal({
                     )}
                     
                     {/* Facebook Preview */}
-                    {platformId === 'facebook' && (
+                    {selectedPreviewPlatform === 'facebook' && (
                       <div className="bg-white border rounded-lg overflow-hidden shadow-sm">
                         {/* Header */}
                         <div className="flex items-center p-4">
@@ -1349,7 +1354,7 @@ export default function PostEditorModal({
                     )}
                     
                     {/* Twitter Preview */}
-                    {platformId === 'twitter' && (
+                    {selectedPreviewPlatform === 'twitter' && (
                       <div className="bg-white border rounded-xl overflow-hidden shadow-sm">
                         {/* Header */}
                         <div className="flex items-start p-3">
@@ -1406,7 +1411,7 @@ export default function PostEditorModal({
                     )}
                     
                     {/* TikTok Preview */}
-                    {platformId === 'tiktok' && (
+                    {selectedPreviewPlatform === 'tiktok' && (
                       <div className="bg-black rounded-lg overflow-hidden shadow-sm max-w-sm mx-auto">
                         {/* Video Area */}
                         <div className="relative aspect-[9/16] bg-gray-900">
@@ -1460,7 +1465,7 @@ export default function PostEditorModal({
                     )}
                   </div>
                 );
-              })}
+              })()}
             </div>
           </div>
         </div>
