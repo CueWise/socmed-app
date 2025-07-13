@@ -261,6 +261,8 @@ export default function PostEditorModal({
   const [attachedMedia, setAttachedMedia] = useState<{url: string, type: 'image' | 'video', file?: File}[]>([]);
   const [emojiTarget, setEmojiTarget] = useState<'content' | 'note' | 'reply'>('content');
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
+  const [showMediaConfirm, setShowMediaConfirm] = useState(false);
+  const [mediaToRemove, setMediaToRemove] = useState<{index: number, isExisting: boolean} | null>(null);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkText, setLinkText] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
@@ -343,6 +345,50 @@ export default function PostEditorModal({
     }
   }, [content, selectedPlatforms, hashtags, status, notes, initialData]);
 
+  // Get existing media from database
+  const existingMedia = initialData?.mediaUrls || [];
+  
+  // Get all media (existing + newly attached)
+  const allMedia = [
+    ...existingMedia.map(url => ({ 
+      url, 
+      type: url.includes('video') || url.includes('.mp4') || url.includes('.mov') ? 'video' as const : 'image' as const,
+      isExisting: true 
+    })),
+    ...attachedMedia.map(media => ({ ...media, isExisting: false }))
+  ];
+
+  // Check media type restrictions
+  const hasVideo = allMedia.some(media => media.type === 'video');
+  
+  const canAddMedia = () => {
+    if (hasVideo) return false; // No additional media if video exists
+    return true; // Can add multiple images
+  };
+
+  // Handle media removal confirmation
+  const handleRemoveMedia = (index: number, isExisting: boolean) => {
+    setMediaToRemove({ index, isExisting });
+    setShowMediaConfirm(true);
+  };
+
+  const confirmRemoveMedia = () => {
+    if (!mediaToRemove) return;
+    
+    if (mediaToRemove.isExisting) {
+      // Remove from existing media (database field)
+      const newMediaUrls = existingMedia.filter((_, i) => i !== mediaToRemove.index);
+      setMediaUrls(newMediaUrls);
+    } else {
+      // Remove from newly attached media
+      const adjustedIndex = mediaToRemove.index - existingMedia.length;
+      setAttachedMedia(prev => prev.filter((_, i) => i !== adjustedIndex));
+    }
+    
+    setShowMediaConfirm(false);
+    setMediaToRemove(null);
+  };
+
   const platforms = [
     { id: 'instagram', name: 'Instagram', icon: FaInstagram, color: 'text-pink-600' },
     { id: 'facebook', name: 'Facebook', icon: FaFacebook, color: 'text-blue-600' },
@@ -361,8 +407,15 @@ export default function PostEditorModal({
         ? new Date(`${scheduledDate}T${scheduledTime}:00`)
         : undefined;
       
+      // Combine existing and new media URLs
+      const combinedMediaUrls = [
+        ...existingMedia,
+        ...attachedMedia.map(media => media.url)
+      ];
+
       const payload = {
         ...postData,
+        mediaUrls: combinedMediaUrls,
         scheduledAt: scheduleDateTime?.toISOString(),
       };
       
@@ -651,21 +704,34 @@ export default function PostEditorModal({
                         variant="ghost"
                         size="sm"
                         onClick={() => {
+                          if (!canAddMedia()) {
+                            alert('Cannot add more media. Remove the video first to add other content.');
+                            return;
+                          }
+                          
                           const input = document.createElement('input');
                           input.type = 'file';
                           input.accept = 'image/*,video/*,image/gif';
-                          input.multiple = true;
+                          input.multiple = !hasVideo; // Multiple only if no video
                           input.onchange = (e) => {
                             const files = Array.from((e.target as HTMLInputElement).files || []);
                             files.forEach(file => {
                               const url = URL.createObjectURL(file);
                               const type = file.type.startsWith('video/') ? 'video' : 'image';
+                              
+                              // Check restrictions before adding
+                              if (type === 'video' && (hasVideo || allMedia.length > 0)) {
+                                alert('Only one video allowed per post. Remove other media first.');
+                                return;
+                              }
+                              
                               setAttachedMedia(prev => [...prev, { url, type, file }]);
                             });
                           };
                           input.click();
                         }}
                         className="p-2 h-8 w-8"
+                        disabled={!canAddMedia()}
                       >
                         <Upload className="h-4 w-4" />
                       </Button>
@@ -727,9 +793,9 @@ export default function PostEditorModal({
                 <div className="mt-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-sm font-medium text-gray-700">
-                      Attached Media ({attachedMedia.length})
+                      Media ({allMedia.length})
                     </span>
-                    {attachedMedia.length > 0 && (
+                    {allMedia.length > 0 && (
                       <button
                         onClick={() => setShowPreviewPanel(true)}
                         className="text-xs px-2 py-1 h-6 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
@@ -739,23 +805,45 @@ export default function PostEditorModal({
                     )}
                   </div>
                   
-                  {attachedMedia.length > 0 ? (
-                    <div className="flex gap-2 overflow-x-auto p-2 bg-gray-50 rounded border">
-                      {attachedMedia.map((media, index) => (
+                  {allMedia.length > 0 ? (
+                    <div className={cn(
+                      "p-2 bg-gray-50 rounded border",
+                      allMedia.length === 1 ? "flex justify-center" : "grid gap-2",
+                      allMedia.length === 2 ? "grid-cols-2" : "",
+                      allMedia.length === 3 ? "grid-cols-3" : "",
+                      allMedia.length >= 4 ? "grid-cols-4" : ""
+                    )}>
+                      {allMedia.map((media, index) => (
                         <div key={index} className="relative flex-shrink-0">
                           {media.type === 'image' ? (
                             <img 
                               src={media.url} 
-                              alt={`Attachment ${index + 1}`}
-                              className="w-20 h-20 object-cover rounded border shadow-sm"
+                              alt={`Media ${index + 1}`}
+                              className={cn(
+                                "object-cover rounded border shadow-sm",
+                                allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
+                              )}
                             />
                           ) : (
-                            <div className="w-20 h-20 bg-gray-800 rounded border shadow-sm flex items-center justify-center">
-                              <Play className="h-8 w-8 text-white" />
+                            <div className={cn(
+                              "bg-gray-800 rounded border shadow-sm flex items-center justify-center",
+                              allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
+                            )}>
+                              <Play className={cn(
+                                "text-white",
+                                allMedia.length === 1 ? "h-12 w-12" : "h-8 w-8"
+                              )} />
                             </div>
                           )}
+                          
+                          {/* Media Type Badge */}
+                          <div className="absolute top-1 left-1 bg-black bg-opacity-75 text-white text-xs px-1 rounded">
+                            {media.isExisting ? 'DB' : 'NEW'}
+                          </div>
+                          
+                          {/* Remove Button */}
                           <button
-                            onClick={() => setAttachedMedia(prev => prev.filter((_, i) => i !== index))}
+                            onClick={() => handleRemoveMedia(index, media.isExisting)}
                             className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 shadow-sm"
                           >
                             <X className="h-4 w-4" />
@@ -766,6 +854,7 @@ export default function PostEditorModal({
                   ) : (
                     <div className="p-4 bg-gray-50 rounded border text-center text-gray-500 text-sm">
                       No media attached. Use the upload button above to add images or videos.
+                      {hasVideo && <div className="text-xs mt-1 text-amber-600">Video posts can only have one media file.</div>}
                     </div>
                   )}
                 </div>
@@ -972,6 +1061,38 @@ export default function PostEditorModal({
                   </button>
                 )) || []}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Media Removal Confirmation Modal */}
+      {showMediaConfirm && (
+        <div className="fixed inset-0 z-[200] bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-2xl max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Remove Media</h3>
+            <p className="text-gray-600 mb-6">
+              {mediaToRemove?.isExisting 
+                ? "This will permanently remove the media from your post. This action cannot be undone."
+                : "Remove this newly attached media file?"
+              }
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowMediaConfirm(false);
+                  setMediaToRemove(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={confirmRemoveMedia}
+              >
+                {mediaToRemove?.isExisting ? "Remove Permanently" : "Remove"}
+              </Button>
             </div>
           </div>
         </div>
