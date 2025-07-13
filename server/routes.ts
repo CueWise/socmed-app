@@ -2,6 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
+import multer from "multer";
+import path from "path";
+import { promises as fs } from "fs";
 import { 
   insertPostSchema, insertApprovalSchema, insertCommentSchema,
   insertBrandSchema, insertUserSchema, insertAnalyticsSchema 
@@ -11,8 +14,51 @@ import {
   suggestBestPostingTime, generateContentIdeas, checkBrandTone
 } from "./ai";
 
+// Configure multer for file uploads
+const storage_multer = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    await fs.mkdir(uploadDir, { recursive: true });
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage_multer,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed.'));
+    }
+  }
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Media upload endpoint
+  app.post("/api/upload", upload.array('files', 10), async (req, res) => {
+    try {
+      if (!req.files || !Array.isArray(req.files)) {
+        return res.status(400).json({ error: "No files uploaded" });
+      }
+
+      const fileUrls = req.files.map(file => `/uploads/${file.filename}`);
+      res.json({ urls: fileUrls });
+    } catch (error) {
+      console.error('Upload error:', error);
+      res.status(500).json({ error: "Failed to upload files" });
+    }
+  });
+
   // Posts routes
   app.get("/api/posts", async (req, res) => {
     try {
@@ -60,17 +106,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         req.body.scheduledAt = new Date(req.body.scheduledAt);
       }
       
-      // Convert blob URLs to real demo images - preserve media functionality
+      // Filter out blob URLs - they should be converted to real uploads client-side
       const processedBody = {
         ...req.body,
-        mediaUrls: (req.body.mediaUrls || []).map((url: string, index: number) => {
-          if (url && (url.startsWith('blob:') || url.includes('upload_session_'))) {
-            // Use Picsum for demo images with different random seeds
-            const randomSeed = Math.floor(Math.random() * 1000) + index;
-            return `https://picsum.photos/400/300?random=${randomSeed}`;
-          }
-          return url;
-        }).filter(Boolean)
+        mediaUrls: (req.body.mediaUrls || []).filter((url: string) => 
+          url && !url.startsWith('blob:') && !url.includes('upload_session_')
+        )
       };
       
       const validatedData = insertPostSchema.parse(processedBody);
