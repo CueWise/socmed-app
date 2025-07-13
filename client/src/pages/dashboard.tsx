@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Plus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import ContentCalendar from "@/components/calendar/content-calendar";
+import EnhancedCalendar from "@/components/calendar/enhanced-calendar";
 import StatsCard from "@/components/analytics/stats-card";
 import ApprovalCard from "@/components/approvals/approval-card";
 import AISuggestions from "@/components/ai/ai-suggestions";
@@ -15,10 +15,19 @@ import { useBrand } from "@/hooks/use-brand";
 
 export default function Dashboard() {
   const [showPostEditor, setShowPostEditor] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const isMobile = useIsMobile();
   const { selectedBrand } = useBrand();
   const { data: approvals } = useApprovals();
   const { data: analytics } = useAnalytics();
+
+  const handleCreatePost = (date?: Date) => {
+    setShowPostEditor(true);
+  };
+
+  const handleDateSelect = (date: Date | null) => {
+    setSelectedDate(date);
+  };
 
   const pendingApprovals = approvals?.filter(approval => approval.status === 'pending') || [];
   const quickActions = [
@@ -57,14 +66,6 @@ export default function Dashboard() {
         </div>
         
         <div className="hidden md:flex items-center space-x-3 mt-4 sm:mt-0">
-          <Button
-            onClick={() => setShowPostEditor(true)}
-            className="bg-primary hover:bg-primary/90 material-shadow"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            <span>Create Post</span>
-          </Button>
-          
           <Button variant="outline" size="icon" className="touch-target">
             <Sparkles className="h-4 w-4" />
           </Button>
@@ -170,7 +171,12 @@ export default function Dashboard() {
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Content Calendar */}
         <div className="lg:col-span-2">
-          <ContentCalendar />
+          <EnhancedCalendar
+            selectedDate={selectedDate}
+            onDateSelect={handleDateSelect}
+            onCreatePost={handleCreatePost}
+            showCreateButton={true}
+          />
         </div>
 
         {/* Sidebar Content */}
@@ -213,7 +219,8 @@ export default function Dashboard() {
 
       <PostEditorModal 
         open={showPostEditor} 
-        onOpenChange={setShowPostEditor} 
+        onOpenChange={setShowPostEditor}
+        defaultDate={selectedDate || undefined}
       />
     </div>
   );
