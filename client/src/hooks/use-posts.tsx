@@ -23,6 +23,9 @@ export function usePosts(brandId?: number, status?: string) {
       
       return response.json();
     },
+    staleTime: 0, // Always refetch for fresh data
+    refetchOnWindowFocus: true,
+    refetchOnMount: true
   });
 }
 
