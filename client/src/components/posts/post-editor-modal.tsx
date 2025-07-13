@@ -974,7 +974,7 @@ export default function PostEditorModal({
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[300px] pb-[200px]"
+          <div className="flex-1 overflow-y-auto space-y-1 bg-gray-50 p-4 min-h-[300px] pb-[280px]"
                ref={(el) => {
                  if (el && showNotes) {
                    // Scroll to top when notes panel opens  
@@ -1142,7 +1142,7 @@ export default function PostEditorModal({
         {/* Add New Message - Mobile keyboard aware footer */}
         <div className="border-t pt-4 bg-white flex-shrink-0 fixed bottom-0 w-full sm:w-[500px] max-w-[90vw]"
              style={{ 
-               bottom: 'max(env(keyboard-inset-height, 0px), 0px)',
+               bottom: 'env(keyboard-inset-height, 0px)',
                paddingBottom: '20px',
                right: '0px',
                zIndex: 120
@@ -1184,8 +1184,8 @@ export default function PostEditorModal({
             )}
             
             {/* Rich Text Formatting Toolbar */}
-            <div className="flex items-center justify-between relative">
-              <div className="flex items-center gap-2 z-10">
+            <div className="flex items-center justify-center relative pb-2">
+              <div className="flex items-center gap-4 z-10">
                 {/* Always visible: Upload and Emoji */}
                 <input
                   type="file"
@@ -1201,9 +1201,9 @@ export default function PostEditorModal({
                 />
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="lg"
                   type="button"
-                  className="text-gray-700 hover:text-gray-900 p-2 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200"
+                  className="text-gray-700 hover:text-gray-900 p-3 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200 h-12 w-12"
                   onClick={() => {
                     const fileInput = document.getElementById('mobile-file-upload') as HTMLInputElement;
                     if (fileInput) {
@@ -1211,18 +1211,18 @@ export default function PostEditorModal({
                     }
                   }}
                 >
-                  <Paperclip className="h-4 w-4" />
+                  <Paperclip className="h-5 w-5" />
                 </Button>
                 
                 <div className="relative z-10">
                   <Button
                     variant="outline"
-                    size="sm"
+                    size="lg"
                     type="button"
                     onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                    className="text-gray-700 hover:text-gray-900 p-2 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200"
+                    className="text-gray-700 hover:text-gray-900 p-3 bg-white border-2 border-gray-300 shadow-md hover:shadow-lg transition-all duration-200 h-12 w-12"
                   >
-                    <Smile className="h-4 w-4" />
+                    <Smile className="h-5 w-5" />
                   </Button>
                   {showEmojiPicker && (
                     <div className="absolute bottom-full left-0 mb-2 bg-white border-2 border-gray-200 rounded-xl shadow-2xl z-20 w-80 animate-in slide-in-from-bottom-2 duration-300">
@@ -1384,21 +1384,21 @@ export default function PostEditorModal({
                 )}
               </div>
               
-              <div className="flex gap-2 pt-2">
+              <div className="flex gap-3 pt-3 justify-center px-4">
                 <Button
                   variant="outline"
                   onClick={() => setShowNotes(false)}
-                  className="flex-1 sm:flex-none"
+                  className="flex-1 max-w-[120px] h-12 text-base"
                 >
                   Close
                 </Button>
                 <Button
                   onClick={handleAddNote}
                   disabled={!newNoteText.trim()}
-                  className="bg-primary hover:bg-primary/90 px-4 py-2 z-10 relative flex-1 sm:flex-none"
-                  size="sm"
+                  className="bg-primary hover:bg-primary/90 flex-1 max-w-[120px] h-12 text-base"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-5 w-5 mr-2" />
+                  Send
                 </Button>
               </div>
             </div>
