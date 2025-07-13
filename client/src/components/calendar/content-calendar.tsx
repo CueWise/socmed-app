@@ -3,14 +3,20 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { usePosts } from "@/hooks/use-posts";
+import { useCalendarPosts } from "@/hooks/use-posts";
+import { useBrand } from "@/hooks/use-brand";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function ContentCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const { data: posts } = usePosts();
+  const { selectedBrand } = useBrand();
   const isMobile = useIsMobile();
+  
+  // Get posts for the current month only for the selected brand
+  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+  const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+  const { data: posts = [] } = useCalendarPosts(monthStart, monthEnd, selectedBrand?.id);
   const calendarRef = useRef<HTMLDivElement>(null);
 
   const generateCalendarDays = () => {
