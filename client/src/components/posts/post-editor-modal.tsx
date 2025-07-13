@@ -1167,13 +1167,42 @@ export default function PostEditorModal({
                         </div>
                         
                         {/* Media */}
-                        {attachedMedia.length > 0 && (
-                          <div className="aspect-square bg-gray-100">
-                            {attachedMedia[0].type === 'image' ? (
-                              <img src={attachedMedia[0].url} alt="Post content" className="w-full h-full object-cover" />
+                        {allMedia.length > 0 && (
+                          <div className="aspect-square bg-gray-100 relative">
+                            {allMedia.length === 1 ? (
+                              // Single media display
+                              allMedia[0].type === 'image' ? (
+                                <img src={allMedia[0].url} alt="Post content" className="w-full h-full object-cover" />
+                              ) : (
+                                <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                                  <Play className="h-12 w-12 text-white" />
+                                </div>
+                              )
                             ) : (
-                              <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                                <Play className="h-12 w-12 text-white" />
+                              // Multiple images in grid
+                              <div className={cn(
+                                "w-full h-full grid gap-0.5",
+                                allMedia.length === 2 ? "grid-cols-2" : "",
+                                allMedia.length === 3 ? "grid-cols-2 grid-rows-2" : "",
+                                allMedia.length >= 4 ? "grid-cols-2 grid-rows-2" : ""
+                              )}>
+                                {allMedia.slice(0, 4).map((media, idx) => (
+                                  <div key={idx} className={cn(
+                                    "relative",
+                                    allMedia.length === 3 && idx === 0 ? "row-span-2" : ""
+                                  )}>
+                                    <img 
+                                      src={media.url} 
+                                      alt={`Media ${idx + 1}`} 
+                                      className="w-full h-full object-cover" 
+                                    />
+                                    {allMedia.length > 4 && idx === 3 && (
+                                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                                        <span className="text-white font-bold text-lg">+{allMedia.length - 4}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
                               </div>
                             )}
                           </div>
@@ -1216,13 +1245,34 @@ export default function PostEditorModal({
                         </div>
                         
                         {/* Media */}
-                        {attachedMedia.length > 0 && (
+                        {allMedia.length > 0 && (
                           <div className="bg-gray-100">
-                            {attachedMedia[0].type === 'image' ? (
-                              <img src={attachedMedia[0].url} alt="Post content" className="w-full h-auto" />
+                            {allMedia.length === 1 ? (
+                              // Single media
+                              allMedia[0].type === 'image' ? (
+                                <img src={allMedia[0].url} alt="Post content" className="w-full h-auto" />
+                              ) : (
+                                <div className="w-full h-64 bg-gray-800 flex items-center justify-center">
+                                  <Play className="h-16 w-16 text-white" />
+                                </div>
+                              )
                             ) : (
-                              <div className="w-full h-64 bg-gray-800 flex items-center justify-center">
-                                <Play className="h-16 w-16 text-white" />
+                              // Multiple images
+                              <div className="grid grid-cols-2 gap-1 p-2">
+                                {allMedia.slice(0, 4).map((media, idx) => (
+                                  <div key={idx} className="relative aspect-square">
+                                    <img 
+                                      src={media.url} 
+                                      alt={`Media ${idx + 1}`} 
+                                      className="w-full h-full object-cover rounded" 
+                                    />
+                                    {allMedia.length > 4 && idx === 3 && (
+                                      <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded">
+                                        <span className="text-white font-bold">+{allMedia.length - 4}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
                               </div>
                             )}
                           </div>
@@ -1267,10 +1317,10 @@ export default function PostEditorModal({
                             )}
                             
                             {/* Media */}
-                            {attachedMedia.length > 0 && (
+                            {allMedia.length > 0 && (
                               <div className="mt-3 rounded-2xl overflow-hidden border">
-                                {attachedMedia[0].type === 'image' ? (
-                                  <img src={attachedMedia[0].url} alt="Post content" className="w-full h-auto" />
+                                {allMedia[0].type === 'image' ? (
+                                  <img src={allMedia[0].url} alt="Post content" className="w-full h-auto" />
                                 ) : (
                                   <div className="w-full h-48 bg-gray-800 flex items-center justify-center">
                                     <Play className="h-12 w-12 text-white" />
@@ -1307,13 +1357,13 @@ export default function PostEditorModal({
                       <div className="bg-black rounded-lg overflow-hidden shadow-sm max-w-sm mx-auto">
                         {/* Video Area */}
                         <div className="relative aspect-[9/16] bg-gray-900">
-                          {attachedMedia.length > 0 ? (
-                            attachedMedia[0].type === 'video' ? (
+                          {allMedia.length > 0 ? (
+                            allMedia[0].type === 'video' ? (
                               <div className="w-full h-full bg-gray-800 flex items-center justify-center">
                                 <Play className="h-16 w-16 text-white" />
                               </div>
                             ) : (
-                              <img src={attachedMedia[0].url} alt="Post content" className="w-full h-full object-cover" />
+                              <img src={allMedia[0].url} alt="Post content" className="w-full h-full object-cover" />
                             )
                           ) : (
                             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
