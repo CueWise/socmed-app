@@ -476,13 +476,43 @@ export default function PostEditorModal({
   const createPostMutation = useMutation({
     mutationFn: async (postData: PostData) => {
       console.log('Creating post with data:', postData);
+      
+      // Upload any blob URLs to real files first
+      const blobUrls = postData.mediaUrls?.filter(url => url.startsWith('blob:')) || [];
+      let uploadedUrls: string[] = [];
+      
+      if (blobUrls.length > 0) {
+        try {
+          // Convert blob URLs to files and upload them
+          const { convertBlobUrlsToFiles, uploadFiles } = await import('@/lib/upload');
+          const files = await convertBlobUrlsToFiles(blobUrls);
+          uploadedUrls = await uploadFiles(files);
+        } catch (error) {
+          console.error('Failed to upload media files:', error);
+          throw new Error('Failed to upload media files');
+        }
+      }
+      
+      // Replace blob URLs with uploaded URLs
+      const finalMediaUrls = postData.mediaUrls?.map(url => {
+        if (url.startsWith('blob:')) {
+          return uploadedUrls.shift() || url; // Replace with uploaded URL
+        }
+        return url;
+      }) || [];
+
+      const finalPostData = {
+        ...postData,
+        mediaUrls: finalMediaUrls
+      };
+      
       const url = `/api/posts${postId ? `/${postId}` : ""}`;
       const method = postId ? "PATCH" : "POST";
       
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(postData),
+        body: JSON.stringify(finalPostData),
         credentials: "include",
       });
       
