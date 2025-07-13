@@ -62,73 +62,54 @@ export default function RichTextEditor({
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({
-        // Enable all formatting
-        bold: true,
-        italic: true,
-        heading: true,
-        codeBlock: true,
-        strike: true,
-        bulletList: true,
-        orderedList: true,
-        code: true
+      StarterKit,
+      Underline,
+      Heading.configure({
+        levels: [1, 2, 3]
       }),
-      // Add all extensions
-      ...(showToolbar ? [
-        Heading.configure({
-          levels: [1, 2, 3]
-        }),
-        Link.configure({
-          openOnClick: false,
-          HTMLAttributes: {
-            class: 'text-blue-600 underline hover:text-blue-800'
-          }
-        }),
-        Image.configure({
-          HTMLAttributes: {
-            class: 'max-w-full h-auto rounded-lg'
-          }
-        }),
-        Table.configure({
-          resizable: true,
-          HTMLAttributes: {
-            class: 'border-collapse border border-gray-300 w-full'
-          }
-        }),
-        TableRow,
-        TableHeader.configure({
-          HTMLAttributes: {
-            class: 'border border-gray-300 bg-gray-50 px-3 py-2 font-semibold'
-          }
-        }),
-        TableCell.configure({
-          HTMLAttributes: {
-            class: 'border border-gray-300 px-3 py-2'
-          }
-        }),
-        Underline,
-        Strike,
-        CodeBlock.configure({
-          HTMLAttributes: {
-            class: 'bg-gray-100 rounded p-4 font-mono text-sm overflow-x-auto'
-          }
-        })
-      ] : []),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-blue-600 underline hover:text-blue-800'
+        }
+      }),
+      Image.configure({
+        HTMLAttributes: {
+          class: 'max-w-full h-auto rounded-lg'
+        }
+      }),
+      Table.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: 'border-collapse border border-gray-300 w-full'
+        }
+      }),
+      TableRow,
+      TableHeader.configure({
+        HTMLAttributes: {
+          class: 'border border-gray-300 bg-gray-50 px-3 py-2 font-semibold'
+        }
+      }),
+      TableCell.configure({
+        HTMLAttributes: {
+          class: 'border border-gray-300 px-3 py-2'
+        }
+      }),
+      Strike,
+      CodeBlock.configure({
+        HTMLAttributes: {
+          class: 'bg-gray-100 rounded p-4 font-mono text-sm overflow-x-auto'
+        }
+      }),
       Placeholder.configure({
         placeholder
       })
     ],
     content,
     onUpdate: ({ editor }) => {
-      if (showToolbar) {
-        // Rich text mode - send HTML
-        const html = editor.getHTML()
-        onChange?.(html, true)
-      } else {
-        // Plain text mode - send text only
-        const text = editor.getText()
-        onChange?.(text, false)
-      }
+      // Always send HTML for rich text functionality
+      const html = editor.getHTML()
+      onChange?.(html, true)
     },
     editorProps: {
       attributes: {
