@@ -410,19 +410,9 @@ export default function EnhancedCalendar({
                           {/* Media thumbnail */}
                           {post.mediaUrls && post.mediaUrls.length > 0 && (
                             <div className="w-4 h-4 rounded bg-gray-200 border border-gray-300 overflow-hidden">
-                              <img 
-                                src={post.mediaUrls[0]} 
-                                alt="" 
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  // Hide broken images and show placeholder
-                                  e.currentTarget.style.display = 'none';
-                                  const placeholder = e.currentTarget.parentElement;
-                                  if (placeholder) {
-                                    placeholder.innerHTML = '<div class="w-full h-full bg-gray-300 flex items-center justify-center"><span class="text-[6px] text-gray-500">IMG</span></div>';
-                                  }
-                                }}
-                              />
+                              <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                                <span className="text-[6px] text-gray-500 font-medium">IMG</span>
+                              </div>
                             </div>
                           )}
                           
