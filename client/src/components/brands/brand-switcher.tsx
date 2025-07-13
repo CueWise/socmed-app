@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,13 @@ export default function BrandSwitcher() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { data: brands = [], isLoading } = useBrands();
   const { selectedBrand, setSelectedBrand } = useBrand();
+
+  // Auto-select first brand if none is selected
+  useEffect(() => {
+    if (brands.length > 0 && !selectedBrand) {
+      setSelectedBrand(brands[0]);
+    }
+  }, [brands, selectedBrand, setSelectedBrand]);
 
   if (isLoading) {
     return (
