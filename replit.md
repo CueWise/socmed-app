@@ -26,6 +26,9 @@ SocialFlow is a mobile-first social media management platform with AI-powered co
   - Enhanced CSS for smooth touch interactions and feedback
   - PWA manifest configuration for app-like installation
   - Safe area support for mobile devices with notches/rounded corners
+  - Mobile keyboard awareness with env(keyboard-inset-height) support
+  - Responsive Note page that adapts to mobile screen sizes (max 90vw)
+  - Rich text editor tooltips with z-index 120 to appear above modal layers
 
 ✓ **Database Integration Active** - PostgreSQL with sample data populated
   - Drizzle ORM with type-safe queries operational
