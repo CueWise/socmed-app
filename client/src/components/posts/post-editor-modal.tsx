@@ -63,6 +63,8 @@ export default function PostEditorModal({
   const [content, setContent] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [scheduledAt, setScheduledAt] = useState<Date | undefined>(defaultDate);
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [scheduledTime, setScheduledTime] = useState('');
   const [status, setStatus] = useState("draft");
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [mediaUrls, setMediaUrls] = useState<string[]>([]);
@@ -102,8 +104,24 @@ export default function PostEditorModal({
       setMediaUrls(initialData.mediaUrls || []);
       setMediaTypes(initialData.mediaTypes || []);
       setHashtags(initialData.hashtags || []);
+      
+      // Initialize scheduled date and time
+      if (initialData.scheduledAt) {
+        const date = new Date(initialData.scheduledAt);
+        setScheduledDate(date.toISOString().split('T')[0]);
+        setScheduledTime(date.toTimeString().slice(0, 5));
+        setScheduledAt(date);
+      }
     }
   }, [initialData]);
+
+  // Initialize scheduled date and time from defaultDate
+  useEffect(() => {
+    if (defaultDate) {
+      setScheduledDate(defaultDate.toISOString().split('T')[0]);
+      setScheduledTime(defaultDate.toTimeString().slice(0, 5));
+    }
+  }, [defaultDate]);
 
   // Set initial preview platform
   useEffect(() => {
@@ -152,10 +170,16 @@ export default function PostEditorModal({
   const handleSubmit = () => {
     if (!content.trim() || selectedPlatforms.length === 0) return;
     
+    // Combine scheduledDate and scheduledTime into scheduledAt
+    let finalScheduledAt = scheduledAt;
+    if (scheduledDate && scheduledTime) {
+      finalScheduledAt = new Date(`${scheduledDate}T${scheduledTime}`);
+    }
+    
     const postData: PostData = {
       content: content.trim(),
       platforms: selectedPlatforms,
-      scheduledAt,
+      scheduledAt: finalScheduledAt,
       mediaUrls,
       mediaTypes,
       hashtags,
