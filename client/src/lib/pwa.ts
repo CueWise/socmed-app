@@ -115,7 +115,7 @@ class PWAManager {
     // Show update notification
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification('Update Available', {
-        body: 'A new version of SocialFlow is available. Reload to update.',
+        body: 'A new version of CueWise is available. Reload to update.',
         icon: '/icon-192x192.png',
         badge: '/icon-72x72.png',
       });

@@ -1,6 +1,6 @@
 {
-  "name": "SocialFlow - Social Media Management",
-  "short_name": "SocialFlow",
+  "name": "CueWise - Social Media Management",
+  "short_name": "CueWise",
   "description": "Mobile-first social media management platform with AI-powered content creation",
   "start_url": "/",
   "display": "standalone",
