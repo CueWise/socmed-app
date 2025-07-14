@@ -260,16 +260,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const updates = req.body;
       
-      // Handle scheduledAt as local datetime string - no timezone conversion
-      if (updates.scheduledAt && typeof updates.scheduledAt === 'string') {
-        // Ensure consistent format for future posts: "2025-07-31T14:00:00"
-        let localDateTime = updates.scheduledAt;
-        if (localDateTime.includes('T') && !localDateTime.includes('Z')) {
-          // Already in correct format "2025-07-31T14:00:00"
-          updates.scheduledAt = localDateTime;
-        } else {
-          // Convert other formats to consistent format
-          updates.scheduledAt = localDateTime;
+      // Handle scheduledAt as local datetime - preserve exact user input without timezone conversion
+      if (updates.scheduledAt) {
+        if (typeof updates.scheduledAt === 'string') {
+          // Keep as string to preserve user's intended time
+          updates.scheduledAt = updates.scheduledAt;
+        } else if (updates.scheduledAt instanceof Date) {
+          // Convert to local time string format
+          const date = updates.scheduledAt;
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, '0');
+          const day = String(date.getDate()).padStart(2, '0');
+          const hours = String(date.getHours()).padStart(2, '0');
+          const minutes = String(date.getMinutes()).padStart(2, '0');
+          const seconds = String(date.getSeconds()).padStart(2, '0');
+          updates.scheduledAt = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
         }
       }
       
@@ -287,6 +292,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       delete processedUpdates.id;
       delete processedUpdates.createdAt;
       delete processedUpdates.updatedAt;
+      // DON'T delete brandId - allow brand updates but ensure it's valid
+      if (processedUpdates.brandId && typeof processedUpdates.brandId !== 'number') {
+        delete processedUpdates.brandId;
+      }
       
       console.log('Updating post:', id, 'with processed data:', processedUpdates);
       

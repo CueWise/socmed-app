@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useBrand } from "@/hooks/use-brand";
 import EnhancedCaptionField from "@/components/ui/enhanced-caption-field";
 import InstagramMediaThumbnail from "@/components/ui/instagram-media-thumbnail";
 import { 
@@ -59,6 +60,9 @@ export default function PostEditorModal({
   postId,
   initialData 
 }: PostEditorModalProps) {
+  // Hooks
+  const { selectedBrand } = useBrand();
+  
   // State management
   const [content, setContent] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
@@ -146,7 +150,9 @@ export default function PostEditorModal({
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate all relevant queries to refresh the UI immediately
       queryClient.invalidateQueries({ queryKey: ['/api/posts'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/calendar/posts'] });
       toast({ title: postId ? "Post updated!" : "Post created!" });
       handleClose();
     },
@@ -170,10 +176,12 @@ export default function PostEditorModal({
   const handleSubmit = () => {
     if (!content.trim() || selectedPlatforms.length === 0) return;
     
-    // Combine scheduledDate and scheduledTime into scheduledAt
+    // Combine scheduledDate and scheduledTime into scheduledAt with proper timezone handling
     let finalScheduledAt = scheduledAt;
     if (scheduledDate && scheduledTime) {
-      finalScheduledAt = new Date(`${scheduledDate}T${scheduledTime}`);
+      // Create date string in local timezone format
+      const localDateTimeString = `${scheduledDate}T${scheduledTime}`;
+      finalScheduledAt = new Date(localDateTimeString);
     }
     
     const postData: PostData = {
@@ -184,7 +192,7 @@ export default function PostEditorModal({
       mediaTypes,
       hashtags,
       status,
-      brandId: 1, // Default brand
+      brandId: selectedBrand?.id || 1, // Use current selected brand
       createdBy: "current-user"
     };
     
