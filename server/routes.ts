@@ -249,6 +249,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/posts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const updates = req.body;
+      
+      // Handle scheduledAt as local datetime string - no timezone conversion
+      if (updates.scheduledAt && typeof updates.scheduledAt === 'string') {
+        // Ensure consistent format for future posts: "2025-07-31T14:00:00"
+        let localDateTime = updates.scheduledAt;
+        if (localDateTime.includes('T') && !localDateTime.includes('Z')) {
+          // Already in correct format "2025-07-31T14:00:00"
+          updates.scheduledAt = localDateTime;
+        } else {
+          // Convert other formats to consistent format
+          updates.scheduledAt = localDateTime;
+        }
+      }
+      
+      // Filter out blob URLs - they should be converted to real uploads client-side
+      const processedUpdates = {
+        ...updates,
+        mediaUrls: (updates.mediaUrls || []).filter((url: string) => 
+          url && !url.startsWith('blob:') && !url.includes('upload_session_')
+        ),
+        mediaTypes: updates.mediaTypes || []
+      };
+      
+      console.log('Updating post:', id, 'with processed data:', processedUpdates);
+      
+      const post = await storage.updatePost(id, processedUpdates);
+      res.json(post);
+    } catch (error) {
+      console.error('Route error updating post:', error);
+      res.status(500).json({ error: "Failed to update post" });
+    }
+  });
+
   app.delete("/api/posts/:id", async (req, res) => {
     try {
       const id = parseInt(req.params.id);
