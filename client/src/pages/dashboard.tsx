@@ -12,7 +12,7 @@ import BrandIdentityShowcase from "@/components/brands/brand-identity-showcase";
 import { useApprovals } from "@/hooks/use-approvals";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useBrand } from "@/hooks/use-brand";
+import { useBrandStore } from "@/hooks/use-brand";
 
 export default function Dashboard() {
   const [showPostEditor, setShowPostEditor] = useState(false);
@@ -20,7 +20,7 @@ export default function Dashboard() {
   const [editingPost, setEditingPost] = useState<any>(null);
   const [showBrandShowcase, setShowBrandShowcase] = useState(false);
   const isMobile = useIsMobile();
-  const { selectedBrand } = useBrand();
+  const { selectedBrand } = useBrandStore();
   const { data: approvals } = useApprovals();
   const { data: analytics } = useAnalytics();
 
@@ -78,7 +78,10 @@ export default function Dashboard() {
         <div className="flex gap-2 mt-4 sm:mt-0">
           <Button
             variant="outline"
-            onClick={() => setShowBrandShowcase(true)}
+            onClick={() => {
+              console.log("Brand Identity button clicked, selectedBrand:", selectedBrand);
+              setShowBrandShowcase(true);
+            }}
             className="flex items-center gap-2"
           >
             <Palette className="w-4 h-4" />
