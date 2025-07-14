@@ -365,7 +365,7 @@ export default function PostEditorModal({
                       maxLength={2200}
                     />
                     {/* Bottom toolbar with icons and counters */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-[hsl(var(--background))] border-t border-input px-3 py-3 flex items-center justify-between z-10">
+                    <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-input px-3 py-3 flex items-center justify-between z-10">
                       {/* Left side icons */}
                       <div className="flex items-center space-x-3">
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add media">
