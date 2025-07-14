@@ -361,11 +361,11 @@ export default function PostEditorModal({
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="Write your caption..."
-                      className="w-full h-[450px] resize-none text-base font-medium leading-relaxed pb-12"
+                      className="w-full h-[450px] resize-none text-base font-medium leading-relaxed pb-16"
                       maxLength={2200}
                     />
                     {/* Bottom toolbar with icons and counters */}
-                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                    <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-3 py-3 flex items-center justify-between">
                       {/* Left side icons */}
                       <div className="flex items-center space-x-2">
                         <button className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors" title="Add media">
