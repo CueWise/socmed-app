@@ -89,12 +89,15 @@ CueWise is a web-based social media management platform with AI-powered content 
   - Improved blob URL cleanup logic to prevent memory leaks
   - App now starts consistently without React warnings
 
-✓ **Desktop Post Editor Modal Enhanced** - Fixed overlapping text and improved layout
+✓ **Desktop Post Editor Modal Enhanced** - Complete 2-column layout with media previews
   - Replaced Enhanced Caption Field with simple textarea to fix duplicate text overlay
-  - Made caption field take 50% of available height using flex-1 layout
-  - Reduced font size from text-lg to text-base for better readability
+  - Created 2-column flex layout below caption field for desktop view
+  - Left column: Media preview section with Instagram square (264x264) for photos and Facebook Reel aspect ratio (192x320) for videos
+  - Right column: Scheduling controls with date/time pickers, status selector, and action buttons
+  - Removed platform count display, showing only platform icons in selection trigger
+  - Made caption field fixed height (300px) with text-base font for better readability
   - Maintained separate mobile and desktop layouts without affecting mobile view
-  - Added character counter and improved overall styling
+  - Enhanced media thumbnails with proper aspect ratios and remove buttons
 
 ✓ **Theme System Removal Complete** - Removed complex theme customization to fix text display issues
   - Simplified to single, consistent light theme design
