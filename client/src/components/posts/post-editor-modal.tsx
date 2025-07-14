@@ -369,76 +369,79 @@ export default function PostEditorModal({
                       {/* Left side icons */}
                       <div className="flex items-center space-x-3">
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add media">
-                          <svg className="w-5 h-5 text-gray-800 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                            <circle cx="8.5" cy="8.5" r="1.5"/>
-                            <polyline points="21,15 16,10 5,21"/>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="#3B82F6" stroke="#2563EB" strokeWidth="1"/>
+                            <circle cx="8.5" cy="8.5" r="1.5" fill="#EFF6FF"/>
+                            <polyline points="21,15 16,10 5,21" fill="none" stroke="#EFF6FF" strokeWidth="1.5"/>
                           </svg>
                         </button>
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add emoji">
-                          <svg className="w-5 h-5 text-gray-800 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="m9,9h.01"/>
-                            <path d="m15,9h.01"/>
-                            <path d="m8,15s1.5,2,4,2,4-2,4-2"/>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" fill="#F59E0B" stroke="#D97706" strokeWidth="1"/>
+                            <circle cx="9" cy="9" r="1" fill="#1F2937"/>
+                            <circle cx="15" cy="9" r="1" fill="#1F2937"/>
+                            <path d="m8,15s1.5,2,4,2,4-2,4-2" fill="none" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/>
                           </svg>
                         </button>
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add hashtag">
-                          <svg className="w-5 h-5 text-gray-800 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <line x1="4" y1="9" x2="20" y2="9"/>
-                            <line x1="4" y1="15" x2="20" y2="15"/>
-                            <line x1="10" y1="3" x2="8" y2="21"/>
-                            <line x1="16" y1="3" x2="14" y2="21"/>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <g fill="#8B5CF6">
+                              <line x1="4" y1="9" x2="20" y2="9" stroke="#8B5CF6" strokeWidth="2.5"/>
+                              <line x1="4" y1="15" x2="20" y2="15" stroke="#8B5CF6" strokeWidth="2.5"/>
+                              <line x1="10" y1="3" x2="8" y2="21" stroke="#8B5CF6" strokeWidth="2.5"/>
+                              <line x1="16" y1="3" x2="14" y2="21" stroke="#8B5CF6" strokeWidth="2.5"/>
+                            </g>
                           </svg>
                         </button>
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add mention">
-                          <svg className="w-5 h-5 text-gray-800 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#10B981" stroke="#059669" strokeWidth="1"/>
                           </svg>
                         </button>
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add location">
-                          <svg className="w-5 h-5 text-gray-800 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                            <circle cx="12" cy="10" r="3"/>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="#EF4444" stroke="#DC2626" strokeWidth="1"/>
+                            <circle cx="12" cy="10" r="3" fill="#FEF2F2" stroke="#DC2626" strokeWidth="1"/>
                           </svg>
                         </button>
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add link">
-                          <svg className="w-5 h-5 text-gray-800 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <g fill="none" stroke="#6366F1" strokeWidth="2.5">
+                              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </g>
                           </svg>
                         </button>
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Reddit">
-                          <svg className="w-5 h-5 text-gray-800 drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24" style={{filter: 'drop-shadow(0 1px 1px rgba(0,0,0,0.1))'}}>
-                            <path d="M14.238 15.348c.085-.055.237-.055.364-.055.085 0 .193.055.278.085.084.031.162.085.237.141.075.084.141.169.199.253a.888.888 0 0 1 .14.448c0 .169-.055.337-.141.478-.085.14-.207.253-.337.337-.14.085-.281.127-.422.127-.169 0-.337-.055-.478-.141-.14-.085-.253-.199-.337-.337-.085-.14-.127-.281-.127-.422 0-.169.042-.338.127-.478.084-.14.199-.253.337-.337.14-.084.309-.098.16-.098zm-8.477 0c.085-.055.237-.055.364-.055.085 0 .193.055.278.085.084.031.162.085.237.141.075.084.141.169.199.253a.888.888 0 0 1 .14.448c0 .169-.055.337-.141.478-.085.14-.207.253-.337.337-.14.085-.281.127-.422.127-.169 0-.337-.055-.478-.141-.14-.085-.253-.199-.337-.337-.085-.14-.127-.281-.127-.422 0-.169.042-.338.127-.478.084-.14.199-.253.337-.337.14-.084.309-.098.16-.098z"/>
-                            <circle cx="12" cy="12" r="10"/>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" fill="#FF4500"/>
+                            <path d="M14.238 15.348c.085-.055.237-.055.364-.055.085 0 .193.055.278.085.084.031.162.085.237.141.075.084.141.169.199.253a.888.888 0 0 1 .14.448c0 .169-.055.337-.141.478-.085.14-.207.253-.337.337-.14.085-.281.127-.422.127-.169 0-.337-.055-.478-.141-.14-.085-.253-.199-.337-.337-.085-.14-.127-.281-.127-.422 0-.169.042-.338.127-.478.084-.14.199-.253.337-.337.14-.084.309-.098.16-.098zm-8.477 0c.085-.055.237-.055.364-.055.085 0 .193.055.278.085.084.031.162.085.237.141.075.084.141.169.199.253a.888.888 0 0 1 .14.448c0 .169-.055.337-.141.478-.085.14-.207.253-.337.337-.14.085-.281.127-.422.127-.169 0-.337-.055-.478-.141-.14-.085-.253-.199-.337-.337-.085-.14-.127-.281-.127-.422 0-.169.042-.338.127-.478.084-.14.199-.253.337-.337.14-.084.309-.098.16-.098z" fill="white"/>
                           </svg>
                         </button>
                         <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Video">
-                          <svg className="w-5 h-5 text-gray-800 drop-shadow-sm" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                            <polygon points="23 7 16 12 23 17 23 7"/>
-                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <polygon points="23 7 16 12 23 17 23 7" fill="#EC4899"/>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" fill="#F472B6" stroke="#EC4899" strokeWidth="1"/>
                           </svg>
                         </button>
                       </div>
                       
                       {/* Right side counters */}
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <span className="flex items-center">
-                          <span>0 / 30</span>
-                          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <line x1="4" y1="9" x2="20" y2="9"/>
-                            <line x1="4" y1="15" x2="20" y2="15"/>
-                            <line x1="10" y1="3" x2="8" y2="21"/>
-                            <line x1="16" y1="3" x2="14" y2="21"/>
+                      <div className="flex items-center space-x-4 text-sm font-medium">
+                        <div className="flex items-center space-x-1">
+                          <span className="text-purple-600 font-semibold">{(content.match(/#\w+/g) || []).length}</span>
+                          <span className="text-gray-500">/30</span>
+                          <span className="text-purple-600 font-bold">#</span>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <span className={`font-semibold ${content.length > 2000 ? 'text-red-500' : content.length > 1800 ? 'text-orange-500' : 'text-gray-700'}`}>
+                            {content.length}
+                          </span>
+                          <span className="text-gray-500">/2200</span>
+                          <svg className="w-4 h-4 text-pink-500" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.017 0L15.22 9.344h9.91l-8.017 5.821 3.059 9.435L12.017 18.8 3.862 24.6l3.059-9.435L-2.096 9.344h9.91L12.017 0z"/>
                           </svg>
-                        </span>
-                        <span className="flex items-center">
-                          <span>{content.length} / 2000</span>
-                          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path d="M14.828 14.828a4 4 0 0 1-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
-                          </svg>
-                        </span>
+                        </div>
                       </div>
                     </div>
                   </div>
