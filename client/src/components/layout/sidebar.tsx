@@ -42,7 +42,7 @@ const navigationItems = [
   },
   {
     name: "Brand Library",
-    href: "/library",
+    href: "/brand-library",
     icon: Image,
   },
   {

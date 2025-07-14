@@ -484,15 +484,38 @@ export default function PostEditorModal({
   }, [showMediaPlayer, allMedia.length]);
 
   // Handle media removal - automatically remove from database permanently
-  const handleRemoveMedia = (index: number, isExisting: boolean) => {
+  const handleRemoveMedia = async (index: number, isExisting: boolean) => {
     if (!isExisting) {
       // For newly attached media, remove immediately
       const adjustedIndex = index - existingMedia.length;
       setAttachedMedia(prev => prev.filter((_, i) => i !== adjustedIndex));
     } else {
       // For existing media, remove from database permanently
+      const mediaToRemove = existingMedia[index];
       const newMediaUrls = existingMedia.filter((_, i) => i !== index);
       setMediaUrls(newMediaUrls);
+      
+      // If editing an existing post, update the database immediately
+      if (postId && mediaToRemove) {
+        try {
+          // Remove the media URL from the post in the database
+          const updatedPost = {
+            mediaUrls: newMediaUrls,
+          };
+          
+          await fetch(`/api/posts/${postId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedPost),
+          });
+          
+          console.log('Media removed from database:', mediaToRemove);
+        } catch (error) {
+          console.error('Failed to remove media from database:', error);
+        }
+      }
     }
     
     // Show success message

@@ -16,11 +16,8 @@ export default function BrandIdentityShowcase({ onClose }: BrandIdentityShowcase
 
   const brand = brands?.find(b => b.id === selectedBrand?.id) || selectedBrand;
 
-  console.log("BrandIdentityShowcase render:", { selectedBrand, brands, brand });
-
   // Auto-advance slides every 4 seconds
   useEffect(() => {
-    console.log("Brand in useEffect:", brand);
     if (!brand) return;
     
     const interval = setInterval(() => {
