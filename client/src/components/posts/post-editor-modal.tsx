@@ -356,17 +356,91 @@ export default function PostEditorModal({
                 {/* Caption */}
                 <div className="flex flex-col">
                   <Label className="text-sm font-medium">Caption</Label>
-                  <div className="mt-2">
+                  <div className="mt-2 relative">
                     <Textarea
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="Write your caption..."
-                      className="w-full h-[380px] resize-none text-base font-medium leading-relaxed"
+                      className="w-full h-[380px] resize-none text-base font-medium leading-relaxed pb-12"
                       maxLength={2200}
                     />
-                  </div>
-                  <div className="mt-2 text-xs text-gray-500 text-right">
-                    {content.length}/2200 characters
+                    {/* Bottom toolbar with icons and counters */}
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                      {/* Left side icons */}
+                      <div className="flex items-center space-x-3">
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Add media">
+                          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21,15 16,10 5,21"/>
+                          </svg>
+                        </button>
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Add emoji">
+                          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="m9,9h.01"/>
+                            <path d="m15,9h.01"/>
+                            <path d="m8,15s1.5,2,4,2,4-2,4-2"/>
+                          </svg>
+                        </button>
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Add hashtag">
+                          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <line x1="4" y1="9" x2="20" y2="9"/>
+                            <line x1="4" y1="15" x2="20" y2="15"/>
+                            <line x1="10" y1="3" x2="8" y2="21"/>
+                            <line x1="16" y1="3" x2="14" y2="21"/>
+                          </svg>
+                        </button>
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Add mention">
+                          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                          </svg>
+                        </button>
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Add location">
+                          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                          </svg>
+                        </button>
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Add link">
+                          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                          </svg>
+                        </button>
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Reddit">
+                          <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14.238 15.348c.085-.055.237-.055.364-.055.085 0 .193.055.278.085.084.031.162.085.237.141.075.084.141.169.199.253a.888.888 0 0 1 .14.448c0 .169-.055.337-.141.478-.085.14-.207.253-.337.337-.14.085-.281.127-.422.127-.169 0-.337-.055-.478-.141-.14-.085-.253-.199-.337-.337-.085-.14-.127-.281-.127-.422 0-.169.042-.338.127-.478.084-.14.199-.253.337-.337.14-.084.309-.098.16-.098zm-8.477 0c.085-.055.237-.055.364-.055.085 0 .193.055.278.085.084.031.162.085.237.141.075.084.141.169.199.253a.888.888 0 0 1 .14.448c0 .169-.055.337-.141.478-.085.14-.207.253-.337.337-.14.085-.281.127-.422.127-.169 0-.337-.055-.478-.141-.14-.085-.253-.199-.337-.337-.085-.14-.127-.281-.127-.422 0-.169.042-.338.127-.478.084-.14.199-.253.337-.337.14-.084.309-.098.16-.098z"/>
+                            <circle cx="12" cy="12" r="10"/>
+                          </svg>
+                        </button>
+                        <button className="p-1 hover:bg-gray-100 rounded transition-colors" title="Video">
+                          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <polygon points="23 7 16 12 23 17 23 7"/>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+                          </svg>
+                        </button>
+                      </div>
+                      
+                      {/* Right side counters */}
+                      <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <span className="flex items-center">
+                          <span>0 / 30</span>
+                          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <line x1="4" y1="9" x2="20" y2="9"/>
+                            <line x1="4" y1="15" x2="20" y2="15"/>
+                            <line x1="10" y1="3" x2="8" y2="21"/>
+                            <line x1="16" y1="3" x2="14" y2="21"/>
+                          </svg>
+                        </span>
+                        <span className="flex items-center">
+                          <span>{content.length} / 2000</span>
+                          <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path d="M14.828 14.828a4 4 0 0 1-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+                          </svg>
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -405,19 +479,7 @@ export default function PostEditorModal({
                                 >
                                   <X className="h-4 w-4" />
                                 </button>
-                                {/* Upload icon for photos only (when no videos exist) */}
-                                {isPhoto && allMedia.every(m => m.type.startsWith('image/')) && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      fileInputRef.current?.click();
-                                    }}
-                                    className="absolute top-2 left-2 bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors z-10"
-                                    title="Upload more photos"
-                                  >
-                                    <Upload className="h-4 w-4" />
-                                  </button>
-                                )}
+
                               </div>
                             );
                           })}
