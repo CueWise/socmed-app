@@ -31,6 +31,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
 import RichTextEditor from "@/components/ui/rich-text-editor";
 import { useBrandStore } from "@/hooks/use-brand";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PostEditorModalProps {
   open: boolean;
@@ -50,7 +51,7 @@ interface PostData {
   status: string;
   notes?: string;
   brandId?: number;
-  createdBy?: number;
+  createdBy?: string;
 }
 
 // Enhanced emoji picker with categories
@@ -316,6 +317,7 @@ export default function PostEditorModal({
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { selectedBrand } = useBrandStore();
+  const { user } = useAuth();
 
   // Utility function to detect mobile device
   const isMobileDevice = () => {
@@ -664,7 +666,7 @@ export default function PostEditorModal({
         brandId: selectedBrand.id,
       }),
       ...(!postId && {
-        createdBy: 1, // TODO: Replace with actual user ID when auth is implemented
+        createdBy: user?.id || "1", // Use authenticated user ID
       }),
     };
 
