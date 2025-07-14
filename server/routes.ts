@@ -238,6 +238,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const id = parseInt(req.params.id);
       const updates = req.body;
       
+      // Remove fields that shouldn't be updated (foreign keys and auto-generated fields)
+      delete updates.createdBy;
+      delete updates.id;
+      delete updates.createdAt;
+      delete updates.updatedAt;
+      
       // Log the incoming data for debugging
       console.log('Updating post:', id, 'with data:', updates);
       
@@ -267,7 +273,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Filter out blob URLs - they should be converted to real uploads client-side
+      // Filter out blob URLs and exclude fields that shouldn't be updated
       const processedUpdates = {
         ...updates,
         mediaUrls: (updates.mediaUrls || []).filter((url: string) => 
@@ -275,6 +281,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ),
         mediaTypes: updates.mediaTypes || []
       };
+      
+      // Remove fields that shouldn't be updated (foreign keys and auto-generated fields)
+      delete processedUpdates.createdBy;
+      delete processedUpdates.id;
+      delete processedUpdates.createdAt;
+      delete processedUpdates.updatedAt;
       
       console.log('Updating post:', id, 'with processed data:', processedUpdates);
       
