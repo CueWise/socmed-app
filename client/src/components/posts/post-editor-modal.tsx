@@ -370,17 +370,17 @@ export default function PostEditorModal({
                       <div className="flex items-center space-x-3">
                         {/* Media Icon - Combined Image/Video */}
                         <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-400/50 group" 
-                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.1)'}}
                                 title="Add media">
                           <div className="relative w-5 h-5">
                             {/* Image icon */}
-                            <svg className="absolute inset-0 w-4 h-4 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <svg className="absolute inset-0 w-4 h-4 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                               <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                               <circle cx="8.5" cy="8.5" r="1.5"/>
                               <polyline points="21,15 16,10 5,21"/>
                             </svg>
                             {/* Video icon overlay */}
-                            <svg className="absolute top-0.5 right-0 w-3 h-3 text-white/80 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                            <svg className="absolute top-0.5 right-0 w-3 h-3 text-gray-600 group-hover:text-gray-800 transition-colors" fill="currentColor" viewBox="0 0 24 24">
                               <polygon points="5,3 19,12 5,21 5,3"/>
                             </svg>
                           </div>
@@ -388,9 +388,9 @@ export default function PostEditorModal({
                         
                         {/* Emoji Icon */}
                         <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-yellow-400/50 group" 
-                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.1)'}}
                                 title="Add emoji">
-                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="10"/>
                             <path d="m9,9h.01"/>
                             <path d="m15,9h.01"/>
@@ -400,9 +400,9 @@ export default function PostEditorModal({
                         
                         {/* Hashtag Icon */}
                         <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-purple-400/50 group" 
-                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.1)'}}
                                 title="Add hashtag">
-                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <line x1="4" y1="9" x2="20" y2="9"/>
                             <line x1="4" y1="15" x2="20" y2="15"/>
                             <line x1="10" y1="3" x2="8" y2="21"/>
@@ -412,18 +412,18 @@ export default function PostEditorModal({
                         
                         {/* Mention Icon */}
                         <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-400/50 group" 
-                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.1)'}}
                                 title="Add mention">
-                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                             <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                           </svg>
                         </button>
                         
                         {/* Location Icon */}
                         <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-400/50 group" 
-                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.1)'}}
                                 title="Add location">
-                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                             <circle cx="12" cy="10" r="3"/>
                           </svg>
@@ -431,9 +431,9 @@ export default function PostEditorModal({
                         
                         {/* Link Icon */}
                         <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-400/50 group" 
-                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.1)'}}
                                 title="Add link">
-                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
                             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                           </svg>
@@ -441,18 +441,18 @@ export default function PostEditorModal({
                         
                         {/* Reddit Icon */}
                         <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-orange-400/50 group" 
-                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.1)'}}
                                 title="Reddit">
-                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-700 group-hover:text-gray-900 transition-colors" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
                           </svg>
                         </button>
                         
                         {/* Video Icon */}
                         <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-pink-400/50 group" 
-                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 2px 4px rgba(0,0,0,0.1)'}}
                                 title="Video">
-                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 text-gray-700 group-hover:text-gray-900 transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                             <polygon points="23 7 16 12 23 17 23 7"/>
                             <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
                           </svg>
@@ -460,20 +460,25 @@ export default function PostEditorModal({
                       </div>
                       
                       {/* Right side counters */}
-                      <div className="flex items-center space-x-4 text-sm font-medium">
-                        <div className="flex items-center space-x-1">
-                          <span className="text-purple-600 font-semibold">{(content.match(/#\w+/g) || []).length}</span>
-                          <span className="text-gray-500">/30</span>
-                          <span className="text-purple-600 font-bold">#</span>
+                      <div className="flex items-center space-x-3">
+                        {/* Hashtag counter */}
+                        <div className="flex items-center px-3 py-1.5 rounded-lg transition-all duration-300 hover:shadow-md" 
+                             style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.05)'}}>
+                          <span className="text-purple-600 font-bold text-sm">#</span>
+                          <span className="text-gray-700 font-semibold text-sm ml-1">{(content.match(/#\w+/g) || []).length}</span>
+                          <span className="text-gray-500 text-sm">/30</span>
                         </div>
-                        <div className="flex items-center space-x-1">
-                          <span className={`font-semibold ${content.length > 2000 ? 'text-red-500' : content.length > 1800 ? 'text-orange-500' : 'text-gray-700'}`}>
+                        
+                        {/* Character counter */}
+                        <div className="flex items-center px-3 py-1.5 rounded-lg transition-all duration-300 hover:shadow-md" 
+                             style={{background: 'linear-gradient(145deg, #f3f4f6 0%, #e5e7eb 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 1px 2px rgba(0,0,0,0.05)'}}>
+                          <svg className="w-4 h-4 text-gray-600 mr-1" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                          </svg>
+                          <span className={`font-semibold text-sm ${content.length > 2000 ? 'text-red-500' : content.length > 1800 ? 'text-orange-500' : 'text-gray-700'}`}>
                             {content.length}
                           </span>
-                          <span className="text-gray-500">/2200</span>
-                          <svg className="w-4 h-4 text-pink-500" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12.017 0L15.22 9.344h9.91l-8.017 5.821 3.059 9.435L12.017 18.8 3.862 24.6l3.059-9.435L-2.096 9.344h9.91L12.017 0z"/>
-                          </svg>
+                          <span className="text-gray-500 text-sm">/2200</span>
                         </div>
                       </div>
                     </div>
