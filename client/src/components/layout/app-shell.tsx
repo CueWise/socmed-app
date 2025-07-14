@@ -89,47 +89,70 @@ export default function AppShell({ children }: AppShellProps) {
   }, [isMobile, sidebarOpen]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 touch-manipulation">
-      <TopNavigation onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-      <MobileStatsBar />
-      
-      <div className="flex flex-1">
-        {/* Desktop Sidebar */}
-        <div className="hidden md:flex">
-          <Sidebar />
-        </div>
-        
-        {/* Enhanced Mobile Sidebar Overlay */}
-        {isMobile && sidebarOpen && (
-          <>
-            <div 
-              className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 transition-opacity duration-300"
-              onClick={() => setSidebarOpen(false)}
-              style={{ touchAction: 'none' }}
-            />
-            <div 
-              className="fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-out"
-              onClick={(e) => e.stopPropagation()}
-              style={{ touchAction: 'auto' }}
-            >
-              <Sidebar onClose={() => setSidebarOpen(false)} />
+    <div className="h-screen flex flex-col bg-background">
+      {/* Desktop Layout */}
+      {!isMobile ? (
+        <div className="flex h-full bg-gray-50">
+          {/* Desktop Sidebar with enhanced design */}
+          <div className="w-72 bg-white border-r border-gray-200 shadow-sm">
+            <Sidebar />
+          </div>
+          
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col overflow-hidden">
+            {/* Desktop Top Navigation */}
+            <div className="bg-white border-b border-gray-200 shadow-sm">
+              <TopNavigation />
             </div>
-          </>
-        )}
-        
-        {/* Main Content with Enhanced Touch Support */}
-        <main className={cn(
-          "flex-1 p-4 md:p-6 overflow-auto scroll-smooth",
-          "touch-pan-y safe-area-inset-bottom",
-          isMobile && "pb-20 pt-2", // Extra padding for mobile nav, reduced top padding
-          "focus:outline-none"
-        )}>
-          {children}
-        </main>
-      </div>
-      
-      {/* Mobile Bottom Navigation */}
-      {isMobile && <MobileNav />}
+            
+            {/* Main Content with padding and background */}
+            <main className="flex-1 overflow-auto bg-gray-50 p-6">
+              <div className="max-w-7xl mx-auto">
+                {children}
+              </div>
+            </main>
+          </div>
+        </div>
+      ) : (
+        /* Mobile Layout - Keep existing mobile design */
+        <div className="min-h-screen flex flex-col bg-gray-50 touch-manipulation">
+          <TopNavigation onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          <MobileStatsBar />
+          
+          <div className="flex flex-1">
+            {/* Enhanced Mobile Sidebar Overlay */}
+            {sidebarOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40 transition-opacity duration-300"
+                  onClick={() => setSidebarOpen(false)}
+                  style={{ touchAction: 'none' }}
+                />
+                <div 
+                  className="fixed inset-y-0 left-0 z-50 w-72 transform transition-transform duration-300 ease-out"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ touchAction: 'auto' }}
+                >
+                  <Sidebar onClose={() => setSidebarOpen(false)} />
+                </div>
+              </>
+            )}
+            
+            {/* Main Content with Enhanced Touch Support */}
+            <main className={cn(
+              "flex-1 p-4 overflow-auto scroll-smooth",
+              "touch-pan-y safe-area-inset-bottom",
+              "pb-20 pt-2", // Extra padding for mobile nav, reduced top padding
+              "focus:outline-none"
+            )}>
+              {children}
+            </main>
+          </div>
+          
+          {/* Mobile Bottom Navigation */}
+          <MobileNav />
+        </div>
+      )}
     </div>
   );
 }
