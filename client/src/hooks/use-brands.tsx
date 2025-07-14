@@ -40,10 +40,8 @@ export function useBrand(id: number) {
 export function useCreateBrand() {
   return useMutation({
     mutationFn: async (brandData: InsertBrand) => {
-      return await apiRequest("/api/brands", {
-        method: "POST",
-        body: brandData,
-      });
+      const response = await apiRequest("POST", "/api/brands", brandData);
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/brands"] });
@@ -54,10 +52,8 @@ export function useCreateBrand() {
 export function useUpdateBrand() {
   return useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<Brand> }) => {
-      return await apiRequest(`/api/brands/${id}`, {
-        method: "PATCH",
-        body: data,
-      });
+      const response = await apiRequest("PATCH", `/api/brands/${id}`, data);
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/brands"] });
@@ -68,9 +64,8 @@ export function useUpdateBrand() {
 export function useDeleteBrand() {
   return useMutation({
     mutationFn: async (id: number) => {
-      return await apiRequest(`/api/brands/${id}`, {
-        method: "DELETE",
-      });
+      const response = await apiRequest("DELETE", `/api/brands/${id}`);
+      return await response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/brands"] });
