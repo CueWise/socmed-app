@@ -1,5 +1,5 @@
 import { users, brands, posts, approvals, comments, analytics, brandAssets,
-         type User, type InsertUser, type Brand, type InsertBrand, 
+         type User, type InsertUser, type UpsertUser, type Brand, type InsertBrand, 
          type Post, type InsertPost, type Approval, type InsertApproval,
          type Comment, type InsertComment, type Analytics, type InsertAnalytics,
          type BrandAsset, type InsertBrandAsset } from "@shared/schema";
@@ -7,10 +7,9 @@ import { db } from "./db";
 import { eq, and, gte, lte, desc, sql, or, isNull } from "drizzle-orm";
 
 export interface IStorage {
-  // Users
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  // Users (Required for Replit Auth)
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
 
   // Brands
   getBrands(): Promise<Brand[]>;
@@ -51,24 +50,27 @@ export interface IStorage {
   // Brand management
   updateBrand(id: number, updates: Partial<Brand>): Promise<Brand>;
   deleteBrand(id: number): Promise<void>;
-
-
 }
 
 export class DatabaseStorage implements IStorage {
-  // Users
-  async getUser(id: number): Promise<User | undefined> {
+  // Users (Required for Replit Auth)
+  async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    return user;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
     return user;
   }
 
