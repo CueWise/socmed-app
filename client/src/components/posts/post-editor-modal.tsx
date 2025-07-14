@@ -275,21 +275,16 @@ export default function PostEditorModal({
                         >
                           <div className="flex items-center gap-2">
                             {selectedPlatforms.length > 0 ? (
-                              <>
-                                <div className="flex items-center gap-1">
-                                  {platforms
-                                    .filter(p => selectedPlatforms.includes(p.id))
-                                    .map((platform) => {
-                                      const Icon = platform.icon;
-                                      return (
-                                        <Icon key={platform.id} className={cn("h-4 w-4", platform.color)} />
-                                      );
-                                    })}
-                                </div>
-                                <span className="text-sm">
-                                  {selectedPlatforms.length} platform{selectedPlatforms.length !== 1 ? 's' : ''} selected
-                                </span>
-                              </>
+                              <div className="flex items-center gap-1">
+                                {platforms
+                                  .filter(p => selectedPlatforms.includes(p.id))
+                                  .map((platform) => {
+                                    const Icon = platform.icon;
+                                    return (
+                                      <Icon key={platform.id} className={cn("h-4 w-4", platform.color)} />
+                                    );
+                                  })}
+                              </div>
                             ) : (
                               <span className="text-gray-500">Select platforms</span>
                             )}
@@ -335,117 +330,158 @@ export default function PostEditorModal({
                 </div>
 
                 {/* Caption */}
-                <div className="flex-1 flex flex-col">
+                <div className="flex flex-col">
                   <Label className="text-sm font-medium">Caption</Label>
-                  <div className="mt-2 flex-1">
+                  <div className="mt-2">
                     <Textarea
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="Write your caption..."
-                      className="w-full h-full min-h-[200px] resize-none text-base font-medium leading-relaxed"
+                      className="w-full h-[300px] resize-none text-base font-medium leading-relaxed"
                       maxLength={2200}
                     />
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="mt-2 text-xs text-gray-500 text-right">
                     {content.length}/2200 characters
                   </div>
                 </div>
 
-                {/* Media Upload */}
-                <div>
-                  <Label className="text-sm font-medium">Media</Label>
-                  <div className="mt-2 space-y-3">
-                    {/* Media Thumbnails */}
-                    {allMedia.length > 0 && (
-                      <div className="grid grid-cols-4 gap-2">
-                        {allMedia.map((media, index) => (
-                          <div key={index} className="relative group">
-                            <InstagramMediaThumbnail
-                              src={media.url}
-                              alt={`Media ${index + 1}`}
-                              className="w-full h-16 object-cover rounded-lg"
-                            />
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => removeMedia(index)}
-                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                {/* Two Column Layout - Media & Scheduling */}
+                <div className="flex gap-6 flex-1">
+                  {/* Left Column - Media Thumbnails */}
+                  <div className="flex-1 flex flex-col">
+                    <Label className="text-sm font-medium mb-3">Media Preview</Label>
+                    <div className="flex-1 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                      {allMedia.length > 0 ? (
+                        <div className="flex flex-col items-center space-y-4">
+                          {allMedia.map((media, index) => {
+                            const isVideo = media.type.startsWith('video/');
+                            return (
+                              <div
+                                key={index}
+                                className={cn(
+                                  "relative bg-white rounded-lg overflow-hidden shadow-md",
+                                  isVideo 
+                                    ? "w-48 h-80" // Facebook Reel aspect ratio (9:16)
+                                    : "w-64 h-64" // Instagram square
+                                )}
+                              >
+                                <InstagramMediaThumbnail
+                                  src={media.url}
+                                  type={media.type}
+                                  className="w-full h-full object-cover"
+                                />
+                                <button
+                                  onClick={() => removeMedia(index)}
+                                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-center text-gray-500">
+                          <Upload className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                          <p className="text-sm">No media uploaded</p>
+                          <p className="text-xs mt-1">Upload images or videos to see preview</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple={!allMedia.some(m => m.type.startsWith('video/'))}
-                      accept="image/*,video/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
-                    
-                    {/* Only show upload button if no video is attached */}
-                    {!allMedia.some(media => media.type.startsWith('video/')) && (
+                  {/* Right Column - Scheduling & Actions */}
+                  <div className="w-80 flex flex-col space-y-6">
+                    {/* Scheduling */}
+                    <div>
+                      <Label className="text-sm font-medium">Schedule Post</Label>
+                      <div className="mt-2 space-y-3">
+                        <div>
+                          <Label className="text-xs text-gray-600">Date</Label>
+                          <Input
+                            type="date"
+                            value={scheduledDate}
+                            onChange={(e) => setScheduledDate(e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-gray-600">Time</Label>
+                          <Input
+                            type="time"
+                            value={scheduledTime}
+                            onChange={(e) => setScheduledTime(e.target.value)}
+                            className="mt-1"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status */}
+                    <div>
+                      <Label className="text-sm font-medium">Status</Label>
+                      <Select value={status} onValueChange={setStatus}>
+                        <SelectTrigger className="mt-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="draft">Draft</SelectItem>
+                          <SelectItem value="scheduled">Scheduled</SelectItem>
+                          <SelectItem value="pending_approval">Pending Approval</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex flex-col space-y-3 pt-4">
+                      <Button
+                        onClick={handleSubmit}
+                        disabled={createPostMutation.isPending || !content.trim() || selectedPlatforms.length === 0}
+                        className="w-full"
+                      >
+                        {createPostMutation.isPending ? "Saving..." : (postId ? "Update Post" : "Create Post")}
+                      </Button>
                       <Button
                         variant="outline"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-full h-16 border-dashed"
+                        onClick={handleClose}
+                        className="w-full"
                       >
-                        <div className="text-center">
-                          <Upload className="h-4 w-4 mx-auto mb-1 text-gray-400" />
-                          <span className="text-xs text-gray-600">
-                            Upload photos and videos
-                          </span>
-                        </div>
+                        Cancel
                       </Button>
-                    )}
+                    </div>
                   </div>
                 </div>
 
-                {/* Date and Time Scheduling */}
-                <div>
-                  <Label className="text-sm font-medium">Schedule</Label>
-                  <div className="mt-2">
-                    <Input
-                      type="datetime-local"
-                      value={scheduledAt ? new Date(scheduledAt.getTime() - scheduledAt.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
-                      onChange={(e) => setScheduledAt(e.target.value ? new Date(e.target.value) : undefined)}
-                      className="w-full"
-                    />
+                {/* Hidden File Upload Input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple={!allMedia.some(m => m.type.startsWith('video/'))}
+                  accept="image/*,video/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+
+                {/* Upload Button */}
+                {!allMedia.some(media => media.type.startsWith('video/')) && (
+                  <div className="mb-4">
+                    <Button
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full h-12 border-dashed"
+                    >
+                      <div className="text-center">
+                        <Upload className="h-4 w-4 mx-auto mb-1 text-gray-400" />
+                        <span className="text-xs text-gray-600">
+                          Upload photos and videos
+                        </span>
+                      </div>
+                    </Button>
                   </div>
-                </div>
+                )}
 
-                {/* Status */}
-                <div>
-                  <Label className="text-sm font-medium">Status</Label>
-                  <Select value={status} onValueChange={setStatus}>
-                    <SelectTrigger className="mt-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="scheduled">Scheduled</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col space-y-3 pt-6">
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={createPostMutation.isPending || !content.trim() || selectedPlatforms.length === 0}
-                    className="w-full"
-                  >
-                    {createPostMutation.isPending ? "Saving..." : postId ? "Update Post" : "Create Post"}
-                  </Button>
-                  <Button variant="outline" onClick={handleClose} className="w-full">
-                    Cancel
-                  </Button>
-                </div>
               </div>
             </div>
             
