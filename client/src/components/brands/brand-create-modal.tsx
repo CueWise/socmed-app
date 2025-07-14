@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertBrandSchema, type InsertBrand, type Brand } from "@shared/schema";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -37,28 +38,122 @@ export default function BrandCreateModal({
   const { toast } = useToast();
   const createBrand = useCreateBrand();
   
+  // Enhanced validation schema with custom error messages
+  const enhancedBrandSchema = insertBrandSchema.extend({
+    name: z.string()
+      .min(1, "Brand name is required")
+      .min(2, "Brand name must be at least 2 characters long")
+      .max(100, "Brand name cannot exceed 100 characters")
+      .trim(),
+    logo: z.string()
+      .optional()
+      .refine((val) => !val || val === "" || /^https?:\/\/.+/.test(val), {
+        message: "Logo must be a valid URL starting with http:// or https://"
+      }),
+  });
+
   const form = useForm<InsertBrand>({
-    resolver: zodResolver(insertBrandSchema),
+    resolver: zodResolver(enhancedBrandSchema),
     defaultValues: {
       name: "",
       logo: "",
       colorPalette: [],
     },
+    mode: "onChange", // Enable real-time validation
   });
 
   const onSubmit = async (data: InsertBrand) => {
     try {
-      const brand = await createBrand.mutateAsync(data);
+      console.log('Form submission data:', data);
+      console.log('Form errors:', form.formState.errors);
+      
+      // Validate required fields
+      if (!data.name || data.name.trim().length === 0) {
+        toast({
+          title: "Validation Error",
+          description: "Brand name is required and cannot be empty.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (data.name.trim().length < 2) {
+        toast({
+          title: "Validation Error", 
+          description: "Brand name must be at least 2 characters long.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate logo URL if provided
+      if (data.logo && data.logo.trim().length > 0) {
+        try {
+          new URL(data.logo);
+        } catch {
+          toast({
+            title: "Invalid Logo URL",
+            description: "Please enter a valid URL for the logo (e.g., https://example.com/logo.png).",
+            variant: "destructive",
+          });
+          return;
+        }
+      }
+
+      // Clean the data
+      const cleanData = {
+        name: data.name.trim(),
+        logo: data.logo?.trim() || null,
+        colorPalette: data.colorPalette || []
+      };
+
+      const brand = await createBrand.mutateAsync(cleanData);
       toast({
-        title: "Brand created",
-        description: `${brand.name} has been created successfully.`,
+        title: "Success!",
+        description: `Brand "${brand.name}" has been created successfully.`,
       });
       onSuccess?.(brand);
       form.reset();
-    } catch (error) {
+      onOpenChange(false);
+    } catch (error: any) {
+      console.error('Brand creation error:', error);
+      
+      let errorTitle = "Failed to Create Brand";
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      
+      // Handle specific server error responses
+      if (error?.message && typeof error.message === 'string') {
+        errorMessage = error.message;
+      } else if (error?.response?.data) {
+        const serverError = error.response.data;
+        if (serverError.message) {
+          errorMessage = serverError.message;
+        }
+        
+        if (serverError.error === "duplicate") {
+          errorTitle = "Brand Already Exists";
+        } else if (serverError.error === "validation") {
+          errorTitle = "Invalid Input";
+        } else if (serverError.error === "server") {
+          errorTitle = "Server Error";
+        }
+      } else if (error?.message) {
+        // Handle fetch/network errors
+        if (error.message.includes('Failed to fetch') || error.message.includes('network')) {
+          errorTitle = "Connection Error";
+          errorMessage = "Unable to connect to server. Please check your internet connection and try again.";
+        } else if (error.message.includes('duplicate') || error.message.includes('unique')) {
+          errorTitle = "Brand Already Exists";
+          errorMessage = "A brand with this name already exists. Please choose a different name.";
+        } else if (error.message.includes('validation')) {
+          errorTitle = "Invalid Input";
+          errorMessage = "Please check all fields and try again.";
+        }
+      }
+
       toast({
-        title: "Error",
-        description: "Failed to create brand. Please try again.",
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive",
       });
     }

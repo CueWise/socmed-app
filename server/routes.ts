@@ -377,11 +377,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/brands", async (req, res) => {
     try {
-      const validatedData = insertBrandSchema.parse(req.body);
+      console.log('Creating brand with data:', JSON.stringify(req.body, null, 2));
+      
+      // Validate and clean input data
+      const cleanData = {
+        name: req.body.name?.trim(),
+        logo: req.body.logo?.trim() || null,
+        colorPalette: req.body.colorPalette || []
+      };
+
+      // Additional server-side validation
+      if (!cleanData.name || cleanData.name.length === 0) {
+        return res.status(400).json({ 
+          error: "validation", 
+          message: "Brand name is required and cannot be empty" 
+        });
+      }
+
+      if (cleanData.name.length < 2) {
+        return res.status(400).json({ 
+          error: "validation", 
+          message: "Brand name must be at least 2 characters long" 
+        });
+      }
+
+      if (cleanData.name.length > 100) {
+        return res.status(400).json({ 
+          error: "validation", 
+          message: "Brand name cannot exceed 100 characters" 
+        });
+      }
+
+      // Validate logo URL if provided
+      if (cleanData.logo && cleanData.logo.length > 0) {
+        try {
+          new URL(cleanData.logo);
+          if (!cleanData.logo.startsWith('http://') && !cleanData.logo.startsWith('https://')) {
+            return res.status(400).json({ 
+              error: "validation", 
+              message: "Logo URL must start with http:// or https://" 
+            });
+          }
+        } catch {
+          return res.status(400).json({ 
+            error: "validation", 
+            message: "Logo must be a valid URL" 
+          });
+        }
+      }
+
+      const validatedData = insertBrandSchema.parse(cleanData);
       const brand = await storage.createBrand(validatedData);
+      
+      console.log('Brand created successfully:', JSON.stringify(brand, null, 2));
       res.status(201).json(brand);
-    } catch (error) {
-      res.status(400).json({ error: "Invalid brand data" });
+    } catch (error: any) {
+      console.error('Brand creation error:', error);
+      
+      if (error?.code === '23505') { // PostgreSQL unique constraint violation
+        return res.status(409).json({ 
+          error: "duplicate", 
+          message: "A brand with this name already exists" 
+        });
+      }
+      
+      if (error?.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "validation", 
+          message: "Invalid input data",
+          details: error.issues?.map((issue: any) => issue.message).join(', ')
+        });
+      }
+
+      res.status(500).json({ 
+        error: "server", 
+        message: "An unexpected error occurred while creating the brand" 
+      });
     }
   });
 
