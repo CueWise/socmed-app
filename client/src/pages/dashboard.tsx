@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Sparkles, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import EnhancedCalendar from "@/components/calendar/enhanced-calendar";
@@ -8,6 +8,7 @@ import ApprovalCard from "@/components/approvals/approval-card";
 import AISuggestions from "@/components/ai/ai-suggestions";
 import PostEditorModal from "@/components/posts/post-editor-modal";
 import MobileWidgets from "@/components/mobile/mobile-widgets";
+import BrandIdentityShowcase from "@/components/brands/brand-identity-showcase";
 import { useApprovals } from "@/hooks/use-approvals";
 import { useAnalytics } from "@/hooks/use-analytics";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -17,6 +18,7 @@ export default function Dashboard() {
   const [showPostEditor, setShowPostEditor] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [editingPost, setEditingPost] = useState<any>(null);
+  const [showBrandShowcase, setShowBrandShowcase] = useState(false);
   const isMobile = useIsMobile();
   const { selectedBrand } = useBrand();
   const { data: approvals } = useApprovals();
@@ -72,6 +74,23 @@ export default function Dashboard() {
           <p className="text-gray-600 dark:text-gray-400">
             Manage your social media presence
           </p>
+        </div>
+        <div className="flex gap-2 mt-4 sm:mt-0">
+          <Button
+            variant="outline"
+            onClick={() => setShowBrandShowcase(true)}
+            className="flex items-center gap-2"
+          >
+            <Palette className="w-4 h-4" />
+            Brand Identity
+          </Button>
+          <Button
+            onClick={() => handleCreatePost()}
+            className="flex items-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Create Post
+          </Button>
         </div>
         
         <div className="hidden md:flex items-center space-x-3 mt-4 sm:mt-0">
@@ -234,6 +253,10 @@ export default function Dashboard() {
         postId={editingPost?.id}
         initialData={editingPost}
       />
+
+      {showBrandShowcase && (
+        <BrandIdentityShowcase onClose={() => setShowBrandShowcase(false)} />
+      )}
     </div>
   );
 }

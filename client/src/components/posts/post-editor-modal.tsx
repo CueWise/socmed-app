@@ -304,8 +304,6 @@ export default function PostEditorModal({
   const [mediaTypes, setMediaTypes] = useState<string[]>([]);
   const [emojiTarget, setEmojiTarget] = useState<'content' | 'note' | 'reply'>('content');
   const [activeFormats, setActiveFormats] = useState<Set<string>>(new Set());
-  const [showMediaConfirm, setShowMediaConfirm] = useState(false);
-  const [mediaToRemove, setMediaToRemove] = useState<{index: number, isExisting: boolean} | null>(null);
   const [detachedMedia, setDetachedMedia] = useState<string[]>([]);
   const [showLinkDialog, setShowLinkDialog] = useState(false);
   const [linkText, setLinkText] = useState("");
@@ -485,35 +483,23 @@ export default function PostEditorModal({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [showMediaPlayer, allMedia.length]);
 
-  // Handle media removal confirmation
+  // Handle media removal - automatically remove from database permanently
   const handleRemoveMedia = (index: number, isExisting: boolean) => {
     if (!isExisting) {
-      // For newly attached media, remove immediately without confirmation
+      // For newly attached media, remove immediately
       const adjustedIndex = index - existingMedia.length;
       setAttachedMedia(prev => prev.filter((_, i) => i !== adjustedIndex));
     } else {
-      // For existing media, show confirmation with two options
-      setMediaToRemove({ index, isExisting });
-      setShowMediaConfirm(true);
-    }
-  };
-
-  const confirmRemoveMedia = (permanent: boolean) => {
-    if (!mediaToRemove) return;
-    
-    if (permanent) {
-      // Remove from database permanently
-      const newMediaUrls = existingMedia.filter((_, i) => i !== mediaToRemove.index);
+      // For existing media, remove from database permanently
+      const newMediaUrls = existingMedia.filter((_, i) => i !== index);
       setMediaUrls(newMediaUrls);
-    } else {
-      // Just detach from this draft (hide from preview but keep in database)
-      // We'll track detached media separately
-      const detachedUrl = existingMedia[mediaToRemove.index];
-      setDetachedMedia(prev => [...prev, detachedUrl]);
     }
     
-    setShowMediaConfirm(false);
-    setMediaToRemove(null);
+    // Show success message
+    toast({
+      title: "Media Removed",
+      description: "The media has been successfully removed from the content.",
+    });
   };
 
   const platforms = [
@@ -1322,51 +1308,7 @@ export default function PostEditorModal({
         </div>
       )}
 
-      {/* Media Removal Confirmation Modal */}
-      {showMediaConfirm && (
-        <div className="fixed inset-0 z-[200] bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-2xl max-w-md mx-4">
-            <h3 className="text-lg font-semibold mb-4">Remove Media</h3>
-            <p className="text-gray-600 mb-6">
-              Choose how you want to remove this media:
-            </p>
-            <div className="space-y-3 mb-6">
-              <div className="p-3 border rounded-lg">
-                <h4 className="font-medium text-sm mb-1">Detach from Draft Only</h4>
-                <p className="text-xs text-gray-500">Hide from this draft but keep the media in your post database</p>
-              </div>
-              <div className="p-3 border rounded-lg border-red-200 bg-red-50">
-                <h4 className="font-medium text-sm mb-1 text-red-800">Remove Permanently</h4>
-                <p className="text-xs text-red-600">Delete the media from your post completely. This cannot be undone.</p>
-              </div>
-            </div>
-            <div className="flex gap-3 justify-end">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowMediaConfirm(false);
-                  setMediaToRemove(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => confirmRemoveMedia(false)}
-                className="border-blue-200 text-blue-700 hover:bg-blue-50"
-              >
-                Detach Only
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => confirmRemoveMedia(true)}
-              >
-                Remove Permanently
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Platform Selection Modal */}
       <PlatformSelectionModal
