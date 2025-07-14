@@ -295,7 +295,7 @@ export default function PostEditorModal({
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="Write your caption..."
-                      className="w-full h-full min-h-[200px] resize-none text-lg font-medium leading-relaxed"
+                      className="w-full h-full min-h-[200px] resize-none text-base font-medium leading-relaxed"
                       maxLength={2200}
                     />
                   </div>
