@@ -376,11 +376,16 @@ export default function PostEditorModal({
                   <div className="w-[35%] flex flex-col">
                     <Label className="text-sm font-medium mb-3">Media Preview</Label>
                     <div 
-                      className="flex-1 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+                      className={cn(
+                        "flex-1 flex items-center justify-center rounded-lg border-2 cursor-pointer transition-colors",
+                        allMedia.length === 0 
+                          ? "bg-gray-50 border-dashed border-gray-200 hover:bg-gray-100" 
+                          : "bg-transparent border-transparent"
+                      )}
                       onClick={() => allMedia.length === 0 && fileInputRef.current?.click()}
                     >
                       {allMedia.length > 0 ? (
-                        <div className="flex flex-col items-center space-y-4 relative w-full h-full">
+                        <div className="flex flex-col items-center justify-center space-y-4 relative w-full h-full">
                           {allMedia.map((media, index) => {
                             const isVideo = media.type.startsWith('video/');
                             const isPhoto = media.type.startsWith('image/');
@@ -390,8 +395,8 @@ export default function PostEditorModal({
                                 className={cn(
                                   "relative bg-white rounded-lg overflow-hidden shadow-md",
                                   isVideo 
-                                    ? "w-40 h-64" // Facebook Reel aspect ratio (9:16)
-                                    : "w-48 h-48" // Instagram square
+                                    ? "w-32 h-56" // Facebook Reel aspect ratio (9:16) - adjusted for smaller column
+                                    : "w-40 h-40" // Instagram square - adjusted for smaller column
                                 )}
                               >
                                 <InstagramMediaThumbnail
@@ -406,7 +411,7 @@ export default function PostEditorModal({
                                   <X className="h-4 w-4" />
                                 </button>
                                 {/* Upload icon for photos only */}
-                                {isPhoto && !allMedia.some(m => m.type.startsWith('video/')) && (
+                                {isPhoto && (
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
