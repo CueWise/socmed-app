@@ -443,7 +443,7 @@ export default function PostEditorModal({
   }, [content, selectedPlatforms, hashtags, status, notes, initialData]);
 
   // Get existing media from database (excluding detached ones)
-  const existingMedia = (initialData?.mediaUrls || []).filter(url => !detachedMedia.includes(url));
+  const existingMedia = mediaUrls.filter(url => !detachedMedia.includes(url));
   
   // Get all media (existing + newly attached)
   const allMedia = [
@@ -490,30 +490,29 @@ export default function PostEditorModal({
       const adjustedIndex = index - existingMedia.length;
       setAttachedMedia(prev => prev.filter((_, i) => i !== adjustedIndex));
     } else {
-      // For existing media, remove from database permanently
+      // For existing media, remove from UI state immediately
       const mediaToRemove = existingMedia[index];
       const newMediaUrls = existingMedia.filter((_, i) => i !== index);
+      
+      // Update local state immediately for instant UI update
       setMediaUrls(newMediaUrls);
       
-      // If editing an existing post, update the database immediately
+      // If editing an existing post, update the database in background
       if (postId && mediaToRemove) {
         try {
-          // Remove the media URL from the post in the database
-          const updatedPost = {
-            mediaUrls: newMediaUrls,
-          };
-          
           await fetch(`/api/posts/${postId}`, {
             method: 'PATCH',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify(updatedPost),
+            body: JSON.stringify({ mediaUrls: newMediaUrls }),
           });
           
           console.log('Media removed from database:', mediaToRemove);
         } catch (error) {
           console.error('Failed to remove media from database:', error);
+          // Revert the UI change if database update fails
+          setMediaUrls(existingMedia);
         }
       }
     }
