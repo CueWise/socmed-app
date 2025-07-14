@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { useCalendarPosts } from "@/hooks/use-posts";
 import { useBrand } from "@/hooks/use-brand";
 import { useIsMobile } from "@/hooks/use-mobile";
+import MediaThumbnail from "@/components/ui/media-thumbnail";
 
 interface TooltipData {
   visible: boolean;
@@ -409,30 +410,12 @@ export default function EnhancedCalendar({
                           
                           {/* Media thumbnail */}
                           {post.mediaUrls && post.mediaUrls.length > 0 && (
-                            <div className="w-4 h-4 rounded bg-gray-200 border border-gray-300 overflow-hidden">
-                              <img 
-                                src={post.mediaUrls[0]} 
-                                alt="" 
-                                className="w-full h-full object-cover"
-                                loading="lazy"
-                                onLoad={(e) => {
-                                  console.log('Image loaded successfully:', e.currentTarget.src);
-                                }}
-                                onError={(e) => {
-                                  console.log('Image failed to load:', e.currentTarget.src);
-                                  // Show placeholder text if image fails to load
-                                  const target = e.currentTarget;
-                                  target.style.display = 'none';
-                                  const placeholder = target.parentElement;
-                                  if (placeholder && !placeholder.querySelector('.placeholder-text')) {
-                                    const span = document.createElement('div');
-                                    span.className = 'placeholder-text w-full h-full bg-gray-300 flex items-center justify-center';
-                                    span.innerHTML = '<span class="text-[6px] text-gray-500 font-medium">IMG</span>';
-                                    placeholder.appendChild(span);
-                                  }
-                                }}
-                              />
-                            </div>
+                            <MediaThumbnail
+                              src={post.mediaUrls[0]}
+                              alt=""
+                              className="w-4 h-4 rounded bg-gray-200 border border-gray-300 overflow-hidden"
+                              fallbackText="IMG"
+                            />
                           )}
                           
                           {/* Content preview (truncated) */}
@@ -521,11 +504,12 @@ export default function EnhancedCalendar({
                   {post.mediaUrls && post.mediaUrls.length > 0 && (
                     <div className="flex space-x-2 mb-2">
                       {post.mediaUrls.slice(0, 3).map((url: string, idx: number) => (
-                        <img 
+                        <MediaThumbnail
                           key={idx}
-                          src={url} 
-                          alt="" 
-                          className="w-12 h-12 object-cover rounded border border-gray-200"
+                          src={url}
+                          alt=""
+                          className="w-12 h-12 rounded border border-gray-200"
+                          fallbackText="MEDIA"
                         />
                       ))}
                       {post.mediaUrls.length > 3 && (
@@ -621,11 +605,12 @@ export default function EnhancedCalendar({
                   {post.mediaUrls && post.mediaUrls.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mb-3">
                       {post.mediaUrls.slice(0, 6).map((url: string, idx: number) => (
-                        <img 
+                        <MediaThumbnail
                           key={idx}
-                          src={url} 
-                          alt="" 
-                          className="w-full h-20 object-cover rounded border border-gray-200"
+                          src={url}
+                          alt=""
+                          className="w-full h-20 rounded border border-gray-200"
+                          fallbackText="MEDIA"
                         />
                       ))}
                       {post.mediaUrls.length > 6 && (

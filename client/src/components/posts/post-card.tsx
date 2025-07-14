@@ -14,6 +14,7 @@ import type { Post } from "@shared/schema";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import MediaThumbnail from "@/components/ui/media-thumbnail";
 
 interface PostCardProps {
   post: Post;
@@ -166,13 +167,21 @@ export default function PostCard({ post }: PostCardProps) {
         {/* Media Preview */}
         {post.mediaUrls && post.mediaUrls.length > 0 && (
           <div className="mb-3">
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3 text-center">
-              <div className="w-8 h-8 mx-auto mb-2 bg-gray-300 dark:bg-gray-600 rounded flex items-center justify-center">
-                <span className="material-icons text-gray-600 dark:text-gray-400 text-sm">image</span>
-              </div>
-              <span className="text-xs text-gray-500">
-                {post.mediaUrls.length} media file{post.mediaUrls.length > 1 ? 's' : ''}
-              </span>
+            <div className="grid grid-cols-3 gap-2">
+              {post.mediaUrls.slice(0, 3).map((url: string, idx: number) => (
+                <MediaThumbnail
+                  key={idx}
+                  src={url}
+                  alt=""
+                  className="w-full h-16 rounded border border-gray-200"
+                  fallbackText="MEDIA"
+                />
+              ))}
+              {post.mediaUrls.length > 3 && (
+                <div className="w-full h-16 bg-gray-100 dark:bg-gray-800 rounded border border-gray-200 flex items-center justify-center">
+                  <span className="text-xs text-gray-500">+{post.mediaUrls.length - 3}</span>
+                </div>
+              )}
             </div>
           </div>
         )}
