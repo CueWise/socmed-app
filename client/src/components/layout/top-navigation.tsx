@@ -17,8 +17,8 @@ export default function TopNavigation({ onMenuClick }: TopNavigationProps) {
   const { selectedBrand } = useBrand();
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-      <div className="flex items-center justify-between p-4">
+    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      <div className="flex items-center justify-between h-16 px-4 md:px-6">
         {/* Mobile Menu Button */}
         <Button
           variant="ghost"
@@ -30,24 +30,35 @@ export default function TopNavigation({ onMenuClick }: TopNavigationProps) {
           <Menu className="h-6 w-6" />
         </Button>
 
-        {/* Brand Logo */}
+        {/* Desktop Page Title / Mobile Brand Logo */}
         <div className="flex items-center space-x-3">
-          {selectedBrand?.logo ? (
-            <div className="w-8 h-8 rounded-lg overflow-hidden border border-gray-200">
-              <img 
-                src={selectedBrand.logo} 
-                alt={`${selectedBrand.name} logo`}
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ) : (
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <div className="w-4 h-4 bg-white rounded-sm" />
-            </div>
-          )}
-          <h1 className="text-xl font-medium hidden sm:block text-gray-900">
-            {selectedBrand?.name || "CueWise"}
-          </h1>
+          {/* Mobile Brand Logo */}
+          <div className="md:hidden flex items-center space-x-3">
+            {selectedBrand?.logo ? (
+              <div className="w-8 h-8 rounded-lg overflow-hidden border border-gray-200">
+                <img 
+                  src={selectedBrand.logo} 
+                  alt={`${selectedBrand.name} logo`}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            ) : (
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <div className="w-4 h-4 bg-white rounded-sm" />
+              </div>
+            )}
+            <h1 className="text-xl font-medium text-gray-900">
+              {selectedBrand?.name || "CueWise"}
+            </h1>
+          </div>
+          
+          {/* Desktop Page Context */}
+          <div className="hidden md:block">
+            <h1 className="text-xl font-semibold text-gray-900">
+              {selectedBrand?.name || "CueWise"}
+            </h1>
+            <p className="text-sm text-gray-500">Social Media Management</p>
+          </div>
         </div>
 
         {/* Right Actions */}
