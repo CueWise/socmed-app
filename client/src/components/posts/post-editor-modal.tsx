@@ -261,7 +261,7 @@ export default function PostEditorModal({
               </div>
 
               {/* Form Content */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-6 flex flex-col space-y-6">
                 {/* Platform Selection */}
                 <div>
                   <Label className="text-sm font-medium">Platforms</Label>
@@ -288,16 +288,19 @@ export default function PostEditorModal({
                 </div>
 
                 {/* Caption */}
-                <div>
+                <div className="flex-1 flex flex-col">
                   <Label className="text-sm font-medium">Caption</Label>
-                  <div className="mt-2">
-                    <EnhancedCaptionField
+                  <div className="mt-2 flex-1">
+                    <Textarea
                       value={content}
-                      onChange={setContent}
+                      onChange={(e) => setContent(e.target.value)}
                       placeholder="Write your caption..."
+                      className="w-full h-full min-h-[200px] resize-none text-lg font-medium leading-relaxed"
                       maxLength={2200}
-                      className="min-h-[120px]"
                     />
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {content.length}/2200 characters
                   </div>
                 </div>
 
