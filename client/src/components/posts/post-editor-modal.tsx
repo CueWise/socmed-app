@@ -405,14 +405,15 @@ export default function PostEditorModal({
                                 >
                                   <X className="h-4 w-4" />
                                 </button>
-                                {/* Upload icon for photos only */}
-                                {isPhoto && (
+                                {/* Upload icon for photos only (when no videos exist) */}
+                                {isPhoto && allMedia.every(m => m.type.startsWith('image/')) && (
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       fileInputRef.current?.click();
                                     }}
                                     className="absolute top-2 left-2 bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors z-10"
+                                    title="Upload more photos"
                                   >
                                     <Upload className="h-4 w-4" />
                                   </button>
