@@ -13,6 +13,21 @@ CueWise is a web-based social media management platform with AI-powered content 
   - Logo displays from uploaded brand assets when available
   - Fallback to default "CueWise" branding when no brand is selected
 
+✓ **Media Upload Loading Effects Added** - Enhanced UX during file uploads
+  - Loading spinners appear immediately when files are selected for upload
+  - Loading placeholders show in thumbnail section during file processing
+  - Animated spinner with "Uploading" text provides clear feedback
+  - Loading states removed automatically when upload completes
+  - Error handling reverts loading states if upload fails
+  - Proper sizing for both single and multiple media loading states
+
+✓ **Media Detach Button Fixed** - Immediate UI updates for media removal
+  - Media thumbnails disappear instantly when X button is clicked
+  - Database updates happen in background after UI change
+  - Error handling reverts UI changes if database update fails
+  - Success toast message confirms media removal
+  - No confirmation dialogs needed for streamlined workflow
+
 ✓ **Video Thumbnail Display Fixed** - Complete video thumbnail implementation across all components
   - Fixed post editor modal to display actual video thumbnails instead of generic icons
   - Updated calendar components to use MediaThumbnail component for proper video display
