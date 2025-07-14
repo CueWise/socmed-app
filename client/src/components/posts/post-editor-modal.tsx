@@ -385,19 +385,14 @@ export default function PostEditorModal({
                       onClick={() => allMedia.length === 0 && fileInputRef.current?.click()}
                     >
                       {allMedia.length > 0 ? (
-                        <div className="flex flex-col items-center justify-center space-y-4 relative w-full h-full">
+                        <div className="flex flex-col items-center justify-start pt-4 space-y-4 relative w-full h-full">
                           {allMedia.map((media, index) => {
                             const isVideo = media.type.startsWith('video/');
                             const isPhoto = media.type.startsWith('image/');
                             return (
                               <div
                                 key={index}
-                                className={cn(
-                                  "relative bg-white rounded-lg overflow-hidden shadow-md",
-                                  isVideo 
-                                    ? "w-32 h-56" // Facebook Reel aspect ratio (9:16) - adjusted for smaller column
-                                    : "w-40 h-40" // Instagram square - adjusted for smaller column
-                                )}
+                                className="relative bg-white rounded-lg overflow-hidden shadow-md w-full aspect-square max-w-[200px]"
                               >
                                 <InstagramMediaThumbnail
                                   src={media.url}
@@ -406,7 +401,7 @@ export default function PostEditorModal({
                                 />
                                 <button
                                   onClick={() => removeMedia(index)}
-                                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors z-10"
                                 >
                                   <X className="h-4 w-4" />
                                 </button>
@@ -417,7 +412,7 @@ export default function PostEditorModal({
                                       e.stopPropagation();
                                       fileInputRef.current?.click();
                                     }}
-                                    className="absolute bottom-2 right-2 bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors"
+                                    className="absolute top-2 left-2 bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors z-10"
                                   >
                                     <Upload className="h-4 w-4" />
                                   </button>
