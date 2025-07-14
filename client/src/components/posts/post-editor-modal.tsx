@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 import RichTextEditor from "@/components/ui/rich-text-editor";
 import { useBrandStore } from "@/hooks/use-brand";
 import { useAuth } from "@/hooks/useAuth";
+import MediaThumbnail from "@/components/ui/media-thumbnail";
 
 interface PostEditorModalProps {
   open: boolean;
@@ -967,51 +968,18 @@ export default function PostEditorModal({
                                 setShowMediaPlayer(true);
                               }
                             }}
-                            className="block"
+                            className="block hover:opacity-90 transition-opacity"
                           >
-                            {media.type === 'image' ? (
-                              <img 
-                                src={media.url} 
-                                alt={`Media ${index + 1}`}
-                                className={cn(
-                                  "object-cover rounded border shadow-sm hover:opacity-90 transition-opacity",
-                                  allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
-                                )}
-                                onError={(e) => {
-                                  console.error('Image failed to load:', media.url, e);
-                                  // Fallback display for broken images
-                                  e.currentTarget.style.display = 'none';
-                                  e.currentTarget.parentElement?.nextElementSibling?.classList.remove('hidden');
-                                }}
-                                onLoad={() => {
-                                  console.log('Image loaded successfully:', media.url);
-                                }}
-                              />
-                            ) : (
-                              <div className={cn(
-                                "bg-gray-800 rounded border shadow-sm flex items-center justify-center hover:bg-gray-700 transition-colors",
+                            <MediaThumbnail
+                              src={media.url}
+                              alt={`Media ${index + 1}`}
+                              className={cn(
+                                "rounded border shadow-sm",
                                 allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
-                              )}>
-                                <Play className={cn(
-                                  "text-white",
-                                  allMedia.length === 1 ? "h-12 w-12" : "h-8 w-8"
-                                )} />
-                              </div>
-                            )}
+                              )}
+                              fallbackText={media.type.toUpperCase()}
+                            />
                           </button>
-                          
-                          {/* Fallback display for broken image */}
-                          <div className={cn(
-                            "hidden bg-gray-200 rounded border shadow-sm flex items-center justify-center",
-                            allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
-                          )}>
-                            <div className={cn(
-                              "text-gray-500 text-center",
-                              allMedia.length === 1 ? "text-sm" : "text-xs"
-                            )}>
-                              Failed to load
-                            </div>
-                          </div>
                           
 
                           
@@ -1480,13 +1448,12 @@ export default function PostEditorModal({
                           <div className="aspect-square bg-gray-100 relative">
                             {allMedia.length === 1 ? (
                               // Single media display
-                              allMedia[0].type === 'image' ? (
-                                <img src={allMedia[0].url} alt="Post content" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                                  <Play className="h-12 w-12 text-white" />
-                                </div>
-                              )
+                              <MediaThumbnail
+                                src={allMedia[0].url}
+                                alt="Post content"
+                                className="w-full h-full"
+                                fallbackText={allMedia[0].type.toUpperCase()}
+                              />
                             ) : (
                               // Multiple images in grid
                               <div className={cn(
@@ -1558,13 +1525,12 @@ export default function PostEditorModal({
                           <div className="bg-gray-100">
                             {allMedia.length === 1 ? (
                               // Single media
-                              allMedia[0].type === 'image' ? (
-                                <img src={allMedia[0].url} alt="Post content" className="w-full h-auto" />
-                              ) : (
-                                <div className="w-full h-64 bg-gray-800 flex items-center justify-center">
-                                  <Play className="h-16 w-16 text-white" />
-                                </div>
-                              )
+                              <MediaThumbnail
+                                src={allMedia[0].url}
+                                alt="Post content"
+                                className="w-full h-64"
+                                fallbackText={allMedia[0].type.toUpperCase()}
+                              />
                             ) : (
                               // Multiple images
                               <div className="grid grid-cols-2 gap-1 p-2">
@@ -1640,15 +1606,14 @@ export default function PostEditorModal({
                                       setShowMediaPlayer(true);
                                     }
                                   }}
-                                  className="block w-full"
+                                  className="block w-full hover:opacity-90 transition-opacity"
                                 >
-                                  {allMedia[0].type === 'image' ? (
-                                    <img src={allMedia[0].url} alt="Post content" className="w-full h-auto hover:opacity-90 transition-opacity" />
-                                  ) : (
-                                    <div className="w-full h-48 bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition-colors">
-                                      <Play className="h-12 w-12 text-white" />
-                                    </div>
-                                  )}
+                                  <MediaThumbnail
+                                    src={allMedia[0].url}
+                                    alt="Post content"
+                                    className="w-full h-48"
+                                    fallbackText={allMedia[0].type.toUpperCase()}
+                                  />
                                 </button>
                               </div>
                             )}
@@ -1694,15 +1659,14 @@ export default function PostEditorModal({
                                   setShowMediaPlayer(true);
                                 }
                               }}
-                              className="block w-full h-full"
+                              className="block w-full h-full hover:opacity-90 transition-opacity"
                             >
-                              {allMedia[0].type === 'video' ? (
-                                <div className="w-full h-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition-colors">
-                                  <Play className="h-16 w-16 text-white" />
-                                </div>
-                              ) : (
-                                <img src={allMedia[0].url} alt="Post content" className="w-full h-full object-cover hover:opacity-90 transition-opacity" />
-                              )}
+                              <MediaThumbnail
+                                src={allMedia[0].url}
+                                alt="Post content"
+                                className="w-full h-full"
+                                fallbackText={allMedia[0].type.toUpperCase()}
+                              />
                             </button>
                           ) : (
                             <div className="w-full h-full bg-gray-800 flex items-center justify-center">
