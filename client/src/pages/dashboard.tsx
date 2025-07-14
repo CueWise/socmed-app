@@ -78,10 +78,7 @@ export default function Dashboard() {
         <div className="flex gap-2 mt-4 sm:mt-0">
           <Button
             variant="outline"
-            onClick={() => {
-              console.log("Brand Identity button clicked, selectedBrand:", selectedBrand);
-              setShowBrandShowcase(true);
-            }}
+            onClick={() => setShowBrandShowcase(true)}
             className="flex items-center gap-2"
           >
             <Palette className="w-4 h-4" />

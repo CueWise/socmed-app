@@ -10,6 +10,7 @@ import Dashboard from "@/pages/dashboard";
 import Calendar from "@/pages/calendar";
 import Drafts from "@/pages/drafts";
 import Analytics from "@/pages/analytics";
+import BrandLibraryPage from "@/pages/brand-library";
 import Landing from "@/pages/landing";
 import NotFound from "@/pages/not-found";
 
@@ -32,6 +33,7 @@ function Router() {
         <Route path="/calendar" component={Calendar} />
         <Route path="/drafts" component={Drafts} />
         <Route path="/analytics" component={Analytics} />
+        <Route path="/brand-library" component={BrandLibraryPage} />
         <Route component={NotFound} />
       </Switch>
     </AppShell>

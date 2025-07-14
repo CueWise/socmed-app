@@ -30,6 +30,44 @@ export const brands = pgTable("brands", {
   name: text("name").notNull(),
   logo: text("logo"),
   colorPalette: json("color_palette").$type<string[]>(),
+  
+  // Brand Identity
+  vision: text("vision"),
+  mission: text("mission"),
+  values: text("values"),
+  brandGuidelines: text("brand_guidelines"),
+  brandStory: text("brand_story"),
+  targetAudience: text("target_audience"),
+  
+  // Primary Contact
+  primaryContactName: text("primary_contact_name"),
+  primaryContactEmail: text("primary_contact_email"),
+  primaryContactPhone: text("primary_contact_phone"),
+  primaryContactRole: text("primary_contact_role"),
+  
+  // Secondary Contact
+  secondaryContactName: text("secondary_contact_name"),
+  secondaryContactEmail: text("secondary_contact_email"),
+  secondaryContactPhone: text("secondary_contact_phone"),
+  secondaryContactRole: text("secondary_contact_role"),
+  
+  // Business Information
+  website: text("website"),
+  businessAddress: text("business_address"),
+  officePhone: text("office_phone"),
+  businessType: text("business_type"),
+  industry: text("industry"),
+  
+  // Social Media
+  instagramHandle: text("instagram_handle"),
+  facebookPage: text("facebook_page"),
+  twitterHandle: text("twitter_handle"),
+  tiktokHandle: text("tiktok_handle"),
+  linkedinPage: text("linkedin_page"),
+  
+  // Custom Fields (JSON for flexibility)
+  customFields: json("custom_fields").$type<Array<{label: string, value: string, type: string}>>(),
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
