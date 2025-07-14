@@ -33,6 +33,8 @@ import RichTextEditor from "@/components/ui/rich-text-editor";
 import { useBrandStore } from "@/hooks/use-brand";
 import { useAuth } from "@/hooks/useAuth";
 import MediaThumbnail from "@/components/ui/media-thumbnail";
+import InstagramMediaThumbnail from "@/components/ui/instagram-media-thumbnail";
+import EnhancedCaptionField from "@/components/ui/enhanced-caption-field";
 
 interface PostEditorModalProps {
   open: boolean;
@@ -889,62 +891,33 @@ export default function PostEditorModal({
                 {/* Caption */}
                 <div>
                   <Label htmlFor="content" className="text-sm font-medium">Caption</Label>
-                  <Textarea
-                    id="content"
-                    placeholder="Write your caption..."
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    className="mt-2 min-h-[120px] resize-none"
-                    maxLength={2200}
-                  />
-                  
-                  {/* Caption Character Count */}
-                  <div className="flex justify-end mt-2">
-                    <p className="text-xs text-gray-500">
-                      {content.length}/2200 characters
-                    </p>
-                  </div>
-                  
-
-                </div>
-
-                {/* Hashtags */}
-                <div>
-                  <Label className="text-sm font-medium">Hashtags</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {hashtags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-sm"
-                      >
-                        #{tag}
-                        <button
-                          onClick={() => setHashtags(hashtags.filter((_, i) => i !== index))}
-                          className="text-blue-600 hover:text-blue-800"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
-                    ))}
-                    <Input
-                      placeholder="Add hashtag..."
-                      className="w-32 h-8 text-sm"
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          const value = e.currentTarget.value.trim().replace('#', '');
-                          if (value && !hashtags.includes(value)) {
-                            setHashtags([...hashtags, value]);
-                            e.currentTarget.value = '';
-                          }
-                        }
+                  <div className="mt-2">
+                    <EnhancedCaptionField
+                      value={content}
+                      onChange={setContent}
+                      placeholder="Write your caption..."
+                      onEmojiClick={() => {
+                        setEmojiTarget('content');
+                        setShowEmojiPicker(true);
+                      }}
+                      onHashtagClick={() => {
+                        // Insert hashtag at cursor position
+                        setContent(prev => prev + '#');
+                      }}
+                      onAIClick={() => {
+                        setIsGeneratingCaption(true);
+                        // AI caption generation logic here
+                        setTimeout(() => setIsGeneratingCaption(false), 2000);
                       }}
                     />
                   </div>
                 </div>
 
-                {/* Media Thumbnails - Always visible section below hashtags */}
+                {/* Remove Hashtags section - functionality moved to caption field */}
+
+                {/* Media Thumbnails - Instagram-style square thumbnails */}
                 <div className="mt-4">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <span className="text-sm font-medium text-gray-700">
                       Media ({allMedia.length})
                     </span>
@@ -959,75 +932,35 @@ export default function PostEditorModal({
                   </div>
                   
                   {allMedia.length > 0 ? (
-                    <div className={cn(
-                      "p-2 bg-gray-50 rounded border flex flex-wrap gap-2",
-                      allMedia.length === 1 ? "justify-center" : ""
-                    )}>
+                    <div className="grid grid-cols-3 gap-2">
                       {allMedia.map((media, index) => (
-                        <div key={index} className="relative flex-shrink-0">
-                          <button
-                            onClick={() => {
-                              if (isMobileDevice() && (media.type === 'video' || media.type === 'audio')) {
-                                // Open in native media player on mobile
-                                window.open(media.url, '_blank');
-                              } else {
-                                // Use custom media player for desktop or images
-                                setCurrentMediaIndex(index);
-                                setMediaPlayerSource('edit');
-                                setShowMediaPlayer(true);
-                              }
-                            }}
-                            className="block hover:opacity-90 transition-opacity"
-                          >
-                            <MediaThumbnail
-                              src={media.url}
-                              alt={`Media ${index + 1}`}
-                              className={cn(
-                                "rounded border shadow-sm",
-                                allMedia.length === 1 ? "w-32 h-32" : "w-20 h-20"
-                              )}
-                              fallbackText={media.type.toUpperCase()}
-                            />
-                          </button>
-                          
-
-                          
-                          {/* Remove Button */}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleRemoveMedia(index, media.isExisting);
-                            }}
-                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600 shadow-sm z-10"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
+                        <InstagramMediaThumbnail
+                          key={index}
+                          src={media.url}
+                          alt={`Media ${index + 1}`}
+                          className="w-full"
+                          onRemove={() => handleRemoveMedia(index, media.isExisting)}
+                        />
                       ))}
                       
-                      {/* Loading Placeholders */}
+                      {/* Loading placeholders */}
                       {uploadingFiles.map((uploadId) => (
-                        <div key={uploadId} className="relative flex-shrink-0">
-                          <div className={cn(
-                            "rounded border shadow-sm bg-gray-100 flex items-center justify-center animate-pulse",
-                            allMedia.length === 0 && uploadingFiles.length === 1 ? "w-32 h-32" : "w-20 h-20"
-                          )}>
-                            <div className="flex flex-col items-center gap-1">
-                              <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                              <span className="text-xs text-gray-600 font-medium">Uploading</span>
-                            </div>
+                        <div key={uploadId} className="aspect-square bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                          <div className="flex flex-col items-center gap-2">
+                            <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                            <span className="text-xs text-gray-600 font-medium">Uploading</span>
                           </div>
                         </div>
                       ))}
                       
-                      {/* Upload Button - Show if no video and images < 10, or no media at all */}
+                      {/* Upload Button */}
                       {canAddMedia() && (
                         <button
                           onClick={() => {
                             const input = document.createElement('input');
                             input.type = 'file';
                             input.accept = 'image/*,video/*,image/gif';
-                            input.multiple = !hasVideo; // Multiple only if no video
+                            input.multiple = !hasVideo;
                             input.onchange = async (e) => {
                               const files = Array.from((e.target as HTMLInputElement).files || []);
                               
@@ -1038,7 +971,7 @@ export default function PostEditorModal({
                                 return uniqueId;
                               });
                               
-                              // Upload files immediately to get proper file types
+                              // Upload files
                               try {
                                 const { uploadFiles } = await import('@/lib/upload');
                                 const result = await uploadFiles(files);
@@ -1058,7 +991,6 @@ export default function PostEditorModal({
                                     return;
                                   }
                                   
-                                  // Create unique media object with proper identification and session isolation
                                   setAttachedMedia(prev => [...prev, { 
                                     url, 
                                     type, 
@@ -1071,39 +1003,26 @@ export default function PostEditorModal({
                                   }]);
                                 });
                                 
-                                // Update media types state
                                 setMediaTypes(prev => [...prev, ...result.types]);
                               } catch (error) {
                                 console.error('Upload failed:', error);
-                                // Remove loading placeholders on error
                                 setUploadingFiles(prev => prev.filter(id => !loadingPlaceholders.includes(id)));
                                 alert('Failed to upload files. Please try again.');
                               }
                             };
                             input.click();
                           }}
-                          className={cn(
-                            "rounded border-2 border-dashed border-gray-300 hover:border-gray-400 bg-white hover:bg-gray-50 flex items-center justify-center transition-colors",
-                            allMedia.length === 0 ? "w-32 h-32" : "w-20 h-20"
-                          )}
+                          className="aspect-square bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-100 flex items-center justify-center transition-colors"
                         >
                           <div className="text-center">
-                            <Upload className={cn(
-                              "mx-auto text-gray-400 mb-1",
-                              allMedia.length === 0 ? "h-8 w-8" : "h-5 w-5"
-                            )} />
-                            <span className={cn(
-                              "text-gray-500 font-medium",
-                              allMedia.length === 0 ? "text-sm" : "text-xs"
-                            )}>
-                              {allMedia.length === 0 ? "Upload" : "+"}
-                            </span>
+                            <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                            <span className="text-sm text-gray-500 font-medium">Upload</span>
                           </div>
                         </button>
                       )}
                     </div>
                   ) : (
-                    <div className="p-4 bg-gray-50 rounded border text-center text-gray-500 text-sm">
+                    <div className="aspect-square bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
                       <button
                         onClick={() => {
                           const input = document.createElement('input');
@@ -1113,18 +1032,15 @@ export default function PostEditorModal({
                           input.onchange = async (e) => {
                             const files = Array.from((e.target as HTMLInputElement).files || []);
                             
-                            // Upload files immediately to get proper file types
                             try {
                               const { uploadFiles } = await import('@/lib/upload');
                               const result = await uploadFiles(files);
                               
-                              // Add uploaded files to attached media
                               result.urls.forEach((url, index) => {
                                 const file = files[index];
                                 const type = result.types[index] as 'image' | 'video' | 'audio';
                                 const uniqueId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                                 
-                                // Create unique media object with proper identification and session isolation
                                 setAttachedMedia(prev => [...prev, { 
                                   url, 
                                   type, 
@@ -1137,7 +1053,6 @@ export default function PostEditorModal({
                                 }]);
                               });
                               
-                              // Update media types state
                               setMediaTypes(prev => [...prev, ...result.types]);
                             } catch (error) {
                               console.error('Upload failed:', error);
@@ -1146,11 +1061,11 @@ export default function PostEditorModal({
                           };
                           input.click();
                         }}
-                        className="w-full p-8 border-2 border-dashed border-gray-300 hover:border-gray-400 rounded bg-white hover:bg-gray-50 transition-colors"
+                        className="w-full h-full flex flex-col items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
                       >
-                        <Upload className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                        <div className="text-gray-600 font-medium">Click to upload media</div>
-                        <div className="text-xs text-gray-500 mt-1">Images, videos, or GIFs</div>
+                        <Upload className="h-12 w-12 mb-3 text-gray-400" />
+                        <div className="text-lg font-medium">Upload Media</div>
+                        <div className="text-sm">Images, videos, or GIFs</div>
                       </button>
                     </div>
                   )}
@@ -1158,30 +1073,7 @@ export default function PostEditorModal({
 
 
 
-                {/* Scheduling */}
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
-                    <Label htmlFor="scheduled-date" className="text-sm font-medium">Schedule Date</Label>
-                    <Input
-                      id="scheduled-date"
-                      type="date"
-                      value={scheduledDate}
-                      onChange={(e) => setScheduledDate(e.target.value)}
-                      className="mt-2"
-                      min={new Date().toISOString().split('T')[0]}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="scheduled-time" className="text-sm font-medium">Schedule Time (Philippine Time)</Label>
-                    <Input
-                      id="scheduled-time"
-                      type="time"
-                      value={scheduledTime}
-                      onChange={(e) => setScheduledTime(e.target.value)}
-                      className="mt-2"
-                    />
-                  </div>
-                </div>
+                {/* Remove Scheduling section as requested */}
 
                 {/* Status */}
                 <div>
