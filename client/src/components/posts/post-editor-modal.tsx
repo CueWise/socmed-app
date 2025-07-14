@@ -361,7 +361,7 @@ export default function PostEditorModal({
                       value={content}
                       onChange={(e) => setContent(e.target.value)}
                       placeholder="Write your caption..."
-                      className="w-full h-[300px] resize-none text-base font-medium leading-relaxed"
+                      className="w-full h-[380px] resize-none text-base font-medium leading-relaxed"
                       maxLength={2200}
                     />
                   </div>
@@ -372,22 +372,26 @@ export default function PostEditorModal({
 
                 {/* Two Column Layout - Media & Scheduling */}
                 <div className="flex gap-6 flex-1">
-                  {/* Left Column - Media Thumbnails */}
-                  <div className="flex-1 flex flex-col">
+                  {/* Left Column - Media Thumbnails (35%) */}
+                  <div className="w-[35%] flex flex-col">
                     <Label className="text-sm font-medium mb-3">Media Preview</Label>
-                    <div className="flex-1 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                    <div 
+                      className="flex-1 flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => allMedia.length === 0 && fileInputRef.current?.click()}
+                    >
                       {allMedia.length > 0 ? (
-                        <div className="flex flex-col items-center space-y-4">
+                        <div className="flex flex-col items-center space-y-4 relative w-full h-full">
                           {allMedia.map((media, index) => {
                             const isVideo = media.type.startsWith('video/');
+                            const isPhoto = media.type.startsWith('image/');
                             return (
                               <div
                                 key={index}
                                 className={cn(
                                   "relative bg-white rounded-lg overflow-hidden shadow-md",
                                   isVideo 
-                                    ? "w-48 h-80" // Facebook Reel aspect ratio (9:16)
-                                    : "w-64 h-64" // Instagram square
+                                    ? "w-40 h-64" // Facebook Reel aspect ratio (9:16)
+                                    : "w-48 h-48" // Instagram square
                                 )}
                               >
                                 <InstagramMediaThumbnail
@@ -401,6 +405,18 @@ export default function PostEditorModal({
                                 >
                                   <X className="h-4 w-4" />
                                 </button>
+                                {/* Upload icon for photos only */}
+                                {isPhoto && !allMedia.some(m => m.type.startsWith('video/')) && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      fileInputRef.current?.click();
+                                    }}
+                                    className="absolute bottom-2 right-2 bg-blue-500 text-white rounded-full p-1 hover:bg-blue-600 transition-colors"
+                                  >
+                                    <Upload className="h-4 w-4" />
+                                  </button>
+                                )}
                               </div>
                             );
                           })}
@@ -408,15 +424,15 @@ export default function PostEditorModal({
                       ) : (
                         <div className="text-center text-gray-500">
                           <Upload className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                          <p className="text-sm">No media uploaded</p>
-                          <p className="text-xs mt-1">Upload images or videos to see preview</p>
+                          <p className="text-sm">Click to upload media</p>
+                          <p className="text-xs mt-1">Upload images or videos</p>
                         </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Right Column - Scheduling & Actions */}
-                  <div className="w-80 flex flex-col space-y-6">
+                  {/* Right Column - Scheduling & Actions (65%) */}
+                  <div className="w-[65%] flex flex-col space-y-6">
                     {/* Scheduling */}
                     <div>
                       <Label className="text-sm font-medium">Schedule Post</Label>
@@ -486,24 +502,6 @@ export default function PostEditorModal({
                   onChange={handleFileUpload}
                   className="hidden"
                 />
-
-                {/* Upload Button */}
-                {!allMedia.some(media => media.type.startsWith('video/')) && (
-                  <div className="mb-4">
-                    <Button
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full h-12 border-dashed"
-                    >
-                      <div className="text-center">
-                        <Upload className="h-4 w-4 mx-auto mb-1 text-gray-400" />
-                        <span className="text-xs text-gray-600">
-                          Upload photos and videos
-                        </span>
-                      </div>
-                    </Button>
-                  </div>
-                )}
 
 
               </div>
