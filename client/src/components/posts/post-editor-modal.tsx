@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -14,7 +15,7 @@ import InstagramMediaThumbnail from "@/components/ui/instagram-media-thumbnail";
 import { 
   X, ArrowLeft, Upload, Trash2, MoreHorizontal, 
   StickyNote, Calendar, Hash, Sparkles, ChevronLeft, 
-  ChevronRight, Download, Play 
+  ChevronRight, Download, Play, ChevronDown 
 } from "lucide-react";
 import { 
   FaInstagram, FaFacebook, FaTwitter, FaTiktok, 
@@ -264,26 +265,72 @@ export default function PostEditorModal({
               <div className="flex-1 overflow-y-auto p-6 flex flex-col space-y-6">
                 {/* Platform Selection */}
                 <div>
-                  <Label className="text-sm font-medium">Platforms</Label>
-                  <div className="mt-2 flex gap-3">
-                    {platforms.map((platform) => {
-                      const Icon = platform.icon;
-                      const isSelected = selectedPlatforms.includes(platform.id);
-                      return (
-                        <button
-                          key={platform.id}
-                          onClick={() => handlePlatformToggle(platform.id)}
-                          className={cn(
-                            "p-3 border rounded-lg cursor-pointer transition-all hover:shadow-md",
-                            isSelected 
-                              ? "border-blue-500 bg-blue-50" 
-                              : "border-gray-200 hover:border-gray-300"
-                          )}
+                  <Label className="text-sm font-medium">Platform Selection</Label>
+                  <div className="mt-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-between"
                         >
-                          <Icon className={cn("h-6 w-6", platform.color)} />
-                        </button>
-                      );
-                    })}
+                          <div className="flex items-center gap-2">
+                            {selectedPlatforms.length > 0 ? (
+                              <>
+                                <div className="flex items-center gap-1">
+                                  {platforms
+                                    .filter(p => selectedPlatforms.includes(p.id))
+                                    .map((platform) => {
+                                      const Icon = platform.icon;
+                                      return (
+                                        <Icon key={platform.id} className={cn("h-4 w-4", platform.color)} />
+                                      );
+                                    })}
+                                </div>
+                                <span className="text-sm">
+                                  {selectedPlatforms.length} platform{selectedPlatforms.length !== 1 ? 's' : ''} selected
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-gray-500">Select platforms</span>
+                            )}
+                          </div>
+                          <ChevronDown className="h-4 w-4 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-3">
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm">Select Platforms</h4>
+                          <div className="grid grid-cols-2 gap-3">
+                            {platforms.map((platform) => {
+                              const Icon = platform.icon;
+                              const isSelected = selectedPlatforms.includes(platform.id);
+                              return (
+                                <div
+                                  key={platform.id}
+                                  onClick={() => handlePlatformToggle(platform.id)}
+                                  className={cn(
+                                    "p-3 border rounded-lg cursor-pointer transition-all hover:shadow-md",
+                                    isSelected 
+                                      ? "border-blue-500 bg-blue-50" 
+                                      : "border-gray-200 hover:border-gray-300"
+                                  )}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <Icon className={cn("h-5 w-5", platform.color)} />
+                                    <span className="font-medium text-sm">{platform.name}</span>
+                                    <Checkbox 
+                                      checked={isSelected}
+                                      className="ml-auto"
+                                      readOnly
+                                    />
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   </div>
                 </div>
 
