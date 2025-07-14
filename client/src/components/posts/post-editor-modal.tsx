@@ -273,6 +273,7 @@ export default function PostEditorModal({
   const [notes, setNotes] = useState(initialData?.notes || "");
   const [isGeneratingCaption, setIsGeneratingCaption] = useState(false);
   const [isGeneratingHashtags, setIsGeneratingHashtags] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState<string[]>([]); // Track uploading files by unique ID
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [showUnsavedDialog, setShowUnsavedDialog] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -1004,6 +1005,21 @@ export default function PostEditorModal({
                         </div>
                       ))}
                       
+                      {/* Loading Placeholders */}
+                      {uploadingFiles.map((uploadId) => (
+                        <div key={uploadId} className="relative flex-shrink-0">
+                          <div className={cn(
+                            "rounded border shadow-sm bg-gray-100 flex items-center justify-center animate-pulse",
+                            allMedia.length === 0 && uploadingFiles.length === 1 ? "w-32 h-32" : "w-20 h-20"
+                          )}>
+                            <div className="flex flex-col items-center gap-1">
+                              <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                              <span className="text-xs text-gray-600 font-medium">Uploading</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      
                       {/* Upload Button - Show if no video and images < 10, or no media at all */}
                       {canAddMedia() && (
                         <button
@@ -1015,10 +1031,20 @@ export default function PostEditorModal({
                             input.onchange = async (e) => {
                               const files = Array.from((e.target as HTMLInputElement).files || []);
                               
+                              // Create loading placeholders immediately
+                              const loadingPlaceholders = files.map(() => {
+                                const uniqueId = `loading_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                                setUploadingFiles(prev => [...prev, uniqueId]);
+                                return uniqueId;
+                              });
+                              
                               // Upload files immediately to get proper file types
                               try {
                                 const { uploadFiles } = await import('@/lib/upload');
                                 const result = await uploadFiles(files);
+                                
+                                // Remove loading placeholders
+                                setUploadingFiles(prev => prev.filter(id => !loadingPlaceholders.includes(id)));
                                 
                                 // Add uploaded files to attached media
                                 result.urls.forEach((url, index) => {
@@ -1049,6 +1075,8 @@ export default function PostEditorModal({
                                 setMediaTypes(prev => [...prev, ...result.types]);
                               } catch (error) {
                                 console.error('Upload failed:', error);
+                                // Remove loading placeholders on error
+                                setUploadingFiles(prev => prev.filter(id => !loadingPlaceholders.includes(id)));
                                 alert('Failed to upload files. Please try again.');
                               }
                             };
