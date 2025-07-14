@@ -368,60 +368,93 @@ export default function PostEditorModal({
                     <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-input px-3 py-3 flex items-center justify-between z-10">
                       {/* Left side icons */}
                       <div className="flex items-center space-x-3">
-                        <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add media">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" fill="#3B82F6" stroke="#2563EB" strokeWidth="1"/>
-                            <circle cx="8.5" cy="8.5" r="1.5" fill="#EFF6FF"/>
-                            <polyline points="21,15 16,10 5,21" fill="none" stroke="#EFF6FF" strokeWidth="1.5"/>
+                        {/* Media Icon - Combined Image/Video */}
+                        <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-gray-400/50 group" 
+                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                title="Add media">
+                          <div className="relative w-5 h-5">
+                            {/* Image icon */}
+                            <svg className="absolute inset-0 w-4 h-4 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                              <circle cx="8.5" cy="8.5" r="1.5"/>
+                              <polyline points="21,15 16,10 5,21"/>
+                            </svg>
+                            {/* Video icon overlay */}
+                            <svg className="absolute top-0.5 right-0 w-3 h-3 text-white/80 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                              <polygon points="5,3 19,12 5,21 5,3"/>
+                            </svg>
+                          </div>
+                        </button>
+                        
+                        {/* Emoji Icon */}
+                        <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-yellow-400/50 group" 
+                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                title="Add emoji">
+                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="m9,9h.01"/>
+                            <path d="m15,9h.01"/>
+                            <path d="m8,15s1.5,2,4,2,4-2,4-2"/>
                           </svg>
                         </button>
-                        <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add emoji">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" fill="#F59E0B" stroke="#D97706" strokeWidth="1"/>
-                            <circle cx="9" cy="9" r="1" fill="#1F2937"/>
-                            <circle cx="15" cy="9" r="1" fill="#1F2937"/>
-                            <path d="m8,15s1.5,2,4,2,4-2,4-2" fill="none" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round"/>
+                        
+                        {/* Hashtag Icon */}
+                        <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-purple-400/50 group" 
+                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                title="Add hashtag">
+                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <line x1="4" y1="9" x2="20" y2="9"/>
+                            <line x1="4" y1="15" x2="20" y2="15"/>
+                            <line x1="10" y1="3" x2="8" y2="21"/>
+                            <line x1="16" y1="3" x2="14" y2="21"/>
                           </svg>
                         </button>
-                        <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add hashtag">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <g fill="#8B5CF6">
-                              <line x1="4" y1="9" x2="20" y2="9" stroke="#8B5CF6" strokeWidth="2.5"/>
-                              <line x1="4" y1="15" x2="20" y2="15" stroke="#8B5CF6" strokeWidth="2.5"/>
-                              <line x1="10" y1="3" x2="8" y2="21" stroke="#8B5CF6" strokeWidth="2.5"/>
-                              <line x1="16" y1="3" x2="14" y2="21" stroke="#8B5CF6" strokeWidth="2.5"/>
-                            </g>
+                        
+                        {/* Mention Icon */}
+                        <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-green-400/50 group" 
+                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                title="Add mention">
+                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
                           </svg>
                         </button>
-                        <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add mention">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="#10B981" stroke="#059669" strokeWidth="1"/>
+                        
+                        {/* Location Icon */}
+                        <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-400/50 group" 
+                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                title="Add location">
+                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                            <circle cx="12" cy="10" r="3"/>
                           </svg>
                         </button>
-                        <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add location">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" fill="#EF4444" stroke="#DC2626" strokeWidth="1"/>
-                            <circle cx="12" cy="10" r="3" fill="#FEF2F2" stroke="#DC2626" strokeWidth="1"/>
+                        
+                        {/* Link Icon */}
+                        <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-400/50 group" 
+                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                title="Add link">
+                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
                           </svg>
                         </button>
-                        <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Add link">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <g fill="none" stroke="#6366F1" strokeWidth="2.5">
-                              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-                              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                            </g>
+                        
+                        {/* Reddit Icon */}
+                        <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-orange-400/50 group" 
+                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                title="Reddit">
+                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
                           </svg>
                         </button>
-                        <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Reddit">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" fill="#FF4500"/>
-                            <path d="M14.238 15.348c.085-.055.237-.055.364-.055.085 0 .193.055.278.085.084.031.162.085.237.141.075.084.141.169.199.253a.888.888 0 0 1 .14.448c0 .169-.055.337-.141.478-.085.14-.207.253-.337.337-.14.085-.281.127-.422.127-.169 0-.337-.055-.478-.141-.14-.085-.253-.199-.337-.337-.085-.14-.127-.281-.127-.422 0-.169.042-.338.127-.478.084-.14.199-.253.337-.337.14-.084.309-.098.16-.098zm-8.477 0c.085-.055.237-.055.364-.055.085 0 .193.055.278.085.084.031.162.085.237.141.075.084.141.169.199.253a.888.888 0 0 1 .14.448c0 .169-.055.337-.141.478-.085.14-.207.253-.337.337-.14.085-.281.127-.422.127-.169 0-.337-.055-.478-.141-.14-.085-.253-.199-.337-.337-.085-.14-.127-.281-.127-.422 0-.169.042-.338.127-.478.084-.14.199-.253.337-.337.14-.084.309-.098.16-.098z" fill="white"/>
-                          </svg>
-                        </button>
-                        <button className="p-1 hover:bg-gray-100/50 rounded transition-colors" title="Video">
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <polygon points="23 7 16 12 23 17 23 7" fill="#EC4899"/>
-                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" fill="#F472B6" stroke="#EC4899" strokeWidth="1"/>
+                        
+                        {/* Video Icon */}
+                        <button className="p-2 rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-pink-400/50 group" 
+                                style={{background: 'linear-gradient(145deg, #1f2937 0%, #374151 100%)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.3)'}}
+                                title="Video">
+                          <svg className="w-5 h-5 text-white/90 group-hover:text-white transition-colors" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                            <polygon points="23 7 16 12 23 17 23 7"/>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
                           </svg>
                         </button>
                       </div>
