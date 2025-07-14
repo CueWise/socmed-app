@@ -18,8 +18,7 @@ export const sessions = pgTable(
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").unique(),
-  firstName: varchar("first_name"),
-  lastName: varchar("last_name"),
+  name: varchar("name"),
   profileImageUrl: varchar("profile_image_url"),
   role: text("role", { enum: ['creator', 'editor', 'approver', 'admin'] }).notNull().default('creator'),
   createdAt: timestamp("created_at").defaultNow(),

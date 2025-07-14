@@ -85,7 +85,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBrand(brand: InsertBrand): Promise<Brand> {
-    const [newBrand] = await db.insert(brands).values([brand]).returning();
+    const [newBrand] = await db.insert(brands).values(brand).returning();
     return newBrand;
   }
 
@@ -110,7 +110,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPost(post: InsertPost): Promise<Post> {
-    const [newPost] = await db.insert(posts).values([post]).returning();
+    const [newPost] = await db.insert(posts).values(post).returning();
     return newPost;
   }
 
@@ -164,7 +164,7 @@ export class DatabaseStorage implements IStorage {
       query = query.where(and(...conditions));
     }
     
-    const allPosts = await query.orderBy(desc(posts.scheduledAt), desc(posts.createdAt));
+    const allPosts = await query;
     
     // Filter posts based on scheduledAt date range, handling both formats
     const filteredPosts = allPosts.filter(post => {
