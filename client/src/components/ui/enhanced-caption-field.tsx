@@ -86,12 +86,12 @@ export default function EnhancedCaptionField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="min-h-[200px] text-base leading-relaxed resize-none pr-4 z-10 relative bg-transparent"
+          className="min-h-[200px] text-lg leading-relaxed resize-none pr-4 z-10 relative bg-transparent font-semibold text-gray-800"
           maxLength={maxLength}
         />
         
         {/* Hashtag highlighting overlay */}
-        <div className="absolute inset-0 p-3 text-base leading-relaxed pointer-events-none whitespace-pre-wrap break-words z-0">
+        <div className="absolute inset-0 p-3 text-lg leading-relaxed pointer-events-none whitespace-pre-wrap break-words z-0 font-semibold">
           {renderTextWithHashtags(value)}
         </div>
       </div>
