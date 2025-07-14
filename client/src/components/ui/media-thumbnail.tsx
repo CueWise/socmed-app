@@ -106,10 +106,13 @@ export default function MediaThumbnail({
           style={{ display: isLoading ? 'none' : 'block' }}
           muted
           preload="metadata"
+          playsInline
         />
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <PlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
-        </div>
+        {!isLoading && !hasError && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <PlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+          </div>
+        )}
         <span className="absolute bottom-1 right-1 text-[6px] bg-black bg-opacity-50 text-white px-1 rounded">
           VIDEO
         </span>
