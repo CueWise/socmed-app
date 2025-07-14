@@ -41,9 +41,8 @@ export default function BrandCreateModal({
     resolver: zodResolver(insertBrandSchema),
     defaultValues: {
       name: "",
-      description: "",
       logo: "",
-      website: "",
+      colorPalette: [],
     },
   });
 
@@ -96,23 +95,6 @@ export default function BrandCreateModal({
             
             <FormField
               control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea 
-                      placeholder="Brief description of your brand..."
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
               name="logo"
               render={({ field }) => (
                 <FormItem>
@@ -120,24 +102,6 @@ export default function BrandCreateModal({
                   <FormControl>
                     <Input 
                       placeholder="https://example.com/logo.png" 
-                      type="url"
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="website"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Website (Optional)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      placeholder="https://example.com" 
                       type="url"
                       {...field} 
                     />
