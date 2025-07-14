@@ -7,12 +7,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useBrand } from "@/hooks/use-brand";
 
 interface TopNavigationProps {
   onMenuClick: () => void;
 }
 
 export default function TopNavigation({ onMenuClick }: TopNavigationProps) {
+  const { selectedBrand } = useBrand();
+
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
       <div className="flex items-center justify-between p-4">
@@ -29,11 +32,21 @@ export default function TopNavigation({ onMenuClick }: TopNavigationProps) {
 
         {/* Brand Logo */}
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <div className="w-4 h-4 bg-white rounded-sm" />
-          </div>
+          {selectedBrand?.logo ? (
+            <div className="w-8 h-8 rounded-lg overflow-hidden border border-gray-200">
+              <img 
+                src={selectedBrand.logo} 
+                alt={`${selectedBrand.name} logo`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+              <div className="w-4 h-4 bg-white rounded-sm" />
+            </div>
+          )}
           <h1 className="text-xl font-medium hidden sm:block text-gray-900">
-            SocialFlow
+            {selectedBrand?.name || "CueWise"}
           </h1>
         </div>
 

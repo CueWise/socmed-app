@@ -6,6 +6,13 @@ CueWise is a web-based social media management platform with AI-powered content 
 
 ## Recent Changes (July 2025)
 
+✓ **Application Rebranding Complete** - Changed application name from SocialFlow to CueWise
+  - Updated all application references across HTML, manifest, service worker, and PWA files
+  - Implemented dynamic brand logo display in top navigation
+  - Brand name now displays dynamically based on selected brand
+  - Logo displays from uploaded brand assets when available
+  - Fallback to default "CueWise" branding when no brand is selected
+
 ✓ **Video Thumbnail Display Fixed** - Complete video thumbnail implementation across all components
   - Fixed post editor modal to display actual video thumbnails instead of generic icons
   - Updated calendar components to use MediaThumbnail component for proper video display

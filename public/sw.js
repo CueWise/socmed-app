@@ -198,7 +198,7 @@ self.addEventListener('push', (event) => {
   console.log('Push notification received:', event);
   
   const options = {
-    body: 'You have new notifications in SocialFlow',
+    body: 'You have new notifications in CueWise',
     icon: '/icon-192x192.png',
     badge: '/icon-72x72.png',
     vibrate: [200, 100, 200],
@@ -226,7 +226,7 @@ self.addEventListener('push', (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification('SocialFlow', options)
+    self.registration.showNotification('CueWise', options)
   );
 });
 
