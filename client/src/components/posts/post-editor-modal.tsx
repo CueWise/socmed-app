@@ -173,24 +173,22 @@ export default function PostEditorModal({
     setMediaFiles(prev => [...prev, ...files]);
     
     // Upload files and get URLs
-    for (const file of files) {
-      const formData = new FormData();
-      formData.append('file', file);
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
       
-      try {
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          setMediaUrls(prev => [...prev, data.url]);
-          setMediaTypes(prev => [...prev, file.type]);
-        }
-      } catch (error) {
-        toast({ title: "Upload failed", variant: "destructive" });
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setMediaUrls(prev => [...prev, ...data.urls]);
+        setMediaTypes(prev => [...prev, ...data.types]);
       }
+    } catch (error) {
+      toast({ title: "Upload failed", variant: "destructive" });
     }
   };
 
@@ -220,7 +218,7 @@ export default function PostEditorModal({
       <div className={cn(
         "bg-white rounded-xl shadow-2xl overflow-hidden flex",
         isDesktop 
-          ? "w-[90vw] h-[85vh] max-w-none" 
+          ? "w-[90vw] h-[95vh] max-w-none" 
           : "w-full max-w-4xl h-[95vh] flex-col"
       )}>
         
@@ -267,12 +265,12 @@ export default function PostEditorModal({
                 {/* Platform Selection */}
                 <div>
                   <Label className="text-sm font-medium">Platforms</Label>
-                  <div className="mt-2 grid grid-cols-2 gap-3">
+                  <div className="mt-2 flex gap-3">
                     {platforms.map((platform) => {
                       const Icon = platform.icon;
                       const isSelected = selectedPlatforms.includes(platform.id);
                       return (
-                        <div
+                        <button
                           key={platform.id}
                           onClick={() => handlePlatformToggle(platform.id)}
                           className={cn(
@@ -282,16 +280,8 @@ export default function PostEditorModal({
                               : "border-gray-200 hover:border-gray-300"
                           )}
                         >
-                          <div className="flex items-center gap-3">
-                            <Icon className={cn("h-5 w-5", platform.color)} />
-                            <span className="font-medium">{platform.name}</span>
-                            <Checkbox 
-                              checked={isSelected}
-                              className="ml-auto"
-                              readOnly
-                            />
-                          </div>
-                        </div>
+                          <Icon className={cn("h-6 w-6", platform.color)} />
+                        </button>
                       );
                     })}
                   </div>
@@ -315,42 +305,21 @@ export default function PostEditorModal({
                 <div>
                   <Label className="text-sm font-medium">Media</Label>
                   <div className="mt-2 space-y-3">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      accept="image/*,video/*"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full h-24 border-dashed"
-                    >
-                      <div className="text-center">
-                        <Upload className="h-6 w-6 mx-auto mb-2 text-gray-400" />
-                        <span className="text-sm text-gray-600">
-                          Upload photos and videos
-                        </span>
-                      </div>
-                    </Button>
-
                     {/* Media Thumbnails */}
                     {allMedia.length > 0 && (
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-4 gap-2">
                         {allMedia.map((media, index) => (
                           <div key={index} className="relative group">
                             <InstagramMediaThumbnail
                               src={media.url}
                               alt={`Media ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg"
+                              className="w-full h-16 object-cover rounded-lg"
                             />
                             <Button
                               size="sm"
                               variant="destructive"
                               onClick={() => removeMedia(index)}
-                              className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                             >
                               <X className="h-3 w-3" />
                             </Button>
@@ -358,6 +327,44 @@ export default function PostEditorModal({
                         ))}
                       </div>
                     )}
+
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple={!allMedia.some(m => m.type.startsWith('video/'))}
+                      accept="image/*,video/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                    
+                    {/* Only show upload button if no video is attached */}
+                    {!allMedia.some(media => media.type.startsWith('video/')) && (
+                      <Button
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full h-16 border-dashed"
+                      >
+                        <div className="text-center">
+                          <Upload className="h-4 w-4 mx-auto mb-1 text-gray-400" />
+                          <span className="text-xs text-gray-600">
+                            Upload photos and videos
+                          </span>
+                        </div>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Date and Time Scheduling */}
+                <div>
+                  <Label className="text-sm font-medium">Schedule</Label>
+                  <div className="mt-2">
+                    <Input
+                      type="datetime-local"
+                      value={scheduledAt ? new Date(scheduledAt.getTime() - scheduledAt.getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ''}
+                      onChange={(e) => setScheduledAt(e.target.value ? new Date(e.target.value) : undefined)}
+                      className="w-full"
+                    />
                   </div>
                 </div>
 
@@ -460,6 +467,85 @@ export default function PostEditorModal({
                         </div>
                       </div>
                     )}
+
+                    {selectedPreviewPlatform === 'facebook' && (
+                      <div className="bg-white rounded-lg p-4 shadow-sm">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                            B
+                          </div>
+                          <div>
+                            <div className="font-semibold">Brand Name</div>
+                            <div className="text-xs text-gray-500">Just now</div>
+                          </div>
+                        </div>
+                        
+                        {content && <div className="mb-3 text-sm">{content}</div>}
+                        
+                        {allMedia.length > 0 && (
+                          <div className="rounded-lg overflow-hidden">
+                            <InstagramMediaThumbnail
+                              src={allMedia[0].url}
+                              alt="Preview"
+                              className="w-full h-48 object-cover"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {selectedPreviewPlatform === 'twitter' && (
+                      <div className="bg-white rounded-lg p-4 shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
+                            B
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-bold">Brand Name</span>
+                              <span className="text-gray-500">@brand</span>
+                              <span className="text-gray-500">·</span>
+                              <span className="text-gray-500 text-sm">now</span>
+                            </div>
+                            
+                            {content && <div className="mb-3">{content}</div>}
+                            
+                            {allMedia.length > 0 && (
+                              <div className="rounded-xl overflow-hidden border">
+                                <InstagramMediaThumbnail
+                                  src={allMedia[0].url}
+                                  alt="Preview"
+                                  className="w-full h-48 object-cover"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {selectedPreviewPlatform === 'tiktok' && (
+                      <div className="bg-black rounded-lg p-4 text-white shadow-sm">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-red-500 rounded-full"></div>
+                            <span className="font-semibold">Brand Name</span>
+                          </div>
+                        </div>
+                        
+                        {allMedia.length > 0 && (
+                          <div className="rounded-lg overflow-hidden mb-3">
+                            <InstagramMediaThumbnail
+                              src={allMedia[0].url}
+                              alt="Preview"
+                              className="w-full h-64 object-cover"
+                            />
+                          </div>
+                        )}
+                        
+                        {content && <div className="text-sm">{content}</div>}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="text-center text-gray-500 mt-8">
@@ -534,24 +620,39 @@ export default function PostEditorModal({
             </Button>
           </div>
           
-          {/* Menu Content */}
+          {/* Notes Content */}
           <div className="flex-1 p-6 overflow-y-auto">
             <div className="space-y-6">
               <div>
-                <h4 className="font-medium mb-3">Quick Actions</h4>
-                <div className="space-y-2">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={() => {
-                      setStatus('draft');
-                      handleSubmit();
-                    }}
-                    disabled={!content.trim() || selectedPlatforms.length === 0}
-                  >
-                    <FaRegSave className="mr-2 h-4 w-4" />
-                    Save as Draft
-                  </Button>
+                <h4 className="font-medium mb-3">Notes & Comments</h4>
+                <div className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                          U
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-baseline gap-2 mb-1">
+                            <span className="font-medium text-gray-900">Current User</span>
+                            <span className="text-xs text-gray-500">2 min ago</span>
+                          </div>
+                          <p className="text-gray-700 text-sm">Ready for review. Please check the caption and timing.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Textarea
+                      placeholder="Add a note or comment..."
+                      className="resize-none"
+                      rows={3}
+                    />
+                    <Button size="sm" className="w-full">
+                      Add Note
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
