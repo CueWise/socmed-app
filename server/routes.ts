@@ -1,7 +1,20 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { optimizedStorage } from "./services/optimizedStorage";
+import { optimizedAI } from "./services/aiThrottler";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { 
+  compressionMiddleware, 
+  securityMiddleware, 
+  apiRateLimit, 
+  aiRateLimit, 
+  uploadRateLimit,
+  performanceMiddleware,
+  timeoutMiddleware,
+  cacheMiddleware
+} from "./middleware/performance";
+import { rateLimiters } from "./middleware/rateLimiter";
 import { z } from "zod";
 import multer from "multer";
 import path from "path";
@@ -85,15 +98,23 @@ const upload = multer({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Performance and security middleware
+  app.use(compressionMiddleware);
+  app.use(securityMiddleware);
+  app.use(performanceMiddleware);
+  app.use(timeoutMiddleware(30000)); // 30 second timeout
   
   // Setup authentication middleware
   await setupAuth(app);
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Warm up cache on startup
+  optimizedStorage.warmCache().catch(console.error);
+
+  // Auth routes with rate limiting
+  app.get('/api/auth/user', rateLimiters.auth.middleware(), isAuthenticated, async (req: any, res) => {
     try {
       const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
+      const user = await optimizedStorage.getUser(userId);
       res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
@@ -109,8 +130,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return 'unknown';
   }
 
-  // Media upload endpoint
-  app.post("/api/upload", upload.array('files', 10), async (req, res) => {
+  // Media upload endpoint with rate limiting
+  app.post("/api/upload", rateLimiters.upload.middleware(), upload.array('files', 10), async (req, res) => {
     try {
       if (!req.files || !Array.isArray(req.files)) {
         return res.status(400).json({ error: "No files uploaded" });
