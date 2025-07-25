@@ -58,107 +58,97 @@ const PostCard = memo(function PostCard({ post }: PostCardProps) {
         title: "Post updated",
         description: "The post has been successfully updated.",
       });
-    }, [queryClient, toast]),
-    onError: useCallback(() => {
+    },
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to update post.",
         variant: "destructive",
       });
-    }, [toast]),
+    },
   });
 
-  // Memoize static data for performance
-  const platformColors = useMemo(() => ({
+  const platformColors: Record<string, string> = {
     instagram: "bg-pink-500",
     facebook: "bg-blue-600",
     tiktok: "bg-gray-900 dark:bg-gray-300",
     twitter: "bg-blue-400",
-  }), []);
+  };
 
-  const statusColors = useMemo(() => ({
+  const statusColors: Record<string, string> = {
     draft: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
     pending_approval: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
     approved: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
     scheduled: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
     published: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200",
     rejected: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
-  }), []);
+  };
 
-  const handleDelete = useCallback(() => {
+  const handleDelete = () => {
     if (confirm("Are you sure you want to delete this post?")) {
       deletePostMutation.mutate(post.id);
     }
-  }, [deletePostMutation, post.id]);
+  };
 
-  const handleStatusUpdate = useCallback((newStatus: string) => {
+  const handleStatusUpdate = (newStatus: string) => {
     updatePostMutation.mutate({
       id: post.id,
       updates: { status: newStatus as any }
     });
-  }, [updatePostMutation, post.id]);
+  };
 
-  const formatDate = useCallback((date: string | null) => {
-    if (!date) return "Not scheduled";
-    try {
-      const parsedDate = new Date(date);
-      return parsedDate.toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-    } catch {
-      return "Invalid date";
-    }
-  }, []);
-
-  // Memoize platform icons for performance
-  const platformIcons = useMemo(() => {
-    const iconMap: Record<string, JSX.Element> = {
-      instagram: <span className="material-icons text-xs">photo_camera</span>,
-      facebook: <span className="material-icons text-xs">facebook</span>,
-      tiktok: <span className="material-icons text-xs">music_video</span>,
-      twitter: <span className="material-icons text-xs">chat_bubble</span>,
-    };
-    
-    return post.platforms?.map((platform, index) => (
-      <div
-        key={index}
-        className={cn(
-          "w-6 h-6 rounded-full flex items-center justify-center text-white text-xs",
-          platformColors[platform] || "bg-gray-500"
-        )}
-      >
-        {iconMap[platform] || platform.charAt(0).toUpperCase()}
-      </div>
-    ));
-  }, [post.platforms, platformColors]);
+  const formatDate = (date: string | null) => {
+    if (!date) return "No date set";
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   return (
-    <Card className="hover:shadow-md transition-shadow duration-200">
+    <Card className="hover:shadow-lg transition-shadow">
       <CardContent className="p-4">
         {/* Header */}
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-start justify-between mb-3">
           <div className="flex items-center space-x-2">
-            {platformIcons}
+            {post.platforms?.map((platform) => (
+              <div key={platform} className="flex items-center space-x-1">
+                <div className={cn("w-3 h-3 rounded-full", platformColors[platform])} />
+                <span className="text-xs capitalize text-gray-600 dark:text-gray-400">
+                  {platform}
+                </span>
+              </div>
+            ))}
           </div>
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreVertical className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleStatusUpdate("published")}>
+              <DropdownMenuItem>
                 <Edit className="mr-2 h-4 w-4" />
-                Publish
+                Edit
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleStatusUpdate("scheduled")}>
-                <Clock className="mr-2 h-4 w-4" />
-                Schedule
-              </DropdownMenuItem>
+              {post.status === 'draft' && (
+                <DropdownMenuItem onClick={() => handleStatusUpdate('pending_approval')}>
+                  Submit for Review
+                </DropdownMenuItem>
+              )}
+              {post.status === 'pending_approval' && (
+                <DropdownMenuItem onClick={() => handleStatusUpdate('approved')}>
+                  Approve
+                </DropdownMenuItem>
+              )}
+              {post.status === 'approved' && (
+                <DropdownMenuItem onClick={() => handleStatusUpdate('scheduled')}>
+                  Schedule
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem 
                 onClick={handleDelete}
                 className="text-red-600 dark:text-red-400"

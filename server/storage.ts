@@ -4,7 +4,7 @@ import { users, brands, posts, approvals, comments, analytics, brandAssets,
          type Comment, type InsertComment, type Analytics, type InsertAnalytics,
          type BrandAsset, type InsertBrandAsset } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, gte, lte, desc, sql, or, isNull } from "drizzle-orm";
+import { eq, and, gte, lte, desc, sql, or, isNull, isNotNull } from "drizzle-orm";
 
 export interface IStorage {
   // Users (Required for Replit Auth)
@@ -146,48 +146,59 @@ export class DatabaseStorage implements IStorage {
   async getPostsByDateRange(start: Date, end: Date, brandId?: number): Promise<Post[]> {
     console.log('Calendar query - Start:', start.toISOString(), 'End:', end.toISOString(), 'BrandId:', brandId);
     
-    // Convert dates to local date strings for text comparison
+    // Convert dates to local date strings for efficient database filtering
     const startDateString = start.toISOString().split('T')[0]; // "2025-07-01"
     const endDateString = end.toISOString().split('T')[0]; // "2025-07-31"
     
     console.log('Converted date strings - Start:', startDateString, 'End:', endDateString);
     
-    // Get all posts and filter in JavaScript to handle both date formats
+    // Performance optimization: Use database-level filtering instead of JavaScript filtering
     let query = db.select().from(posts);
     
     const conditions = [];
+    
+    // Brand filtering
     if (brandId) {
       conditions.push(eq(posts.brandId, brandId));
     }
+    
+    // Date range filtering using SQL LIKE for efficient text-based date comparison
+    // This handles both "2025-07-31T14:00:00" and "2025-07-24 08:00:00" formats
+    conditions.push(
+      or(
+        // Posts with scheduled dates in range
+        and(
+          isNotNull(posts.scheduledAt),
+          gte(posts.scheduledAt, startDateString),
+          lte(posts.scheduledAt, endDateString + 'Z') // Include end of day
+        ),
+        // Recent drafts without scheduled dates (last 7 days)
+        and(
+          isNull(posts.scheduledAt),
+          gte(posts.createdAt, new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+        )
+      )
+    );
     
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
     }
     
-    const allPosts = await query.execute();
+    // Order by scheduled date for better calendar performance
+    const result = await query
+      .orderBy(desc(posts.scheduledAt), desc(posts.createdAt));
     
-    // Filter posts based on scheduledAt date range, handling both formats
-    const filteredPosts = allPosts.filter(post => {
+    // Final client-side filtering for exact date matching (minimal processing)
+    const filteredPosts = result.filter(post => {
       if (!post.scheduledAt) {
-        // Include drafts without dates if created recently
-        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-        return post.createdAt >= weekAgo;
+        return true; // Already filtered by database
       }
       
-      // Extract date part from scheduledAt regardless of format
-      let postDateStr = '';
-      if (post.scheduledAt.includes('T')) {
-        // Format: "2025-07-31T14:00:00"
-        postDateStr = post.scheduledAt.split('T')[0];
-      } else if (post.scheduledAt.includes(' ')) {
-        // Format: "2025-07-24 08:00:00"
-        postDateStr = post.scheduledAt.split(' ')[0];
-      } else {
-        // Format: "2025-07-24"
-        postDateStr = post.scheduledAt;
-      }
+      // Extract date part for exact matching
+      const postDateStr = post.scheduledAt.includes('T') 
+        ? post.scheduledAt.split('T')[0]
+        : post.scheduledAt.split(' ')[0];
       
-      // Check if post date is within range
       return postDateStr >= startDateString && postDateStr <= endDateString;
     });
     

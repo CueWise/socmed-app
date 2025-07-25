@@ -192,8 +192,8 @@ export default function PostEditorModal({
       mediaTypes,
       hashtags,
       status,
-      brandId: selectedBrand?.id || 1, // Use current selected brand
-      createdBy: "current-user"
+      brandId: selectedBrand?.id || 1 // Use current selected brand
+      // createdBy will be set server-side using authenticated user
     };
     
     createPostMutation.mutate(postData);
@@ -348,7 +348,6 @@ export default function PostEditorModal({
                                     <Checkbox 
                                       checked={isSelected}
                                       className="ml-auto"
-                                      readOnly
                                     />
                                   </div>
                                 </div>

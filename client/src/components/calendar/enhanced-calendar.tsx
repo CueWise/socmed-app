@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
 import { ChevronLeft, ChevronRight, Plus, X, Edit2 } from "lucide-react";
 import { FaInstagram, FaFacebook, FaTiktok, FaTwitter } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
@@ -33,7 +33,7 @@ interface EnhancedCalendarProps {
   className?: string;
 }
 
-export default function EnhancedCalendar({
+const EnhancedCalendar = memo(function EnhancedCalendar({
   onDateSelect,
   selectedDate: externalSelectedDate,
   onCreatePost,
@@ -65,12 +65,17 @@ export default function EnhancedCalendar({
   // Use external selectedDate if provided, otherwise use internal state
   const selectedDate = externalSelectedDate ?? internalSelectedDate;
   
-  // Get posts for the current month only for the selected brand
-  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-  const monthEnd = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+  // Memoize calendar range calculation for performance
+  const { monthStart, monthEnd } = useMemo(() => {
+    const start = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const end = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0, 23, 59, 59, 999);
+    return { monthStart: start, monthEnd: end };
+  }, [currentDate]);
+  
   const { data: posts = [] } = useCalendarPosts(monthStart, monthEnd, selectedBrand?.id);
 
-  const generateCalendarDays = () => {
+  // Memoize calendar days generation for better performance
+  const calendarDays = useMemo(() => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const firstDay = new Date(year, month, 1);
@@ -89,19 +94,28 @@ export default function EnhancedCalendar({
     }
     
     return days;
-  };
-
-  const calendarDays = generateCalendarDays();
+  }, [currentDate]);
   
-  const getPostsForDate = (date: Date | null) => {
-    if (!date || !posts) return [];
-    
-    return posts.filter(post => {
-      if (!post.scheduledAt) return false;
-      const postDate = new Date(post.scheduledAt);
-      return postDate.toDateString() === date.toDateString();
+  // Memoize posts grouping by date for performance
+  const postsByDate = useMemo(() => {
+    const grouped: Record<string, any[]> = {};
+    posts.forEach(post => {
+      if (post.scheduledAt) {
+        const postDate = new Date(post.scheduledAt);
+        const dateKey = postDate.toDateString();
+        if (!grouped[dateKey]) {
+          grouped[dateKey] = [];
+        }
+        grouped[dateKey].push(post);
+      }
     });
-  };
+    return grouped;
+  }, [posts]);
+  
+  const getPostsForDate = useCallback((date: Date | null) => {
+    if (!date) return [];
+    return postsByDate[date.toDateString()] || [];
+  }, [postsByDate]);
 
   const navigateMonth = (direction: 'prev' | 'next') => {
     const newDate = new Date(currentDate);
@@ -322,7 +336,7 @@ export default function EnhancedCalendar({
           {showCreateButton && (
             <div className="flex justify-end mt-2">
               <Button
-                onClick={() => onCreatePost?.(selectedDate || undefined)}
+                onClick={() => onCreatePost?.(selectedDate ?? undefined)}
                 disabled={isSelectedDateInPast}
                 className={cn(
                   "min-h-[44px]",
@@ -664,4 +678,6 @@ export default function EnhancedCalendar({
       </Dialog>
     </>
   );
-}
+});
+
+export default EnhancedCalendar;

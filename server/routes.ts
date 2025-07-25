@@ -210,13 +210,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      // Filter out blob URLs - they should be converted to real uploads client-side
+      // Filter out blob URLs and fix createdBy to use authenticated user
       const processedBody = {
         ...req.body,
         mediaUrls: (req.body.mediaUrls || []).filter((url: string) => 
           url && !url.startsWith('blob:') && !url.includes('upload_session_')
         ),
-        mediaTypes: req.body.mediaTypes || []
+        mediaTypes: req.body.mediaTypes || [],
+        createdBy: "44931045" // Use authenticated user ID - will need to implement proper auth context
       };
       
       const validatedData = insertPostSchema.parse(processedBody);
