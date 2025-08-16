@@ -1,150 +1,6 @@
-CueWise - Social Media Management Platform
-
 ## Overview
 
-CueWise is a web-based social media management platform with AI-powered content creation and analytics. The application enables users to create, schedule, and manage social media posts across multiple platforms (Instagram, Facebook, TikTok, Twitter) with collaborative approval workflows and comprehensive analytics.
-
-## Recent Changes (July 2025)
-
-✓ **Comprehensive Performance Optimization Complete** - Eliminated lagging and optimized load times (July 2025)
-  - Database query optimization: 60-80% faster calendar queries with proper filtering
-  - React component memoization: 70% reduction in unnecessary re-renders
-  - Calendar performance enhancement: 80% faster rendering with optimized date calculations
-  - Real-time cache management: Instant UI updates with proper query invalidation
-  - TypeScript compilation fixes: All LSP errors resolved for faster builds
-  - Component optimization: PostCard and Calendar components fully memoized
-  - Database indexing: Added performance indexes for posts table queries
-  - Media loading optimization: Enhanced thumbnail performance and video display
-
-✓ **Application Rebranding Complete** - Changed application name from SocialFlow to CueWise
-  - Updated all application references across HTML, manifest, service worker, and PWA files
-  - Implemented dynamic brand logo display in top navigation
-  - Brand name now displays dynamically based on selected brand
-  - Logo displays from uploaded brand assets when available
-  - Fallback to default "CueWise" branding when no brand is selected
-
-✓ **Desktop-First Design Implementation** - Professional desktop experience while maintaining mobile design
-  - Sophisticated desktop layout with enhanced sidebar design and branding
-  - Fixed-width sidebar (272px) with gradient logo and professional styling
-  - Desktop-specific top navigation with enhanced header and context
-  - Card-based dashboard layout with improved spacing and shadows
-  - Enhanced navigation items with hover effects and active state styling
-  - Desktop-specific content grid layouts optimized for larger screens
-  - Proper responsive breakpoints ensuring mobile design remains intact
-  - Maximum content width constraints for better readability on large screens
-
-✓ **Media Upload Loading Effects Added** - Enhanced UX during file uploads
-  - Loading spinners appear immediately when files are selected for upload
-  - Loading placeholders show in thumbnail section during file processing
-  - Animated spinner with "Uploading" text provides clear feedback
-  - Loading states removed automatically when upload completes
-  - Error handling reverts loading states if upload fails
-  - Proper sizing for both single and multiple media loading states
-
-✓ **Media Detach Button Fixed** - Immediate UI updates for media removal
-  - Media thumbnails disappear instantly when X button is clicked
-  - Database updates happen in background after UI change
-  - Error handling reverts UI changes if database update fails
-  - Success toast message confirms media removal
-  - No confirmation dialogs needed for streamlined workflow
-
-✓ **Video Thumbnail Display Fixed** - Complete video thumbnail implementation across all components
-  - Fixed post editor modal to display actual video thumbnails instead of generic icons
-  - Updated calendar components to use MediaThumbnail component for proper video display
-  - Fixed post card component to show actual media thumbnails in dashboard
-  - Removed "Failed to load" fallback text from all media displays
-  - Video files now display actual video frames with play button overlay
-  - All preview sections (Instagram, Facebook, Twitter, TikTok) now show proper video thumbnails
-
-✓ **TypeScript Warnings Fixed** - Resolved Drizzle ORM compatibility issues
-  - Fixed createBrand and createPost methods to use array syntax for .values()
-  - Updated database query methods to use proper .execute() calls
-  - Corrected authentication schema to match database structure
-  - All TypeScript compilation warnings now resolved
-
-✓ **Authentication Flow Restored** - Fixed user authentication and database integration
-  - Updated users table schema to use 'name' field instead of separate first/last names
-  - Fixed user upsert operations for Replit Auth integration
-  - Database queries now working properly with authenticated users
-
-✓ **Native Mobile Media Player Integration** - Enhanced mobile UX with device-native playback
-  - Implemented automatic mobile device detection using screen width and user agent
-  - Video and audio files now open in native mobile media players on touch devices
-  - Images continue to use custom lightbox modal for consistent experience
-  - Download functionality preserved with proper file extension detection
-  - Desktop users still get full-featured custom media player with navigation
-
-✓ **Multi-Media File Upload System Fixed** - Complete support for all social media formats
-  - Fixed critical bug where video files were saved with .jpg extensions
-  - Updated multer configuration to properly handle MP4, MOV, WebM, AVI video formats
-  - Added support for audio files (MP3, WAV, AAC, OGG) and extended image formats
-  - Increased file size limit to 100MB for video content
-  - Enhanced media thumbnail component with video preview and play icons
-  - Fixed filename logic to preserve correct file extensions based on MIME types
-
-✓ **Calendar Date Range Issues Resolved** - Fixed posts not appearing on 31st days
-  - Corrected calendar month-end date calculation to include full last day (23:59:59)
-  - Fixed date format inconsistency between old and new post formats
-  - Updated server-side date filtering to handle both "2025-07-24 08:00:00" and "2025-07-31T14:00:00" formats
-  - All posts scheduled for 31st days now display correctly in calendar
-
-✓ **Critical Timezone Fix Applied** - Fixed date scheduling bug affecting calendar posts
-  - Replaced hardcoded UTC+8 timezone with user's local timezone
-  - Fixed manual date parsing to prevent timezone conversion issues
-  - Corrected scheduled date display in post editor modal
-  - Posts now save with correct scheduled times matching user input
-
-✓ **React Infinite Loop Bug Fixed** - Resolved app startup failures
-  - Fixed infinite loop in PostEditorModal component's useEffect
-  - Improved blob URL cleanup logic to prevent memory leaks
-  - App now starts consistently without React warnings
-
-✓ **Desktop Post Editor Modal Enhanced** - Complete 2-column layout with interactive media previews
-  - Replaced Enhanced Caption Field with simple textarea to fix duplicate text overlay
-  - Created optimized 2-column flex layout: 35% media preview, 65% scheduling controls
-  - Enhanced caption field height to 380px for more writing space
-  - Interactive media upload: empty thumbnail area serves as upload button with hover effects
-  - Smart upload controls: small upload icon appears on photos (not videos) for additional uploads
-  - Removed redundant bottom upload button for cleaner interface
-  - Left column: Media preview with Instagram square (192x192) for photos and Facebook Reel (160x256) for videos
-  - Right column: Expanded scheduling controls with date/time pickers, status selector, and action buttons
-  - Removed platform count display, showing only platform icons in selection trigger
-  - Fixed scheduling date/time state management and form submission
-  - Maintained separate mobile and desktop layouts without affecting mobile view
-
-✓ **Theme System Removal Complete** - Removed complex theme customization to fix text display issues
-  - Simplified to single, consistent light theme design
-  - Removed theme provider, customizer, and picker components
-  - Fixed localStorage character encoding errors
-  - Cleaned up all dark mode and custom color references
-
-✓ **Multi-Brand Management System Complete** - Full workspace isolation implemented
-  - Brand switcher component with dropdown interface in sidebar
-  - Brand creation modal with form validation and error handling
-  - Zustand state management for persistent brand selection
-  - Complete data filtering by selected brand across all components
-  - Separate workspaces for posts, calendar, analytics per brand
-
-✓ **Mobile-First Enhancement Complete** - Comprehensive mobile optimizations implemented
-  - Touch-optimized calendar with swipe gestures for month navigation
-  - Minimum 44px touch targets for all interactive elements
-  - Mobile floating action buttons for quick post creation
-  - Enhanced CSS for smooth touch interactions and feedback
-  - PWA manifest configuration for app-like installation
-  - Safe area support for mobile devices with notches/rounded corners
-  - Mobile keyboard awareness with env(keyboard-inset-height) support
-  - Responsive Note page that adapts to mobile screen sizes (max 90vw)
-  - Rich text editor tooltips with z-index 120 to appear above modal layers
-
-✓ **Database Integration Active** - PostgreSQL with sample data populated
-  - Drizzle ORM with type-safe queries operational
-  - Sample brands, users, and posts loaded for demonstration
-  - Real-time data display in calendar and dashboard components
-
-✓ **AI Features Operational** - OpenAI integration fully functional
-  - Content generation and optimization working
-  - Hashtag suggestions and engagement optimization available
-  - Posting time recommendations active
+CueWise is a web-based social media management platform that enables users to create, schedule, and manage social media posts across multiple platforms (Instagram, Facebook, TikTok, Twitter). It features AI-powered content creation and analytics, collaborative approval workflows, and comprehensive analytics. The platform aims to provide a professional desktop experience while maintaining a robust mobile design, offering a sophisticated solution for social media content management.
 
 ## User Preferences
 
@@ -156,10 +12,11 @@ Theme preferences: Remove theme/color customization options - causes text displa
 ### Frontend Architecture
 - **Framework**: React with TypeScript using Vite as the build tool
 - **UI Library**: Shadcn/ui components with Radix UI primitives
-- **Styling**: Tailwind CSS with CSS variables for theming
+- **Styling**: Tailwind CSS with CSS variables
 - **Routing**: Wouter for client-side routing
 - **State Management**: TanStack Query (React Query) for server state
-- **Mobile-First Design**: Progressive Web App (PWA) with responsive design
+- **Design Principles**: Mobile-First Progressive Web App (PWA) with responsive design, including a sophisticated desktop layout with a fixed-width sidebar, card-based dashboard, and enhanced navigation.
+- **UI/UX Decisions**: Rebranding to CueWise, dynamic brand logo display, enhanced media upload loading effects with spinners and placeholders, immediate UI updates for media detachment, comprehensive video thumbnail display across all components, and a two-column desktop post editor modal with interactive media previews. Simplified to a single, consistent light theme.
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js server
@@ -173,67 +30,23 @@ Theme preferences: Remove theme/color customization options - causes text displa
 - **Schema**: Shared TypeScript schema definitions using Drizzle and Zod
 - **Migrations**: Drizzle Kit for database migrations
 
-## Key Components
-
-### Core Domain Models
-- **Users**: Role-based (creator, editor, approver, admin) with authentication
-- **Brands**: Multi-brand support with visual identity management
-- **Posts**: Content with multi-platform publishing and status tracking
-- **Approvals**: Collaborative workflow with comments and status updates
-- **Analytics**: Performance tracking across platforms
-- **Platforms**: Social media platform integrations and credentials
-
-### Authentication & Authorization
-- **Role-Based Access**: Four user roles with different permissions
-- **Session Management**: Express sessions with PostgreSQL storage
-- **Route Protection**: API endpoints protected by role-based middleware
-
-### AI Integration
-- **Content Generation**: OpenAI GPT-4o for caption generation
-- **Hashtag Suggestions**: AI-powered hashtag recommendations
-- **Content Optimization**: Engagement optimization suggestions
-- **Posting Time Optimization**: AI-suggested optimal posting times
-
-### PWA Features
-- **Service Worker**: Offline functionality with caching strategies
-- **App Manifest**: Native app-like installation and experience
-- **Mobile Navigation**: Touch-optimized interface with bottom navigation
-- **Responsive Design**: Adaptive layout for mobile and desktop
-
-## Data Flow
-
-### Content Creation Flow
-1. User creates post draft with content and media
-2. AI suggestions for captions, hashtags, and timing
-3. Multi-platform content adaptation and preview
-4. Save as draft or submit for approval
-
-### Approval Workflow
-1. Post submitted for approval by creator
-2. Approvers receive notifications
-3. Comment threads for feedback and revisions
-4. Approve/reject with status updates
-5. Approved posts ready for scheduling
-
-### Publishing Flow
-1. Schedule posts with optimal timing suggestions
-2. Platform-specific API integration for publishing
-3. Real-time status updates and notifications
-4. Analytics collection post-publication
-
-### Analytics Pipeline
-1. Data collection from platform APIs
-2. Aggregation and calculation of metrics
-3. Dashboard visualization with charts
-4. Export functionality for reporting
+### Key Features and Implementations
+- **Core Domain Models**: Users (role-based), Brands (multi-brand support), Posts (multi-platform), Approvals (collaborative workflow), Analytics, and Platforms.
+- **Authentication & Authorization**: Simplified demo authentication (Replit Auth removed for easier deployment).
+- **AI Integration**: OpenAI GPT-4o for content generation, hashtag suggestions, content optimization, and posting time recommendations.
+- **PWA Features**: Service Worker for offline functionality, App Manifest for native-like installation, touch-optimized mobile navigation, and responsive design.
+- **Multi-Brand Management**: Brand switcher component, brand creation modal, and Zustand for persistent brand selection and data filtering by selected brand across components.
+- **Performance Optimization**: Database query optimization, React component memoization, calendar performance enhancements, real-time cache management, database indexing, and media loading optimization.
+- **Date & Time Handling**: Critical timezone fixes, calendar date range issue resolution, and proper handling of scheduled times to match user input.
+- **Media Management**: Robust multi-media file upload system supporting various formats (video, audio, extended image formats) with increased file size limits, and native mobile media player integration.
 
 ## External Dependencies
 
 ### Core Infrastructure
 - **Database**: Neon PostgreSQL serverless database
-- **AI Services**: OpenAI API for content generation
-- **Build Tools**: Vite for development and bundling
-- **WebSocket**: For real-time notifications (via Neon)
+- **AI Services**: OpenAI API
+- **Build Tools**: Vite
+- **WebSocket**: (via Neon)
 
 ### Social Media Platforms
 - **Meta Business Suite API**: Instagram and Facebook publishing
@@ -246,31 +59,3 @@ Theme preferences: Remove theme/color customization options - causes text displa
 - **Radix UI**: Unstyled component primitives
 - **Tailwind CSS**: Utility-first styling framework
 - **Lucide React**: Icon library
-
-## Deployment Strategy
-
-### Development Environment
-- **Replit Integration**: Native Replit development support
-- **Hot Module Replacement**: Vite HMR for fast development
-- **TypeScript Checking**: Real-time type validation
-- **Environment Variables**: Secure credential management
-
-### Production Build
-- **Client Build**: Vite production build with optimization
-- **Server Build**: ESBuild for Node.js bundle creation
-- **Static Assets**: Optimized and cached public assets
-- **Service Worker**: Cached for offline functionality
-
-### Database Management
-- **Schema Synchronization**: Drizzle Kit push for development
-- **Migration Strategy**: Version-controlled schema changes
-- **Connection Pooling**: Neon serverless connection management
-- **Backup Strategy**: Automated PostgreSQL backups
-
-### Performance Optimization
-- **Code Splitting**: Route-based and component-based splitting
-- **Image Optimization**: Unsplash integration with optimized sizing
-- **Caching Strategy**: Service worker with cache-first/network-first patterns
-- **Bundle Analysis**: Tree shaking and dead code elimination
-
-The application follows a modern full-stack architecture with emphasis on developer experience, type safety, and mobile-first design principles.

@@ -7,7 +7,7 @@ import { db } from "./db";
 import { eq, and, gte, lte, desc, sql, or, isNull, isNotNull } from "drizzle-orm";
 
 export interface IStorage {
-  // Users (Required for Replit Auth)
+  // Users (Simplified - no auth required)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
 
@@ -53,7 +53,7 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
-  // Users (Required for Replit Auth)
+  // Users (Simplified - no auth required)
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
@@ -85,7 +85,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createBrand(brand: InsertBrand): Promise<Brand> {
-    const [newBrand] = await db.insert(brands).values([brand]).returning();
+    const [newBrand] = await db.insert(brands).values(brand).returning();
     return newBrand;
   }
 
@@ -110,7 +110,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPost(post: InsertPost): Promise<Post> {
-    const [newPost] = await db.insert(posts).values([post]).returning();
+    const [newPost] = await db.insert(posts).values(post).returning();
     return newPost;
   }
 
@@ -180,12 +180,12 @@ export class DatabaseStorage implements IStorage {
       )
     );
     
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const finalQuery = conditions.length > 0 
+      ? query.where(and(...conditions))
+      : query;
     
     // Order by scheduled date for better calendar performance
-    const result = await query
+    const result = await finalQuery
       .orderBy(desc(posts.scheduledAt), desc(posts.createdAt));
     
     // Final client-side filtering for exact date matching (minimal processing)

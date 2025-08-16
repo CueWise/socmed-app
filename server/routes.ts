@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { optimizedStorage } from "./services/optimizedStorage";
 import { optimizedAI } from "./services/aiThrottler";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+
 import { 
   compressionMiddleware, 
   securityMiddleware, 
@@ -64,7 +64,7 @@ const storage_multer = multer.diskStorage({
         'audio/ogg': '.ogg',
         'audio/m4a': '.m4a'
       };
-      extension = mimeToExt[file.mimetype] || '.bin';
+      extension = (mimeToExt as any)[file.mimetype] || '.bin';
     }
     
     cb(null, file.fieldname + '-' + uniqueSuffix + extension);
@@ -104,23 +104,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(performanceMiddleware);
   app.use(timeoutMiddleware(30000)); // 30 second timeout
   
-  // Setup authentication middleware
-  await setupAuth(app);
-
   // Warm up cache on startup
   optimizedStorage.warmCache().catch(console.error);
-
-  // Auth routes with rate limiting
-  app.get('/api/auth/user', rateLimiters.auth.middleware(), isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await optimizedStorage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
   
   // Helper function to detect file type from MIME type
   function getFileType(mimetype: string): string {
@@ -217,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           url && !url.startsWith('blob:') && !url.includes('upload_session_')
         ),
         mediaTypes: req.body.mediaTypes || [],
-        createdBy: "44931045" // Use authenticated user ID - will need to implement proper auth context
+        createdBy: "system" // Default user since auth is removed
       };
       
       const validatedData = insertPostSchema.parse(processedBody);
