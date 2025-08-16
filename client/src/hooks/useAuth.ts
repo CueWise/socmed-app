@@ -1,14 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-
+// Auth removed - simplified mock auth for demo purposes
 export function useAuth() {
-  const { data: user, isLoading } = useQuery({
-    queryKey: ["/api/auth/user"],
-    retry: false,
-  });
-
   return {
-    user,
-    isLoading,
-    isAuthenticated: !!user,
+    user: { id: "system", name: "Demo User", email: "demo@cuewise.app" },
+    isLoading: false,
+    isAuthenticated: true,
   };
 }
